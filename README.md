@@ -1,2 +1,2 @@
 # Cockroach
-A game engine for 2D platformers
+A game engine for 2D platformers.
