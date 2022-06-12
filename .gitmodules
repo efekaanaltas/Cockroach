@@ -1,0 +1,12 @@
+[submodule "Cockroach/vendor/spdlog"]
+	path = Cockroach/vendor/spdlog
+	url = https://github.com/gabime/spdlog
+[submodule "Cockroach/vendor/GLFW"]
+	path = Cockroach/vendor/GLFW
+	url = https://github.com/efekaanaltas/glfw
+[submodule "Cockroach/vendor/imgui"]
+	path = Cockroach/vendor/imgui
+	url = https://github.com/efekaanaltas/imgui
+[submodule "Cockroach/vendor/glm"]
+	path = Cockroach/vendor/glm
+	url = https://github.com/g-truc/glm
