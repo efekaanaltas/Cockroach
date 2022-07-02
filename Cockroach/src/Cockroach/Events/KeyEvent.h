@@ -4,7 +4,7 @@
 
 namespace Cockroach
 {
-	class COCKROACH_API KeyEvent : public Event
+	class KeyEvent : public Event
 	{
 	public:
 		inline int GetKeyCode() const { return m_KeyCode; }
@@ -17,7 +17,7 @@ namespace Cockroach
 		int m_KeyCode;
 	};
 
-	class COCKROACH_API KeyPressedEvent : public KeyEvent
+	class KeyPressedEvent : public KeyEvent
 	{
 	public:
 		KeyPressedEvent(int keycode, int repeatCount)
@@ -37,7 +37,7 @@ namespace Cockroach
 		int m_RepeatCount;
 	};
 
-	class COCKROACH_API KeyReleasedEvent : public KeyEvent
+	class KeyReleasedEvent : public KeyEvent
 	{
 	public:
 		KeyReleasedEvent(int keycode)
@@ -53,7 +53,7 @@ namespace Cockroach
 		EVENT_CLASS_TYPE(KeyReleased)
 	};
 
-	class COCKROACH_API KeyTypedEvent : public KeyEvent
+	class KeyTypedEvent : public KeyEvent
 	{
 	public:
 		KeyTypedEvent(int keycode)

@@ -2,16 +2,34 @@
 
 // For use by Cockroach applications
 
-#include "Cockroach/Application.h"
-#include "Cockroach/Layer.h"
-#include "Cockroach/Log.h"
+#include "Cockroach/Core/Application.h"
+#include "Cockroach/Core/Log.h"
 
-#include "Cockroach/Input.h"
-#include "Cockroach/KeyCodes.h"
-#include "Cockroach/MouseButtonCodes.h"
+#include "Cockroach/Core/Input.h"
+#include "Cockroach/Core/KeyCodes.h"
+#include "Cockroach/Core/MouseButtonCodes.h"
+#include "Cockroach/CameraController.h"
 
-#include "Cockroach/ImGui/ImGuiLayer.h"
+// ---Renderer-----------------------------
+#include "Cockroach/Renderer/Renderer.h"
 
-// ---Entry Point--------------------------
-#include "Cockroach/EntryPoint.h"
+#include "Cockroach/Renderer/Buffer.h"
+#include "Cockroach/Renderer/Shader.h"
+#include "Cockroach/Renderer/Texture.h"
+#include "Cockroach/Renderer/VertexArray.h"
+
+#include "Cockroach/Renderer/Camera.h"
+// ----------------------------------------
+
+// ---Events-------------------------------
+#include "Cockroach/Events/Event.h"
+#include "Cockroach/Events/MouseEvent.h"
+#include "Cockroach/Events/KeyEvent.h"
+#include "Cockroach/Events/ApplicationEvent.h"
+// ----------------------------------------
+
+// ---Game---------------------------------
+#include "Cockroach/Game/Scene.h"
+#include "Cockroach/Game/Entity.h"
+#include "Cockroach/Game/Component.h"
 // ----------------------------------------

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Cockroach/Core.h" 
+#include "Cockroach/Core/Core.h" 
 
 #include <string>
 #include <functional>
@@ -10,7 +10,7 @@ namespace Cockroach
 	enum class EventType
 	{
 		None = 0,
-		WindowClose, WindowResize, WindowFOcus, WindowLostFocus, WindowMoved,
+		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
 		AppTick, AppUpdate, AppRender,
 		KeyPressed, KeyReleased, KeyTyped,
 		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled
@@ -32,7 +32,7 @@ namespace Cockroach
 
 #define EVENT_CLASS_CATEGORY(category) virtual int GetCategoryFlags() const override { return category; }
 
-	class COCKROACH_API Event
+	class Event
 	{
 	public:
 		bool Handled = false;
@@ -57,12 +57,12 @@ namespace Cockroach
 		{
 		}
 
-		template<typename T>
-		bool Dispatch(EventFn<T> func)
+		template<typename T, typename F>
+		bool Dispatch(const F& func)
 		{
 			if (m_Event.GetEventType() == T::GetStaticType())
 			{
-				m_Event.Handled = func(*(T*)&m_Event);
+				m_Event.Handled |= func(static_cast<T&>(m_Event));
 				return true;
 			}
 			return false;

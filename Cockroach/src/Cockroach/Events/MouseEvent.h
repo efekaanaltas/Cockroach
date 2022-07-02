@@ -4,7 +4,7 @@
 
 namespace Cockroach
 {
-	class COCKROACH_API MouseMovedEvent : public Event
+	class MouseMovedEvent : public Event
 	{
 	public:
 		MouseMovedEvent(float x, float y)
@@ -26,10 +26,10 @@ namespace Cockroach
 		float m_MouseX, m_MouseY;
 	};
 
-	class COCKROACH_API MouseScrolledEvent : public Event
+	class MouseScrollEvent : public Event
 	{
 	public:
-		MouseScrolledEvent(float xOffset, float yOffset)
+		MouseScrollEvent(float xOffset, float yOffset)
 			: m_XOffset(xOffset), m_YOffset(yOffset) {}
 
 		inline float GetXOffset() const { return m_XOffset; }
@@ -48,7 +48,7 @@ namespace Cockroach
 		float m_XOffset, m_YOffset;
 	};
 
-	class COCKROACH_API MouseButtonEvent : public Event
+	class MouseButtonEvent : public Event
 	{
 	public:
 		inline int GetMouseButton() const { return m_Button; }
@@ -61,7 +61,7 @@ namespace Cockroach
 		int m_Button;
 	};
 
-	class COCKROACH_API MouseButtonPressedEvent : public MouseButtonEvent
+	class MouseButtonPressedEvent : public MouseButtonEvent
 	{
 	public:
 		MouseButtonPressedEvent(int button)
@@ -77,7 +77,7 @@ namespace Cockroach
 		EVENT_CLASS_TYPE(MouseButtonPressed)
 	};
 
-	class COCKROACH_API MouseButtonReleasedEvent : public MouseButtonEvent
+	class MouseButtonReleasedEvent : public MouseButtonEvent
 	{
 	public:
 		MouseButtonReleasedEvent(int button)

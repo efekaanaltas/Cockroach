@@ -2,22 +2,20 @@
 #include "ImGuiLayer.h"
 
 #include "imgui.h"
-
-#define IMGUI_IMPL_API
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 
-#include "Cockroach/Application.h"
+#include "Cockroach/Core/Application.h"
 
 // TEMPORARY
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
-#include "Platform/Windows/WindowsWindow.h"
 
 namespace Cockroach
 {
+	bool imguiInitialized = false;
+
 	ImGuiLayer::ImGuiLayer()
-		: Layer("ImGuiLayer")
 	{
 	}
 
@@ -50,11 +48,15 @@ namespace Cockroach
 		}
 
 		Application& app = Application::Get();
-		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GetNativeWindow());
+		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GLFWWindow);
 
 		// Setup Platform/Renderer bindings
-		ImGui_ImplGlfw_InitForOpenGL(window, true);
-		ImGui_ImplOpenGL3_Init("#version 410");
+		if (!imguiInitialized)
+		{
+			ImGui_ImplGlfw_InitForOpenGL(window, true);
+			ImGui_ImplOpenGL3_Init("#version 410");
+			imguiInitialized = true;
+		}
 	}
 
 	void ImGuiLayer::OnDetach()
@@ -62,12 +64,6 @@ namespace Cockroach
 		ImGui_ImplOpenGL3_Shutdown();
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
-	}
-
-	void ImGuiLayer::OnImGuiRender()
-	{
-		static bool show = true;
-		ImGui::ShowDemoWindow(&show);
 	}
 
 	void ImGuiLayer::Begin()
@@ -81,7 +77,7 @@ namespace Cockroach
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		Application& app = Application::Get();
-		io.DisplaySize = ImVec2(app.GetWindow().GetWidth(), app.GetWindow().GetHeight());
+		io.DisplaySize = ImVec2((float)app.GetWindow().Width(), (float)app.GetWindow().Height());
 
 		// Rendering
 		ImGui::Render();
