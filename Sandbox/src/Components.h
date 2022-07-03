@@ -35,10 +35,10 @@ public:
 	virtual void Update(float dt) override;
 
 	float xRemainder = 0.0f, yRemainder = 0.0f;
-	float gravity = 100.0f;
+	float gravity = 200.0f;
 	glm::vec2 velocity = { 0.0f, 0.0f };
 
-	void MoveX(float amount);
-	void MoveY(float amount);
+	int32_t MoveX(float amount);
+	int32_t MoveY(float amount);
 	Hitbox* GetCollidingHitbox(int xForesense, int yForesense);
 };

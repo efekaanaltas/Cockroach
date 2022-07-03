@@ -8,9 +8,10 @@
   <ItemGroup>
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\Components.h" />
+    <ClInclude Include="src\Entities.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\shaders\Line.glsl" />
     <None Include="assets\shaders\Texture.glsl" />
+    <None Include="assets\shaders\Line.glsl" />
   </ItemGroup>
 </Project>

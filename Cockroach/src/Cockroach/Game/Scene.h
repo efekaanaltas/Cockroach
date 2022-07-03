@@ -6,15 +6,15 @@
 
 namespace Cockroach
 {
-	enum EntityType
-	{
-		Player, Tile, SpikeRight, SpikeUp, SpikeLeft, SpikeDown, MovingPlatform
-	};
-
 	class Scene
 	{
 	public:
+		static const uint32_t MAX_TEXTURES = 32;
+
 		static Scene* current;
+
+		uint32_t nextEmptyTextureSlot = 0;
+		Ref<Texture2D> sceneTextures[MAX_TEXTURES];
 
 		Scene();
 
@@ -24,6 +24,8 @@ namespace Cockroach
 		void Render();
 
 		void Load();
+
+		Ref<SubTexture2D> GetSubTexture(const std::string& filepath, const glm::vec2& coords, const glm::vec2& spriteSize);
 
 		Ref<Entity> AddEntity(const glm::ivec2 position);
 	};

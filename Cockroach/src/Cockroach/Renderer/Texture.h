@@ -35,9 +35,8 @@ namespace Cockroach
 			return m_RendererID == ((Texture2D&)other).m_RendererID;
 		}
 
-	public:
+		std::string path;
 	private:
-		std::string m_Path;
 		uint32_t m_Width, m_Height;
 		uint32_t m_RendererID;
 

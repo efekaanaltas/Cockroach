@@ -51,18 +51,21 @@ void ::Player::Update(float dt)
 	velocity.x = std::signbit(velocity.x) ? std::max(velocity.x, -50.0f) : std::min(velocity.x, 50.0f);
 
 	MoveX(velocity.x * dt);
-	MoveY(velocity.y * dt);
+	int32_t verticalCollisionDirection = MoveY(velocity.y * dt);
+
+	if (verticalCollisionDirection == -1) 
+		velocity.y = 0;
 }
 
-void Player::MoveX(float amount)
+int32_t Player::MoveX(float amount)
 {
 	xRemainder += amount;
-	int move = (int)xRemainder;
+	int32_t move = (int)xRemainder;
 
 	if (move != 0)
 	{
 		xRemainder -= move;
-		int sign = move > 0 ? 1 : -1;
+		int32_t sign = move > 0 ? 1 : -1;
 
 		while (move != 0)
 		{
@@ -72,20 +75,21 @@ void Player::MoveX(float amount)
 				entity->position.x += sign;
 				move -= sign;
 			}
-			else break;
+			else return sign;
 		}
 	}
+	return 0;
 }
 
-void Player::MoveY(float amount)
+int32_t Player::MoveY(float amount)
 {
 	yRemainder += amount;
-	int move = (int)yRemainder;
+	int32_t move = (int)yRemainder;
 
 	if (move != 0)
 	{
 		yRemainder -= move;
-		int sign = move > 0 ? 1 : -1;
+		int32_t sign = move > 0 ? 1 : -1;
 
 		while (move != 0)
 		{
@@ -95,9 +99,10 @@ void Player::MoveY(float amount)
 				entity->position.y += sign;
 				move -= sign;
 			}
-			else break;
+			else return sign;
 		}
 	}
+	return 0;
 }
 
 Hitbox* Player::GetCollidingHitbox(int xForesense, int yForesense)
