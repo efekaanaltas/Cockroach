@@ -11,6 +11,6 @@ namespace Cockroach
 	public:
 		Component() {};
 		Entity* entity = nullptr;
-		virtual void Update(float dt) = 0;
+		virtual void Update(float dt) {};
 	};
 }

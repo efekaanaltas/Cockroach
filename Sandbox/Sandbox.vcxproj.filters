@@ -2,13 +2,12 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="src\SandboxApp.cpp" />
-    <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\Components.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\Components.h" />
     <ClInclude Include="src\Entities.h" />
+    <ClInclude Include="src\State.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\shaders\Texture.glsl" />

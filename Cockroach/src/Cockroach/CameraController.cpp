@@ -2,7 +2,6 @@
 #include "CameraController.h"
 
 #include "Cockroach/Core/Input.h"
-#include "Cockroach/Core/KeyCodes.h"
 
 namespace Cockroach
 {
@@ -15,13 +14,13 @@ namespace Cockroach
 
 	void CameraController::OnUpdate(float dt)
 	{
-		if (Input::IsKeyPressed(CR_KEY_A))
+		if (Input::IsPressed(CR_KEY_A))
 			m_CameraPosition.x -= m_Speed * dt;
-		if (Input::IsKeyPressed(CR_KEY_D))
+		if (Input::IsPressed(CR_KEY_D))
 			m_CameraPosition.x += m_Speed * dt;
-		if (Input::IsKeyPressed(CR_KEY_S))
+		if (Input::IsPressed(CR_KEY_S))
 			m_CameraPosition.y -= m_Speed * dt;
-		if (Input::IsKeyPressed(CR_KEY_W))
+		if (Input::IsPressed(CR_KEY_W))
 			m_CameraPosition.y += m_Speed * dt;
 
 		camera.SetPosition(m_CameraPosition);

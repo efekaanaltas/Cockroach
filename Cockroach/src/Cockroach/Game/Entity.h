@@ -17,6 +17,8 @@ namespace Cockroach
 		Entity();
 		Entity(const glm::ivec2& position);
 
+		int32_t ID = -1;
+
 		std::vector<Ref<Component>> components = std::vector<Ref<Component>>();
 		glm::ivec2 position;
 		Ref<SubTexture2D> sprite;

@@ -66,13 +66,7 @@
     <ClInclude Include="src\Cockroach\Core\Input.h">
       <Filter>src\Cockroach\Core</Filter>
     </ClInclude>
-    <ClInclude Include="src\Cockroach\Core\KeyCodes.h">
-      <Filter>src\Cockroach\Core</Filter>
-    </ClInclude>
     <ClInclude Include="src\Cockroach\Core\Log.h">
-      <Filter>src\Cockroach\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Cockroach\Core\MouseButtonCodes.h">
       <Filter>src\Cockroach\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Cockroach\Core\Window.h">
@@ -1390,9 +1384,6 @@
     </ClCompile>
     <ClCompile Include="src\Cockroach\Core\Window.cpp">
       <Filter>src\Cockroach\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Cockroach\Game\Component.cpp">
-      <Filter>src\Cockroach\Game</Filter>
     </ClCompile>
     <ClCompile Include="src\Cockroach\Game\Entity.cpp">
       <Filter>src\Cockroach\Game</Filter>

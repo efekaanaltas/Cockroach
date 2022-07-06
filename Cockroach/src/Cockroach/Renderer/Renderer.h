@@ -21,20 +21,20 @@ namespace Cockroach
 		static void BeginScene(Camera& camera);
 		static void EndScene();
 
-		static void SetClearColor(const glm::vec4& color);
+		static void SetClearColor(const float4& color);
 		static void Clear();
 
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec2& min, const glm::vec2& max);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture);
-		static void DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<SubTexture2D>& subTexture);
+		static void DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture, const float2& min, const float2& max);
+		static void DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture);
+		static void DrawQuad(const float3& position, const float2& size, const Ref<SubTexture2D>& subTexture);
 		
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec2& min, const glm::vec2& max);
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture);
-		static void DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<SubTexture2D>& subTexture);
+		static void DrawQuad(const float2& position, const float2& size, const Ref<Texture2D>& texture, const float2& min, const float2& max);
+		static void DrawQuad(const float2& position, const float2& size, const Ref<Texture2D>& texture);
+		static void DrawQuad(const float2& position, const float2& size, const Ref<SubTexture2D>& subTexture);
 
-		static void DrawLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color);
+		static void DrawLine(const float3& p0, const float3& p1, const float4& color);
 
-		static void Draw(const Ref<Shader> shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform = glm::mat4(1.0f));
+		static void Draw(const Ref<Shader> shader, const Ref<VertexArray>& vertexArray, const mat4& transform = mat4(1.0f));
 
 		// Stats
 		struct Statistics

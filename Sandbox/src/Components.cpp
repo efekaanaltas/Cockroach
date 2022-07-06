@@ -2,7 +2,6 @@
 
 #include "Cockroach.h"
 #include "Components.h"
-#include "Input.h"
 
 using namespace Cockroach;
 
@@ -14,7 +13,6 @@ bool Hitbox::OverlapsWith(Hitbox other, float xForesense, float yForesense)
 	bool y = (Bottom() + yForesense < other.Top()) && (Top() + yForesense > other.Bottom());
 	return x && y;
 }
-
 
 Hitbox::Hitbox()
 {
@@ -32,12 +30,12 @@ void ::Player::Update(float dt)
 {
 	velocity.y -= gravity * dt;
 
-	if (::Input::input->GetKeyDown(CR_KEY_SPACE))
+	if (Input::IsDown(CR_KEY_SPACE))
 		velocity.y = 100;
 
-	if (Cockroach::Input::IsKeyPressed(CR_KEY_LEFT))
+	if (Input::IsPressed(CR_KEY_LEFT))
 		velocity.x -= 1000 * dt;
-	else if (Cockroach::Input::IsKeyPressed(CR_KEY_RIGHT))
+	else if (Input::IsPressed(CR_KEY_RIGHT))
 		velocity.x += 1000 * dt;
 	else
 	{
@@ -51,16 +49,13 @@ void ::Player::Update(float dt)
 	velocity.x = std::signbit(velocity.x) ? std::max(velocity.x, -50.0f) : std::min(velocity.x, 50.0f);
 
 	MoveX(velocity.x * dt);
-	int32_t verticalCollisionDirection = MoveY(velocity.y * dt);
-
-	if (verticalCollisionDirection == -1) 
-		velocity.y = 0;
+	MoveY(velocity.y * dt);
 }
 
-int32_t Player::MoveX(float amount)
+void Player::MoveX(float amount)
 {
 	xRemainder += amount;
-	int32_t move = (int)xRemainder;
+	i32 move = (i32)xRemainder;
 
 	if (move != 0)
 	{
@@ -75,21 +70,24 @@ int32_t Player::MoveX(float amount)
 				entity->position.x += sign;
 				move -= sign;
 			}
-			else return sign;
+			else
+			{
+				velocity.x = 0;
+				break;
+			}
 		}
 	}
-	return 0;
 }
 
-int32_t Player::MoveY(float amount)
+void Player::MoveY(float amount)
 {
 	yRemainder += amount;
-	int32_t move = (int)yRemainder;
+	i32 move = (i32)yRemainder;
 
 	if (move != 0)
 	{
 		yRemainder -= move;
-		int32_t sign = move > 0 ? 1 : -1;
+		i32 sign = move > 0 ? 1 : -1;
 
 		while (move != 0)
 		{
@@ -99,10 +97,13 @@ int32_t Player::MoveY(float amount)
 				entity->position.y += sign;
 				move -= sign;
 			}
-			else return sign;
+			else
+			{
+				velocity.y = 0;
+				break;
+			}
 		}
 	}
-	return 0;
 }
 
 Hitbox* Player::GetCollidingHitbox(int xForesense, int yForesense)
@@ -113,4 +114,11 @@ Hitbox* Player::GetCollidingHitbox(int xForesense, int yForesense)
 			if (playerHitbox->OverlapsWith(*h, xForesense, yForesense))
 				return h;
 	return nullptr;
+}
+
+std::vector<StaticObject*> StaticObject::all = std::vector<StaticObject*>();
+
+StaticObject::StaticObject()
+{
+	StaticObject::all.push_back(this);
 }

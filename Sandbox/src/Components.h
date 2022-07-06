@@ -10,8 +10,6 @@ public:
 	static std::vector<Hitbox*> all;
 
 	Hitbox();
-	~Hitbox() {}
-	virtual void Update(float dt) override {}
 
 	glm::ivec2 min = { 0, 0 };
 	glm::ivec2 max = { 8, 8 };
@@ -27,18 +25,45 @@ public:
 	bool Contains(Hitbox other);
 };
 
+class StaticObject : public Component
+{
+public:
+	static std::vector<StaticObject*> all;
+
+	StaticObject();
+};
+
+class DynamicObject : public Component
+{
+public:
+	static std::vector<DynamicObject*> all;
+
+	DynamicObject();
+
+	DynamicObject* parent = nullptr;
+	std::vector<DynamicObject*> children;
+
+	void Move(float dx, float dy);
+	virtual void OnCollide(DynamicObject* other) = 0;
+};
+
 class Player : public Component
 {
 public:
 	Player() {}
-	~Player() {}
 	virtual void Update(float dt) override;
 
 	float xRemainder = 0.0f, yRemainder = 0.0f;
 	float gravity = 200.0f;
-	glm::vec2 velocity = { 0.0f, 0.0f };
+	float2 velocity = { 0.0f, 0.0f };
 
-	int32_t MoveX(float amount);
-	int32_t MoveY(float amount);
+	void MoveX(float amount);
+	void MoveY(float amount);
 	Hitbox* GetCollidingHitbox(int xForesense, int yForesense);
+};
+
+class Hazard : public DynamicObject
+{
+public:
+	Hazard() {}
 };

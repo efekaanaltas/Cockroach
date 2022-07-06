@@ -146,9 +146,7 @@
     <ClInclude Include="src\Cockroach\Core\Core.h" />
     <ClInclude Include="src\Cockroach\Core\EntryPoint.h" />
     <ClInclude Include="src\Cockroach\Core\Input.h" />
-    <ClInclude Include="src\Cockroach\Core\KeyCodes.h" />
     <ClInclude Include="src\Cockroach\Core\Log.h" />
-    <ClInclude Include="src\Cockroach\Core\MouseButtonCodes.h" />
     <ClInclude Include="src\Cockroach\Core\Window.h" />
     <ClInclude Include="src\Cockroach\Events\ApplicationEvent.h" />
     <ClInclude Include="src\Cockroach\Events\Event.h" />
@@ -589,7 +587,6 @@
     <ClCompile Include="src\Cockroach\Core\Input.cpp" />
     <ClCompile Include="src\Cockroach\Core\Log.cpp" />
     <ClCompile Include="src\Cockroach\Core\Window.cpp" />
-    <ClCompile Include="src\Cockroach\Game\Component.cpp" />
     <ClCompile Include="src\Cockroach\Game\Entity.cpp" />
     <ClCompile Include="src\Cockroach\Game\Scene.cpp" />
     <ClCompile Include="src\Cockroach\ImGui\ImGuiBuild.cpp" />

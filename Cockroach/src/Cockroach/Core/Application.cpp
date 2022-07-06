@@ -48,6 +48,18 @@ namespace Cockroach
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResize));
+		
+		if (e.GetEventType() == EventType::KeyPressed)
+			Input::stateMap[dynamic_cast<KeyPressedEvent&>(e).GetKeyCode()].pressed = true;
+		if (e.GetEventType() == EventType::KeyReleased)
+			Input::stateMap[dynamic_cast<KeyReleasedEvent&>(e).GetKeyCode()].pressed = false;
+		if (e.GetEventType() == EventType::MouseButtonPressed)
+			Input::stateMap[dynamic_cast<MouseButtonPressedEvent&>(e).GetMouseButton()].pressed = true;
+		if (e.GetEventType() == EventType::MouseButtonReleased)
+			Input::stateMap[dynamic_cast<MouseButtonReleasedEvent&>(e).GetMouseButton()].pressed = false;
+		if (e.GetEventType() == EventType::MouseScrolled)
+			Input::scroll = dynamic_cast<MouseScrollEvent&>(e).GetYOffset();
+
 		CR_CORE_TRACE("{0}", e);
 
 		OnEvent(e);
@@ -65,6 +77,7 @@ namespace Cockroach
 			{
 				Update(dt);
 				Render();
+				Input::Update();
 			}
 
 			m_Window->OnUpdate();

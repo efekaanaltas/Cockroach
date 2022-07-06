@@ -25,7 +25,7 @@ namespace Cockroach
 
 		void Load();
 
-		Ref<SubTexture2D> GetSubTexture(const std::string& filepath, const glm::vec2& coords, const glm::vec2& spriteSize);
+		Ref<SubTexture2D> GetSubTexture(const std::string& filepath, const float2& coords, const float2& spriteSize);
 
 		Ref<Entity> AddEntity(const glm::ivec2 position);
 	};

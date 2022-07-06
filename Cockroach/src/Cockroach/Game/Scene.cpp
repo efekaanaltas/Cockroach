@@ -26,7 +26,7 @@ namespace Cockroach
 		current = this;
 	}
 
-	Ref<SubTexture2D> Scene::GetSubTexture(const std::string& filepath, const glm::vec2& coords, const glm::vec2& spriteSize)
+	Ref<SubTexture2D> Scene::GetSubTexture(const std::string& filepath, const float2& coords, const float2& spriteSize)
 	{
 		for (uint32_t i = 0; i < nextEmptyTextureSlot; i++)
 			if (filepath == sceneTextures[i].get()->path)

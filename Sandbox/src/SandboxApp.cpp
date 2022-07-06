@@ -6,7 +6,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Input.h"
 #include "Components.h"
 #include "Entities.h"
 
@@ -38,16 +37,15 @@ public:
 	{
 		m_CameraController.OnUpdate(dt);
 		m_Scene->Update(dt);
-		::Input::input->Update();
 	}
 
-	glm::vec2 EntityPlacePosition()
+	float2 EntityPlacePosition()
 	{
-		glm::ivec2 mousePos = { (int)Cockroach::Input::GetMouseX(), (int)Cockroach::Input::GetMouseY() };
-		glm::vec2 worldPos = m_CameraController.camera.ScreenToWorldCoord(mousePos);
-		glm::vec2 worldCoord = m_CameraController.camera.ScreenToWorldCoord(mousePos);
-		glm::vec2 entityCenteredCoord = { worldCoord.x, worldCoord.y};
-		return glm::vec2((int)entityCenteredCoord.x/8 * 8, (int)entityCenteredCoord.y/8 * 8);
+		int2 mousePos = { (int)Cockroach::Input::GetMouseX(), (int)Cockroach::Input::GetMouseY() };
+		float2 worldPos = m_CameraController.camera.ScreenToWorldCoord(mousePos);
+		float2 worldCoord = m_CameraController.camera.ScreenToWorldCoord(mousePos);
+		float2 entityCenteredCoord = { worldCoord.x, worldCoord.y};
+		return float2((int)entityCenteredCoord.x/8 * 8, (int)entityCenteredCoord.y/8 * 8);
 	}
 
 	virtual void Render() override
@@ -79,7 +77,6 @@ public:
 	virtual void OnEvent(Cockroach::Event& e) override
 	{
 		m_CameraController.OnEvent(e);
-		::Input::input->OnEvent(e);
 		Cockroach::EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<Cockroach::MouseButtonPressedEvent>(CR_BIND_EVENT_FN(Sandbox::OnMouseButtonPressed));
 	}
@@ -87,9 +84,9 @@ public:
 	bool OnMouseButtonPressed(Cockroach::MouseButtonPressedEvent& e)
 	{
 		if (e.GetMouseButton() == CR_MOUSE_BUTTON_LEFT)
-			Entities::Cockroach(EntityPlacePosition());
+			Entities::CreateEntity(EntityPlacePosition(), Entities::EntityType::Cockroach);
 		if (e.GetMouseButton() == CR_MOUSE_BUTTON_RIGHT)
-			Entities::Tile(EntityPlacePosition());
+			Entities::CreateEntity(EntityPlacePosition(), Entities::EntityType::Tile);
 
 		return false;
 	}
@@ -134,7 +131,7 @@ public:
 	
 private:
 	Cockroach::CameraController m_CameraController;
-	glm::vec3 m_Transform;
+	float3 m_Transform;
 	Cockroach::Ref<Cockroach::Texture2D> m_Texture;
 	Cockroach::Ref<Cockroach::SubTexture2D> cursorSprite;
 	Cockroach::Ref<Cockroach::Scene> m_Scene;

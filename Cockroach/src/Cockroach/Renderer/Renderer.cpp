@@ -9,15 +9,15 @@ namespace Cockroach
 {
 	struct QuadVertex
 	{
-		glm::vec3 Position;
-		glm::vec2 TexCoord;
+		float3 Position;
+		float2 TexCoord;
 		float TexIndex;
 	};
 
 	struct LineVertex
 	{
-		glm::vec3 Position;
-		glm::vec4 Color;
+		float3 Position;
+		float4 Color;
 	};
 
 	struct RendererData
@@ -34,7 +34,7 @@ namespace Cockroach
 		QuadVertex* QuadVBBase = nullptr;
 		QuadVertex* QuadVBPtr = nullptr;
 
-		glm::mat4 ViewProjectionMatrix;
+		mat4 ViewProjectionMatrix;
 
 		Ref<VertexArray> LineVA;
 		Ref<VertexBuffer> LineVB;
@@ -132,7 +132,7 @@ namespace Cockroach
 		glViewport(0, 0, width, height);
 	}
 
-	void Renderer::SetClearColor(const glm::vec4& color)
+	void Renderer::SetClearColor(const float4& color)
 	{
 		glClearColor(color.r, color.g, color.b, color.a);
 	}
@@ -147,7 +147,7 @@ namespace Cockroach
 		s_Data.ViewProjectionMatrix = camera.GetViewProjectionMatrix();
 		s_Data.QuadShader->Bind();
 		s_Data.QuadShader->UploadUniformMat4("u_ViewProjection", s_Data.ViewProjectionMatrix);
-		s_Data.QuadShader->UploadUniformMat4("u_Transform", glm::mat4(1.0f));
+		s_Data.QuadShader->UploadUniformMat4("u_Transform", mat4(1.0f));
 
 		s_Data.QuadIndexCount = 0;
 		s_Data.QuadVBPtr = s_Data.QuadVBBase;
@@ -200,7 +200,7 @@ namespace Cockroach
 		s_Data.TextureSlotIndex = 0;
 	}
 
-	void Renderer::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec2& min, const glm::vec2& max)
+	void Renderer::DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture, const float2& min, const float2& max)
 	{
 		if (s_Data.QuadIndexCount >= RendererData::BatchIndexCount)
 			FlushAndReset();
@@ -248,32 +248,32 @@ namespace Cockroach
 		s_Data.Stats.QuadCount++;
 	}
 
-	void Renderer::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<Texture2D>& texture)
+	void Renderer::DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture)
 	{
 		DrawQuad({ position.x, position.y, 0.0f }, size, texture, { 0.0f, 0.0f }, { 1.0f, 1.0f });
 	}
 	
-	void Renderer::DrawQuad(const glm::vec3& position, const glm::vec2& size, const Ref<SubTexture2D>& subTexture)
+	void Renderer::DrawQuad(const float3& position, const float2& size, const Ref<SubTexture2D>& subTexture)
 	{
 		DrawQuad({ position.x, position.y, 0.0f }, size, subTexture->texture, subTexture->min, subTexture->max);
 	}
 	
-	void Renderer::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture, const glm::vec2& min, const glm::vec2& max)
+	void Renderer::DrawQuad(const float2& position, const float2& size, const Ref<Texture2D>& texture, const float2& min, const float2& max)
 	{
 		DrawQuad({ position.x, position.y, 0.0f }, size, texture, min, max);
 	}
 	
-	void Renderer::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<Texture2D>& texture)
+	void Renderer::DrawQuad(const float2& position, const float2& size, const Ref<Texture2D>& texture)
 	{
 		DrawQuad({ position.x, position.y, 0.0f }, size, texture);
 	}
 	
-	void Renderer::DrawQuad(const glm::vec2& position, const glm::vec2& size, const Ref<SubTexture2D>& subTexture)
+	void Renderer::DrawQuad(const float2& position, const float2& size, const Ref<SubTexture2D>& subTexture)
 	{
 		DrawQuad({ position.x, position.y, 0.0f }, size, subTexture);
 	}
 
-	void Renderer::DrawLine(const glm::vec3& p0, const glm::vec3& p1, const glm::vec4& color)
+	void Renderer::DrawLine(const float3& p0, const float3& p1, const float4& color)
 	{
 		s_Data.LineVBPtr->Position = p0;
 		s_Data.LineVBPtr->Color = color;
@@ -286,7 +286,7 @@ namespace Cockroach
 		s_Data.LineVertexCount += 2;
 	}
 
-	void Renderer::Draw(const Ref<Shader> shader, const Ref<VertexArray>& vertexArray, const glm::mat4& transform)
+	void Renderer::Draw(const Ref<Shader> shader, const Ref<VertexArray>& vertexArray, const mat4& transform)
 	{
 		shader->Bind();
 		shader->UploadUniformMat4("u_ViewProjection", s_Data.ViewProjectionMatrix);
