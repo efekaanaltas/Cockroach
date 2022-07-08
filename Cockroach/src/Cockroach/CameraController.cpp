@@ -7,25 +7,25 @@ namespace Cockroach
 {
 		//: m_AspectRatio(aspectRatio), camera(-aspectRatio * m_Zoom, aspectRatio* m_Zoom, -m_Zoom, m_Zoom)
 	CameraController::CameraController(float aspectRatio)
-		: m_Zoom(10.0f), m_AspectRatio(aspectRatio), camera(-aspectRatio * m_Zoom, aspectRatio* m_Zoom, -m_Zoom, m_Zoom)
+		: zoom(10.0f), aspectRatio(aspectRatio), camera(-aspectRatio * zoom, aspectRatio* zoom, -zoom, zoom)
 	{
-		m_AspectRatio = aspectRatio;
+		aspectRatio = aspectRatio;
 	}
 
 	void CameraController::OnUpdate(float dt)
 	{
 		if (Input::IsPressed(CR_KEY_A))
-			m_CameraPosition.x -= m_Speed * dt;
+			position.x -= speed * dt;
 		if (Input::IsPressed(CR_KEY_D))
-			m_CameraPosition.x += m_Speed * dt;
+			position.x += speed * dt;
 		if (Input::IsPressed(CR_KEY_S))
-			m_CameraPosition.y -= m_Speed * dt;
+			position.y -= speed * dt;
 		if (Input::IsPressed(CR_KEY_W))
-			m_CameraPosition.y += m_Speed * dt;
+			position.y += speed * dt;
 
-		camera.SetPosition(m_CameraPosition);
+		camera.SetPosition(position);
 
-		m_Speed = m_Zoom; // Change speed according to zoom level
+		speed = zoom; // Change speed according to zoom level
 	}
 
 	void CameraController::OnEvent(Event& e)
@@ -37,16 +37,16 @@ namespace Cockroach
 
 	bool CameraController::OnMouseScrolled(MouseScrollEvent& e)
 	{
-		m_Zoom -= e.GetYOffset() * 0.1f * m_Zoom;
-		m_Zoom = std::min(std::max(m_Zoom, 5.0f), 100.0f);
-		camera.SetZoom(-m_AspectRatio * m_Zoom, m_AspectRatio * m_Zoom, -m_Zoom, m_Zoom);
+		zoom -= e.GetYOffset() * 0.1f * zoom;
+		zoom = std::min(std::max(zoom, 5.0f), 100.0f);
+		camera.SetZoom(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
 
 		return false;
 	}
 	bool CameraController::OnWindowResized(WindowResizeEvent& e)
 	{
-		m_AspectRatio = (float)e.GetWidth() / (float)e.GetHeight();
-		camera.SetZoom(-m_AspectRatio * m_Zoom, m_AspectRatio * m_Zoom, -m_Zoom, m_Zoom);
+		aspectRatio = (float)e.GetWidth() / (float)e.GetHeight();
+		camera.SetZoom(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
 		return false;
 	}
 }

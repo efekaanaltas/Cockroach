@@ -7,14 +7,14 @@
 namespace Cockroach
 {
 	GraphicsContext::GraphicsContext(GLFWwindow* windowHandle)
-		: m_WindowHandle(windowHandle)
+		: windowHandle(windowHandle)
 	{
 		CR_CORE_ASSERT(windowHandle, "Window handle is null!");
 	}
 
 	void GraphicsContext::Init()
 	{
-		glfwMakeContextCurrent(m_WindowHandle);
+		glfwMakeContextCurrent(windowHandle);
 		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 		CR_CORE_ASSERT(status, "Failed to initilalize Glad!");
 
@@ -27,6 +27,6 @@ namespace Cockroach
 
 	void GraphicsContext::SwapBuffers()
 	{
-		glfwSwapBuffers(m_WindowHandle);
+		glfwSwapBuffers(windowHandle);
 	}
 }

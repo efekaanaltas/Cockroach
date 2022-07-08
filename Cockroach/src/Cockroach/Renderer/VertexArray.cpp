@@ -29,12 +29,12 @@ namespace Cockroach
 
 	VertexArray::VertexArray()
 	{
-		glCreateVertexArrays(1, &m_RendererID);
+		glCreateVertexArrays(1, &rendererID);
 	}
 
 	void VertexArray::Bind() const
 	{
-		glBindVertexArray(m_RendererID);
+		glBindVertexArray(rendererID);
 	}
 
 	void VertexArray::Unbind() const
@@ -46,7 +46,7 @@ namespace Cockroach
 	{
 		CR_CORE_ASSERT(vertexBuffer->layout.elements.size(), "Vertex Buffer has no layout!");
 
-		glBindVertexArray(m_RendererID);
+		glBindVertexArray(rendererID);
 		vertexBuffer->Bind();
 
 		const auto& layout = vertexBuffer->layout;
@@ -64,14 +64,14 @@ namespace Cockroach
 			case ShaderDataType::Int4:
 			case ShaderDataType::Bool:
 			{
-				glEnableVertexAttribArray(m_VertexBufferIndex);
-				glVertexAttribPointer(m_VertexBufferIndex,
+				glEnableVertexAttribArray(vertexBufferIndex);
+				glVertexAttribPointer(vertexBufferIndex,
 					element.GetComponentCount(),
 					ShaderDataTypeToOpenGLBaseType(element.Type),
 					element.Normalized ? GL_TRUE : GL_FALSE,
 					layout.stride,
 					(const void*)element.Offset);
-				m_VertexBufferIndex++;
+				vertexBufferIndex++;
 				break;
 			}
 			case ShaderDataType::Mat3:
@@ -80,15 +80,15 @@ namespace Cockroach
 				uint8_t count = element.GetComponentCount();
 				for (uint8_t i = 0; i < count; i++)
 				{
-					glEnableVertexAttribArray(m_VertexBufferIndex);
-					glVertexAttribPointer(m_VertexBufferIndex,
+					glEnableVertexAttribArray(vertexBufferIndex);
+					glVertexAttribPointer(vertexBufferIndex,
 						count,
 						ShaderDataTypeToOpenGLBaseType(element.Type),
 						element.Normalized ? GL_TRUE : GL_FALSE,
 						layout.stride,
 						(const void*)(sizeof(float) * count * i));
-					glVertexAttribDivisor(m_VertexBufferIndex, 1);
-					m_VertexBufferIndex++;
+					glVertexAttribDivisor(vertexBufferIndex, 1);
+					vertexBufferIndex++;
 				}
 				break;
 			}
@@ -102,7 +102,7 @@ namespace Cockroach
 
 	void VertexArray::SetIndexBuffer(const Ref<IndexBuffer>& indexBuffer)
 	{
-		glBindVertexArray(m_RendererID);
+		glBindVertexArray(rendererID);
 		indexBuffer->Bind();
 
 		this->indexBuffer = indexBuffer;

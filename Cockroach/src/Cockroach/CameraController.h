@@ -18,11 +18,11 @@ namespace Cockroach
 		bool OnMouseScrolled(MouseScrollEvent& e);
 		bool OnWindowResized(WindowResizeEvent& e);
 	private:
-		float m_AspectRatio;
-		float m_Zoom = 10.0f;
+		float aspectRatio;
+		float zoom = 10.0f;
 
-		float3 m_CameraPosition = { 0.0f, 0.0f, 0.0f };
-		float m_Speed = 1.0f;
+		float3 position = { 0.0f, 0.0f, 0.0f };
+		float speed = 1.0f;
 	public:
 		Camera camera;
 	};

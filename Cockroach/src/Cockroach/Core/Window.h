@@ -38,11 +38,11 @@ namespace Cockroach
 		GLFWwindow* GLFWWindow;
 		GraphicsContext* Context;
 
-		uint32_t Width() { return m_Data.Width; }
-		uint32_t Height() { return m_Data.Height; }
+		uint32_t Width() { return data.Width; }
+		uint32_t Height() { return data.Height; }
 
 		// Window attributes
-		void SetEventCallback(const EventCallbackFn& callback) { m_Data.EventCallback = callback; }
+		void SetEventCallback(const EventCallbackFn& callback) { data.EventCallback = callback; }
 		void SetVSync(bool enabled);
 		bool IsVSync();
 	private:
@@ -55,6 +55,6 @@ namespace Cockroach
 			EventCallbackFn EventCallback;
 		};
 
-		WindowData m_Data;
+		WindowData data;
 	};
 }

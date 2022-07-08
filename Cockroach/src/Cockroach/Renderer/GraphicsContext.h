@@ -12,6 +12,6 @@ namespace Cockroach
 		void Init();
 		void SwapBuffers();
 	private:
-		GLFWwindow* m_WindowHandle;
+		GLFWwindow* windowHandle;
 	};
 }

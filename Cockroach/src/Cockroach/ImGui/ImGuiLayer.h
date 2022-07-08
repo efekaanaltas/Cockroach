@@ -18,6 +18,6 @@ namespace Cockroach
 		static void Begin();
 		static void End();
 	private:
-		float m_Time = 0.0f;
+		float time = 0.0f;
 	};
 }

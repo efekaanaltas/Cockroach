@@ -1368,6 +1368,7 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
+    <ClInclude Include="src\Cockroach\Game\Room.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Cockroach\CameraController.cpp">
@@ -1424,5 +1425,6 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
+    <ClCompile Include="src\Cockroach\Game\Room.cpp" />
   </ItemGroup>
 </Project>

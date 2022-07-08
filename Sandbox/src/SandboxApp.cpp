@@ -13,12 +13,19 @@ class Sandbox : public Cockroach::Application
 {
 public:
 	Sandbox()
-		: Application(), m_CameraController(16.0f / 9.0f), m_Transform(0.0f)
+		: Application(), cameraController(16.0f / 9.0f)
 	{
-		m_Scene = Cockroach::CreateRef<Cockroach::Scene>();
-		m_Scene->Load();
+		scene = Cockroach::CreateRef<Cockroach::Scene>();
+		scene->Load();
 
-		cursorSprite = m_Scene->GetSubTexture("assets/textures/SpriteSheet.png", { 0, 0 }, { 8, 8 });
+		texture = CreateRef<Texture2D>("assets/textures/SpriteSheet.png");
+		cursorSprite = scene->GetSubTexture("assets/textures/SpriteSheet.png", { 0, 0 }, { 8, 8 });
+
+		Room* room1 = new Room(43, 20);
+		memset(room1->data, 'A', sizeof(char) * room1->width * room1->height);
+		std::string save = room1->Serialize();
+		Room* room2 = Room::Deserialize(save);
+		delete room1;
 	}
 
 	void DrawHitbox(Cockroach::Ref<Hitbox> h)
@@ -35,15 +42,15 @@ public:
 
 	virtual void Update(float dt) override
 	{
-		m_CameraController.OnUpdate(dt);
-		m_Scene->Update(dt);
+		cameraController.OnUpdate(dt);
+		scene->Update(dt);
 	}
 
 	float2 EntityPlacePosition()
 	{
 		int2 mousePos = { (int)Cockroach::Input::GetMouseX(), (int)Cockroach::Input::GetMouseY() };
-		float2 worldPos = m_CameraController.camera.ScreenToWorldCoord(mousePos);
-		float2 worldCoord = m_CameraController.camera.ScreenToWorldCoord(mousePos);
+		float2 worldPos = cameraController.camera.ScreenToWorldCoord(mousePos);
+		float2 worldCoord = cameraController.camera.ScreenToWorldCoord(mousePos);
 		float2 entityCenteredCoord = { worldCoord.x, worldCoord.y};
 		return float2((int)entityCenteredCoord.x/8 * 8, (int)entityCenteredCoord.y/8 * 8);
 	}
@@ -55,14 +62,14 @@ public:
 		Cockroach::Renderer::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 		Cockroach::Renderer::Clear();
 
-		Cockroach::Renderer::BeginScene(m_CameraController.camera);
+		Cockroach::Renderer::BeginScene(cameraController.camera);
 
 		RenderGrid();
-		m_Scene->Render();
+		scene->Render();
 
 		Cockroach::Renderer::DrawQuad(EntityPlacePosition(), {cursorSprite->XSize(), cursorSprite->YSize()}, cursorSprite);
 
-		for (auto& ent : m_Scene->entities)
+		for (auto& ent : scene->entities)
 		{
 			Cockroach::Ref<Hitbox> h = ent->GetComponent<Hitbox>();
 			if (h)
@@ -76,7 +83,7 @@ public:
 
 	virtual void OnEvent(Cockroach::Event& e) override
 	{
-		m_CameraController.OnEvent(e);
+		cameraController.OnEvent(e);
 		Cockroach::EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<Cockroach::MouseButtonPressedEvent>(CR_BIND_EVENT_FN(Sandbox::OnMouseButtonPressed));
 	}
@@ -108,7 +115,7 @@ public:
 
 		Spacing();
 
-		Text("Entity Count: %i", m_Scene->entities.size());
+		Text("Entity Count: %i", scene->entities.size());
 		End();
 
 		Application::ImGuiEnd();
@@ -118,10 +125,10 @@ public:
 	{
 		for (int i = -80; i < 80; i++)
 		{
-			int xFloor = (int)m_CameraController.camera.GetPosition().x;
+			int xFloor = (int)cameraController.camera.GetPosition().x;
 			float xColor = ((i + xFloor) % 8 == 0) ? 0.3f : 0.2f;
 
-			int yFloor = (int)m_CameraController.camera.GetPosition().y;
+			int yFloor = (int)cameraController.camera.GetPosition().y;
 			float yColor = (i + yFloor) % 8 == 0 ? 0.3f : 0.2f;
 
 			Cockroach::Renderer::DrawLine({ i + xFloor, -80.0f + yFloor, 0.0f }, { i + xFloor, 79.0f + yFloor, 0.0f }, { xColor, xColor, xColor, 0.5f });
@@ -130,11 +137,10 @@ public:
 	}
 	
 private:
-	Cockroach::CameraController m_CameraController;
-	float3 m_Transform;
-	Cockroach::Ref<Cockroach::Texture2D> m_Texture;
+	Cockroach::CameraController cameraController;
+	Ref<Texture2D> texture;
 	Cockroach::Ref<Cockroach::SubTexture2D> cursorSprite;
-	Cockroach::Ref<Cockroach::Scene> m_Scene;
+	Cockroach::Ref<Cockroach::Scene> scene;
 };
 
 Cockroach::Application* Cockroach::CreateApplication()

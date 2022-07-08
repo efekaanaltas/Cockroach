@@ -30,4 +30,5 @@
 #include "Cockroach/Game/Scene.h"
 #include "Cockroach/Game/Entity.h"
 #include "Cockroach/Game/Component.h"
+#include "Cockroach/Game/Room.h"
 // ----------------------------------------

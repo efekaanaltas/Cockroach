@@ -7,7 +7,7 @@
 
 namespace Cockroach
 {
-	static bool s_GLFWInitialized = false;
+	static bool GLFWInitialized = false;
 
 	static void GLFWErrorCallback(int error, const char* description)
 	{
@@ -16,28 +16,28 @@ namespace Cockroach
 
 	Window::Window(const WindowProps& props)
 	{
-		m_Data.Title = props.Title;
-		m_Data.Width = props.Width;
-		m_Data.Height = props.Height;
+		data.Title = props.Title;
+		data.Width = props.Width;
+		data.Height = props.Height;
 
 		
 		("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 	
-		if (!s_GLFWInitialized)
+		if (!GLFWInitialized)
 		{
 			// TODO: glfwTerminate on system shutdown
 			int success = glfwInit();
 			CR_CORE_ASSERT(success, "Could not initialize GLFW!");
 			glfwSetErrorCallback(GLFWErrorCallback);
-			s_GLFWInitialized = true;
+			GLFWInitialized = true;
 		}
 
-		GLFWWindow = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
+		GLFWWindow = glfwCreateWindow((int)props.Width, (int)props.Height, data.Title.c_str(), nullptr, nullptr);
 	
 		Context = new GraphicsContext(GLFWWindow);
 		Context->Init();
 
-		glfwSetWindowUserPointer(GLFWWindow, &m_Data);
+		glfwSetWindowUserPointer(GLFWWindow, &data);
 		SetVSync(true);
 
 		// Set GLFW callbacks
@@ -145,11 +145,11 @@ namespace Cockroach
 	void Window::SetVSync(bool enabled)
 	{
 		glfwSwapInterval(enabled);
-		m_Data.VSync = enabled;
+		data.VSync = enabled;
 	}
 
 	bool Window::IsVSync()
 	{
-		return m_Data.VSync;
+		return data.VSync;
 	}
 }

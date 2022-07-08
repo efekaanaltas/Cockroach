@@ -53,22 +53,22 @@ namespace Cockroach
 		using EventFn = std::function<bool(T&)>;
 	public:
 		EventDispatcher(Event& event)
-			: m_Event(event)
+			: event(event)
 		{
 		}
 
 		template<typename T, typename F>
 		bool Dispatch(const F& func)
 		{
-			if (m_Event.GetEventType() == T::GetStaticType())
+			if (event.GetEventType() == T::GetStaticType())
 			{
-				m_Event.Handled |= func(static_cast<T&>(m_Event));
+				event.Handled |= func(static_cast<T&>(event));
 				return true;
 			}
 			return false;
 		}
 	private:
-		Event& m_Event;
+		Event& event;
 	};
 
 	inline std::ostream& operator<<(std::ostream& os, const Event& e)

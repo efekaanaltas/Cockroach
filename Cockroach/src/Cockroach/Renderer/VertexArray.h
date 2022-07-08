@@ -20,8 +20,8 @@ namespace Cockroach
 		const std::vector<Ref<VertexBuffer>>& GetVertexBuffers() const { return vertexBuffers; }
 		const Ref<IndexBuffer>& GetIndexBuffer() const { return indexBuffer; }
 	private:
-		uint32_t m_RendererID;
-		uint32_t m_VertexBufferIndex = 0;
+		uint32_t rendererID;
+		uint32_t vertexBufferIndex = 0;
 		std::vector<Ref<VertexBuffer>> vertexBuffers;
 		Ref<IndexBuffer> indexBuffer;
 	};

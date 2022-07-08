@@ -88,7 +88,7 @@ namespace Cockroach
 			stride = 0;
 			for (auto& element : elements)
 			{
-				element.Offset = stride; // m_Stride is equal to element offset
+				element.Offset = stride; // Stride is equal to element offset
 				stride += element.Size;
 			}
 		}
@@ -111,7 +111,7 @@ namespace Cockroach
 
 		BufferLayout layout;
 	private:
-		uint32_t m_RendererID;
+		uint32_t rendererID;
 	};
 
 	class IndexBuffer
@@ -125,6 +125,6 @@ namespace Cockroach
 
 		uint32_t count;
 	private:
-		uint32_t m_RendererID;
+		uint32_t rendererID;
 	};
 }

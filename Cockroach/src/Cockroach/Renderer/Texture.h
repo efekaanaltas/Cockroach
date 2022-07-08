@@ -25,21 +25,20 @@ namespace Cockroach
 		Texture2D(const std::string& path);
 		virtual ~Texture2D() override;
 
-		virtual uint32_t GetWidth() const override { return m_Width; }
-		virtual uint32_t GetHeight() const override { return m_Height; }
+		virtual uint32_t GetWidth() const override { return width; }
+		virtual uint32_t GetHeight() const override { return height; }
 
 		virtual void Bind(uint32_t slot = 0) const override;
 
 		virtual bool operator ==(const Texture& other) const override
 		{
-			return m_RendererID == ((Texture2D&)other).m_RendererID;
+			return rendererID == ((Texture2D&)other).rendererID;
 		}
 
 		std::string path;
 	private:
-		uint32_t m_Width, m_Height;
-		uint32_t m_RendererID;
-
+		uint32_t width, height;
+		uint32_t rendererID;
 	};
 
 	class SubTexture2D

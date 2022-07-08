@@ -24,7 +24,7 @@ namespace Cockroach
 		virtual void Render() = 0;
 		virtual void OnEvent(Event& e) = 0;
 
-		inline Window& GetWindow() { return *m_Window; }
+		inline Window& GetWindow() { return *window; }
 		
 		inline static Application& Get() { return *s_Instance; }
 	private:
@@ -32,10 +32,10 @@ namespace Cockroach
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 
-		Scope<Window> m_Window;
-		bool m_Running = true;
-		bool m_Minimized = false;
-		float m_LastFrameTime = 0.0f;
+		Scope<Window> window;
+		bool running = true;
+		bool minimized = false;
+		float lastFrameTime = 0.0f;
 	private:
 		static Application* s_Instance;
 	};

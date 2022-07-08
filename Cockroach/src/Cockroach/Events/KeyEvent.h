@@ -7,34 +7,34 @@ namespace Cockroach
 	class KeyEvent : public Event
 	{
 	public:
-		inline int GetKeyCode() const { return m_KeyCode; }
+		inline int GetKeyCode() const { return keycode; }
 
 		EVENT_CLASS_CATEGORY(EventCategoryKeyboard | EventCategoryInput)
 	protected:
 		KeyEvent(int keycode)
-			: m_KeyCode(keycode) {}
+			: keycode(keycode) {}
 
-		int m_KeyCode;
+		int keycode;
 	};
 
 	class KeyPressedEvent : public KeyEvent
 	{
 	public:
 		KeyPressedEvent(int keycode, int repeatCount)
-			: KeyEvent(keycode), m_RepeatCount(repeatCount) {}
+			: KeyEvent(keycode), repeatCount(repeatCount) {}
 
-		inline int GetRepeatCount() const { return m_RepeatCount; }
+		inline int GetRepeatCount() const { return repeatCount; }
 
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "KeyPressedEvent: " << m_KeyCode << " (" << m_RepeatCount << " repeats)";
+			ss << "KeyPressedEvent: " << keycode << " (" << repeatCount << " repeats)";
 			return ss.str();
 		}
 
 		EVENT_CLASS_TYPE(KeyPressed)
 	private:
-		int m_RepeatCount;
+		int repeatCount;
 	};
 
 	class KeyReleasedEvent : public KeyEvent
@@ -46,7 +46,7 @@ namespace Cockroach
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "KeyReleasedEvent: " << m_KeyCode;
+			ss << "KeyReleasedEvent: " << keycode;
 			return ss.str();
 		}
 
@@ -62,7 +62,7 @@ namespace Cockroach
 		std::string ToString() const override
 		{
 			std::stringstream ss;
-			ss << "KeyTypedEvent: " << m_KeyCode;
+			ss << "KeyTypedEvent: " << keycode;
 			return ss.str();
 		}
 

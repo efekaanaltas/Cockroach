@@ -21,8 +21,8 @@ namespace Cockroach
 		CR_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
-		m_Window = Scope<Window>( new Window(WindowProps()) );
-		m_Window->SetEventCallback(BIND_EVENT_FN(BaseOnEvent));
+		window = Scope<Window>( new Window(WindowProps()) );
+		window->SetEventCallback(BIND_EVENT_FN(BaseOnEvent));
 
 		Renderer::Init();
 		ImGuiLayer::OnAttach();
@@ -67,26 +67,26 @@ namespace Cockroach
 
 	void Application::Run()
 	{
-		while (m_Running)
+		while (running)
 		{
 			float time = (float)glfwGetTime();
-			float dt = (time - m_LastFrameTime);
-			m_LastFrameTime = time;
+			float dt = (time - lastFrameTime);
+			lastFrameTime = time;
 
-			if (!m_Minimized)
+			if (!minimized)
 			{
 				Update(dt);
 				Render();
 				Input::Update();
 			}
 
-			m_Window->OnUpdate();
+			window->OnUpdate();
 		}
 	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
 	{
-		m_Running = false;
+		running = false;
 		return true;
 	}
 
@@ -94,11 +94,11 @@ namespace Cockroach
 	{
 		if (e.GetWidth() == 0 || e.GetHeight() == 0)
 		{
-			m_Minimized = true;
+			minimized = true;
 			return false;
 		}
 
-		m_Minimized = false;
+		minimized = false;
 		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
 
 		return false;

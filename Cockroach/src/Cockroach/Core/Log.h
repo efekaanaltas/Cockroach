@@ -10,21 +10,21 @@ namespace Cockroach
 	{
 	public:
 		static void Init();
-		static std::shared_ptr<spdlog::logger> s_CoreLogger;
-		static std::shared_ptr<spdlog::logger> s_ClientLogger;
+		static std::shared_ptr<spdlog::logger> coreLogger;
+		static std::shared_ptr<spdlog::logger> clientLogger;
 	};
 }
 
 // Core log macros
-#define CR_CORE_TRACE(...)  ::Cockroach::Log::s_CoreLogger->trace(__VA_ARGS__)
-#define CR_CORE_INFO(...)   ::Cockroach::Log::s_CoreLogger->info(__VA_ARGS__)
-#define CR_CORE_WARN(...)   ::Cockroach::Log::s_CoreLogger->warn(__VA_ARGS__)
-#define CR_CORE_ERROR(...)  ::Cockroach::Log::s_CoreLogger->error(__VA_ARGS__)
+#define CR_CORE_TRACE(...)  ::Cockroach::Log::coreLogger->trace(__VA_ARGS__)
+#define CR_CORE_INFO(...)   ::Cockroach::Log::coreLogger->info(__VA_ARGS__)
+#define CR_CORE_WARN(...)   ::Cockroach::Log::coreLogger->warn(__VA_ARGS__)
+#define CR_CORE_ERROR(...)  ::Cockroach::Log::coreLogger->error(__VA_ARGS__)
 #define CR_CORE_CRITICAL(...)  ::Cockroach::Log::s_CoreLogger->critical(__VA_ARGS__)
 
 // Client log macros
-#define CR_TRACE(...)       ::Cockroach::Log::s_ClientLogger->trace(__VA_ARGS__)
-#define CR_INFO(...)        ::Cockroach::Log::s_ClientLogger->info(__VA_ARGS__)
-#define CR_WARN(...)        ::Cockroach::Log::s_ClientLogger->warn(__VA_ARGS__)
-#define CR_ERROR(...)       ::Cockroach::Log::s_ClientLogger->error(__VA_ARGS__)
+#define CR_TRACE(...)       ::Cockroach::Log::clientLogger->trace(__VA_ARGS__)
+#define CR_INFO(...)        ::Cockroach::Log::clientLogger->info(__VA_ARGS__)
+#define CR_WARN(...)        ::Cockroach::Log::clientLogger->warn(__VA_ARGS__)
+#define CR_ERROR(...)       ::Cockroach::Log::clientLogger->error(__VA_ARGS__)
 #define CR_CRITICAL(...)       ::Cockroach::Log::s_ClientLogger->critical(__VA_ARGS__)
