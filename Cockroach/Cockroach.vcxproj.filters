@@ -90,11 +90,14 @@
     <ClInclude Include="src\Cockroach\Game\Entity.h">
       <Filter>src\Cockroach\Game</Filter>
     </ClInclude>
+    <ClInclude Include="src\Cockroach\Game\Room.h">
+      <Filter>src\Cockroach\Game</Filter>
+    </ClInclude>
     <ClInclude Include="src\Cockroach\Game\Scene.h">
       <Filter>src\Cockroach\Game</Filter>
     </ClInclude>
-    <ClInclude Include="src\Cockroach\ImGui\ImGuiLayer.h">
-      <Filter>src\Cockroach\ImGui</Filter>
+    <ClInclude Include="src\Cockroach\Game\Timer.h">
+      <Filter>src\Cockroach\Game</Filter>
     </ClInclude>
     <ClInclude Include="src\Cockroach\Renderer\Buffer.h">
       <Filter>src\Cockroach\Renderer</Filter>
@@ -1368,7 +1371,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h">
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
-    <ClInclude Include="src\Cockroach\Game\Room.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Cockroach\CameraController.cpp">
@@ -1389,14 +1391,14 @@
     <ClCompile Include="src\Cockroach\Game\Entity.cpp">
       <Filter>src\Cockroach\Game</Filter>
     </ClCompile>
+    <ClCompile Include="src\Cockroach\Game\Room.cpp">
+      <Filter>src\Cockroach\Game</Filter>
+    </ClCompile>
     <ClCompile Include="src\Cockroach\Game\Scene.cpp">
       <Filter>src\Cockroach\Game</Filter>
     </ClCompile>
-    <ClCompile Include="src\Cockroach\ImGui\ImGuiBuild.cpp">
-      <Filter>src\Cockroach\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Cockroach\ImGui\ImGuiLayer.cpp">
-      <Filter>src\Cockroach\ImGui</Filter>
+    <ClCompile Include="src\Cockroach\Game\Timer.cpp">
+      <Filter>src\Cockroach\Game</Filter>
     </ClCompile>
     <ClCompile Include="src\Cockroach\Renderer\Buffer.cpp">
       <Filter>src\Cockroach\Renderer</Filter>
@@ -1425,6 +1427,5 @@
     <ClCompile Include="vendor\stb_image\stb_image.cpp">
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
-    <ClCompile Include="src\Cockroach\Game\Room.cpp" />
   </ItemGroup>
 </Project>

@@ -4,6 +4,13 @@
 
 using namespace Cockroach;
 
+template<typename T>
+class State;
+class WalkingState;
+class JumpingState;
+class ClingingState;
+class DashingState;
+
 class Hitbox : public Component
 {
 public:
@@ -50,16 +57,33 @@ public:
 class Player : public Component
 {
 public:
-	Player() {}
+	Player();
 	virtual void Update(float dt) override;
 
+	i8 faceDir = 1; // -1 for left, 1 for right
 	float xRemainder = 0.0f, yRemainder = 0.0f;
 	float gravity = 200.0f;
-	float2 velocity = { 0.0f, 0.0f };
+	bool grounded = false;
 
-	void MoveX(float amount);
-	void MoveY(float amount);
+	float2 velocity = { 0.0f, 0.0f };
+	float2 velocityLastFrame = { 0.0f, 0.0f };
+
+	State<Player>* currentState = nullptr;
+	WalkingState* walkingState = nullptr;
+	JumpingState* jumpingState = nullptr;
+	JumpingState* superjumpingState = nullptr;
+	JumpingState* walljumpingState = nullptr;
+	JumpingState* climbingState = nullptr;
+	ClingingState* clingingState = nullptr;
+	DashingState* dashingState = nullptr;
+
+	i8 MoveX(float amount);
+	i8 MoveY(float amount);
 	Hitbox* GetCollidingHitbox(int xForesense, int yForesense);
+
+	i8 InputDir() const;
+
+	void TrySwitchState(State<Player>* newState);
 };
 
 class Hazard : public DynamicObject

@@ -2,12 +2,18 @@
 #include "Application.h"
 
 #include "Cockroach/Core/Log.h"
-#include "Input.h"
+#include "Cockroach/Core/Input.h"
+
 #include "Cockroach/Renderer/Renderer.h"
 
-#include <GLFW/glfw3.h>
+#include "Cockroach/Events/Event.h"
+#include "Cockroach/Events/ApplicationEvent.h"
+#include "Cockroach/Events/KeyEvent.h"
+#include "Cockroach/Events/MouseEvent.h"
 
-#include "Cockroach/ImGui/ImGuiLayer.h"
+#define IMGUI_IMPL_OPENGL_LOADER_GLAD
+#include "backends/imgui_impl_opengl3.cpp"
+#include "backends/imgui_impl_glfw.cpp"
 
 namespace Cockroach
 {
@@ -22,10 +28,10 @@ namespace Cockroach
 		s_Instance = this;
 
 		window = Scope<Window>( new Window(WindowProps()) );
-		window->SetEventCallback(BIND_EVENT_FN(BaseOnEvent));
+		window->SetEventCallback(BIND_EVENT_FN(OnEvent));
 
 		Renderer::Init();
-		ImGuiLayer::OnAttach();
+		ImGuiInit();
 	}
 
 	Application::~Application()
@@ -33,27 +39,20 @@ namespace Cockroach
 
 	}
 
-	void Application::ImGuiBegin()
-	{
-		ImGuiLayer::Begin();
-	}
-
-	void Application::ImGuiEnd()
-	{
-		ImGuiLayer::End();
-	}
-
-	void Application::BaseOnEvent(Event& e)
+	void Application::OnEvent(Event& e)
 	{
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResize));
-		
-		if (e.GetEventType() == EventType::KeyPressed)
+
+		ImGuiIO io = ImGui::GetIO();
+			
+		if (e.GetEventType() == EventType::KeyPressed && !io.WantCaptureKeyboard)
 			Input::stateMap[dynamic_cast<KeyPressedEvent&>(e).GetKeyCode()].pressed = true;
 		if (e.GetEventType() == EventType::KeyReleased)
 			Input::stateMap[dynamic_cast<KeyReleasedEvent&>(e).GetKeyCode()].pressed = false;
-		if (e.GetEventType() == EventType::MouseButtonPressed)
+
+		if (e.GetEventType() == EventType::MouseButtonPressed && !io.WantCaptureMouse)
 			Input::stateMap[dynamic_cast<MouseButtonPressedEvent&>(e).GetMouseButton()].pressed = true;
 		if (e.GetEventType() == EventType::MouseButtonReleased)
 			Input::stateMap[dynamic_cast<MouseButtonReleasedEvent&>(e).GetMouseButton()].pressed = false;
@@ -61,8 +60,6 @@ namespace Cockroach
 			Input::scroll = dynamic_cast<MouseScrollEvent&>(e).GetYOffset();
 
 		CR_CORE_TRACE("{0}", e);
-
-		OnEvent(e);
 	}
 
 	void Application::Run()
@@ -104,4 +101,58 @@ namespace Cockroach
 		return false;
 	}
 
+	void Application::ImGuiInit()
+	{
+		static bool imguiInitialized = false;
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+
+		ImGui::StyleColorsDark();
+		ImGuiStyle& style = ImGui::GetStyle();
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			style.WindowRounding = 0.0f;
+			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+		}
+
+		Application& app = Application::Get();
+		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GLFWWindow);
+
+		if (!imguiInitialized)
+		{
+			ImGui_ImplGlfw_InitForOpenGL(window, true);
+			ImGui_ImplOpenGL3_Init("#version 410");
+			imguiInitialized = true;
+		}
+	}
+
+	void Application::ImGuiBegin()
+	{
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
+	}
+
+	void Application::ImGuiEnd()
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		Application& app = Application::Get();
+		io.DisplaySize = ImVec2((float)app.GetWindow().Width(), (float)app.GetWindow().Height());
+
+		// Rendering
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			GLFWwindow* backup_current_context = glfwGetCurrentContext();
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+			glfwMakeContextCurrent(backup_current_context);
+		}
+	}
 }

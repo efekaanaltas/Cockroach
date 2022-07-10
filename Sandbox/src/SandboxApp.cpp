@@ -21,11 +21,16 @@ public:
 		texture = CreateRef<Texture2D>("assets/textures/SpriteSheet.png");
 		cursorSprite = scene->GetSubTexture("assets/textures/SpriteSheet.png", { 0, 0 }, { 8, 8 });
 
-		Room* room1 = new Room(43, 20);
-		memset(room1->data, 'A', sizeof(char) * room1->width * room1->height);
-		std::string save = room1->Serialize();
-		Room* room2 = Room::Deserialize(save);
-		delete room1;
+		room = Room::Load("assets/scenes/room1.txt");
+
+		for (u32 y = 0; y < room->height; y++)
+		{
+			for (u32 x = 0; x < room->width; x++)
+			{
+				if (room->data[x + y * room->width] == Room::Air) continue;
+				Entities::CreateEntity({ 8*x, 8*y }, Entities::EntityType::Tile);
+			}
+		}
 	}
 
 	void DrawHitbox(Cockroach::Ref<Hitbox> h)
@@ -44,6 +49,19 @@ public:
 	{
 		cameraController.OnUpdate(dt);
 		scene->Update(dt);
+
+		if (Input::IsDown(CR_MOUSE_BUTTON_LEFT))
+			Entities::CreateEntity(EntityPlacePosition(), Entities::EntityType::Cockroach);
+		else if (Input::IsDown(CR_MOUSE_BUTTON_RIGHT))
+		{
+			Entities::CreateEntity(EntityPlacePosition(), Entities::EntityType::Tile);
+			u32 roomPlacePosition = EntityPlacePosition().x / 8 + EntityPlacePosition().y / 8 * room->width;
+
+			if (0 <= roomPlacePosition && roomPlacePosition < sizeof(char) * room->width * room->height)
+				room->data[roomPlacePosition] = 'B';
+
+			room->Save("assets/scenes/room1.txt");
+		}
 	}
 
 	float2 EntityPlacePosition()
@@ -52,7 +70,7 @@ public:
 		float2 worldPos = cameraController.camera.ScreenToWorldCoord(mousePos);
 		float2 worldCoord = cameraController.camera.ScreenToWorldCoord(mousePos);
 		float2 entityCenteredCoord = { worldCoord.x, worldCoord.y};
-		return float2((int)entityCenteredCoord.x/8 * 8, (int)entityCenteredCoord.y/8 * 8);
+		return float2(std::floor(entityCenteredCoord.x/8) * 8, std::floor(entityCenteredCoord.y/8) * 8);
 	}
 
 	virtual void Render() override
@@ -79,23 +97,6 @@ public:
 		Cockroach::Renderer::EndScene();
 
 		ImGuiRender();
-	}
-
-	virtual void OnEvent(Cockroach::Event& e) override
-	{
-		cameraController.OnEvent(e);
-		Cockroach::EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<Cockroach::MouseButtonPressedEvent>(CR_BIND_EVENT_FN(Sandbox::OnMouseButtonPressed));
-	}
-
-	bool OnMouseButtonPressed(Cockroach::MouseButtonPressedEvent& e)
-	{
-		if (e.GetMouseButton() == CR_MOUSE_BUTTON_LEFT)
-			Entities::CreateEntity(EntityPlacePosition(), Entities::EntityType::Cockroach);
-		if (e.GetMouseButton() == CR_MOUSE_BUTTON_RIGHT)
-			Entities::CreateEntity(EntityPlacePosition(), Entities::EntityType::Tile);
-
-		return false;
 	}
 
 	void ImGuiRender()
@@ -137,10 +138,11 @@ public:
 	}
 	
 private:
-	Cockroach::CameraController cameraController;
+	CameraController cameraController;
 	Ref<Texture2D> texture;
-	Cockroach::Ref<Cockroach::SubTexture2D> cursorSprite;
-	Cockroach::Ref<Cockroach::Scene> scene;
+	Ref<SubTexture2D> cursorSprite;
+	Ref<Scene> scene;
+	Ref<Room> room;
 };
 
 Cockroach::Application* Cockroach::CreateApplication()

@@ -1,6 +1,8 @@
 #include "crpch.h"
 #include "Room.h"
 
+#include <fstream>
+
 namespace Cockroach
 {
 	Room::Room(u32 width, u32 height)
@@ -12,12 +14,12 @@ namespace Cockroach
 
 	std::string Room::Serialize()
 	{
-		std::string b = std::to_string(width);
-		std::string a = std::to_string(width) + " " + std::to_string(height) + " " + data;
-		return a;
+		u32 a = width;
+		u32 b = height;
+		return std::to_string(width) + " " + std::to_string(height) + " " + data;
 	}
 
-	Room* Room::Deserialize(std::string data)
+	Ref<Room> Room::Deserialize(std::string data)
 	{
 		std::vector<std::string> strings = std::vector<std::string>();
 		i32 current = 0, i = 0, start = 0, end = 0;
@@ -34,8 +36,48 @@ namespace Cockroach
 			}
 			i++;
 		}
-		Room* room = new Room(std::stoi(strings[0]), std::stoi(strings[1]));
+
+		Ref<Room> room = CreateRef<Room>(std::stoi(strings[0]), std::stoi(strings[1]));
 		strcpy(room->data, strings[2].c_str());
 		return room;
+	}
+
+	void Room::Save(const std::string& filepath)
+	{
+		std::string data = Serialize();
+		std::fstream out(filepath, std::ios::out | std::ios::binary | std::ios::trunc);
+
+		if (out)
+		{
+			out << data;
+		}
+		else
+			CR_CORE_ERROR("Could not open file '{0}'", filepath);
+		out.close();
+	}
+
+	Ref<Room> Room::Load(const std::string& filepath)
+	{
+		std::string result;
+		std::fstream in(filepath, std::ios::in);
+
+		if (in)
+		{
+			in.seekg(0, std::ios::end);
+			size_t size = in.tellg();
+			if (size != -1)
+			{
+				result.resize(size);
+				in.seekg(0, std::ios::beg);
+				in.read(&result[0], size);
+			}
+			else
+				CR_CORE_ERROR("Could not read from file '{0}'", filepath);
+		}
+		else
+			CR_CORE_ERROR("Could not open file '{0}'", filepath);
+		in.close();
+
+		return Room::Deserialize(result);
 	}
 }

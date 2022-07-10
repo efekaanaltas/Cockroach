@@ -3,6 +3,8 @@
 #include "Cockroach.h"
 #include "Components.h"
 
+#include "State.h"
+
 using namespace Cockroach;
 
 std::vector<Hitbox*> Hitbox::all = std::vector<Hitbox*>();
@@ -26,33 +28,35 @@ bool Hitbox::Contains(Hitbox other)
 	return x && y;
 }
 
-void ::Player::Update(float dt)
+Player::Player()
 {
-	velocity.y -= gravity * dt;
-
-	if (Input::IsDown(CR_KEY_SPACE))
-		velocity.y = 100;
-
-	if (Input::IsPressed(CR_KEY_LEFT))
-		velocity.x -= 1000 * dt;
-	else if (Input::IsPressed(CR_KEY_RIGHT))
-		velocity.x += 1000 * dt;
-	else
-	{
-		int signBefore = std::signbit(velocity.x) ? -1 : 1;
-		velocity.x -= signBefore * 700 * dt;
-		int signAfter = std::signbit(velocity.x) ? -1 : 1;
-		if (signBefore != signAfter)
-			velocity.x = 0;
-	}
-
-	velocity.x = std::signbit(velocity.x) ? std::max(velocity.x, -50.0f) : std::min(velocity.x, 50.0f);
-
-	MoveX(velocity.x * dt);
-	MoveY(velocity.y * dt);
+	walkingState = new WalkingState;
+	jumpingState = new JumpingState(100.0f, 120.0f);
+	superjumpingState = new JumpingState(200.0f, 400.0f);
+	walljumpingState = new JumpingState(200.0f, 400.0f);
+	climbingState = new JumpingState(200.0f, 400.0f);
+	clingingState = new ClingingState;
+	dashingState = new DashingState;
+	
+	currentState = walkingState;
 }
 
-void Player::MoveX(float amount)
+void ::Player::Update(float dt)
+{
+	velocityLastFrame = velocity;
+
+	TrySwitchState(currentState->Update(this, dt));
+
+	i8 horizontalCollisions = MoveX(velocity.x * dt);
+	i8 verticalCollisions = MoveY((velocityLastFrame.y + velocity.y) * 0.5f * dt); // Verlet integrated vertical motion
+
+	grounded = verticalCollisions == -1;
+
+	if (horizontalCollisions != 0)
+		TrySwitchState(walkingState);
+}
+
+i8 Player::MoveX(float amount)
 {
 	xRemainder += amount;
 	i32 move = (i32)xRemainder;
@@ -60,7 +64,7 @@ void Player::MoveX(float amount)
 	if (move != 0)
 	{
 		xRemainder -= move;
-		int32_t sign = move > 0 ? 1 : -1;
+		i8 sign = move > 0 ? 1 : -1;
 
 		while (move != 0)
 		{
@@ -73,13 +77,15 @@ void Player::MoveX(float amount)
 			else
 			{
 				velocity.x = 0;
-				break;
+				return sign;
 			}
 		}
+
+		return 0;
 	}
 }
 
-void Player::MoveY(float amount)
+i8 Player::MoveY(float amount)
 {
 	yRemainder += amount;
 	i32 move = (i32)yRemainder;
@@ -87,7 +93,7 @@ void Player::MoveY(float amount)
 	if (move != 0)
 	{
 		yRemainder -= move;
-		i32 sign = move > 0 ? 1 : -1;
+		i8 sign = move > 0 ? 1 : -1;
 
 		while (move != 0)
 		{
@@ -100,9 +106,11 @@ void Player::MoveY(float amount)
 			else
 			{
 				velocity.y = 0;
-				break;
+				return sign;
 			}
 		}
+
+		return 0;
 	}
 }
 
@@ -114,6 +122,22 @@ Hitbox* Player::GetCollidingHitbox(int xForesense, int yForesense)
 			if (playerHitbox->OverlapsWith(*h, xForesense, yForesense))
 				return h;
 	return nullptr;
+}
+
+i8 Player::InputDir() const
+{
+	i8 inputDir = 0;
+	if (Input::IsPressed(CR_KEY_LEFT))  inputDir = -1;
+	if (Input::IsPressed(CR_KEY_RIGHT)) inputDir = +1;
+	return inputDir;
+}
+
+void Player::TrySwitchState(State<Player>* newState)
+{
+	if (newState == nullptr) return;
+	currentState->Exit(this);
+	currentState = newState;
+	currentState->Enter(this);
 }
 
 std::vector<StaticObject*> StaticObject::all = std::vector<StaticObject*>();

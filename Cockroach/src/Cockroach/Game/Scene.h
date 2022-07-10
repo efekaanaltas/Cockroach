@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "Entity.h"
+#include "Room.h"
 #include "Cockroach/Renderer/Camera.h"
 
 namespace Cockroach
@@ -19,6 +20,7 @@ namespace Cockroach
 		Scene();
 
 		std::vector<Ref<Entity>> entities = std::vector<Ref<Entity>>();
+		std::vector<Ref<Room>> rooms = std::vector<Ref<Room>>();
 
 		void Update(float dt);
 		void Render();
@@ -28,6 +30,7 @@ namespace Cockroach
 		Ref<SubTexture2D> GetSubTexture(const std::string& filepath, const float2& coords, const float2& spriteSize);
 
 		Ref<Entity> AddEntity(const glm::ivec2 position);
+		Ref<Room> AddRoom(const Ref<Room>& room);
 	};
 
 }

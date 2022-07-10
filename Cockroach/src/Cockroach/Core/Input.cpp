@@ -29,6 +29,7 @@ namespace Cockroach
 
 	void Input::Update()
 	{
+		Input::scroll = 0.0f;
 		for (auto& [key, value] : Input::stateMap)
 			value.pressedLastFrame = value.pressed;
 	}

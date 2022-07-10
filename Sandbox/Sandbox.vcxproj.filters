@@ -3,14 +3,11 @@
   <ItemGroup>
     <ClCompile Include="src\SandboxApp.cpp" />
     <ClCompile Include="src\Components.cpp" />
+    <ClCompile Include="src\State.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Components.h" />
     <ClInclude Include="src\Entities.h" />
     <ClInclude Include="src\State.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="assets\shaders\Texture.glsl" />
-    <None Include="assets\shaders\Line.glsl" />
   </ItemGroup>
 </Project>

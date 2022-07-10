@@ -7,7 +7,7 @@ namespace Cockroach
 	class Room
 	{
 	public:
-		static const char Air = ' ';
+		static const char Air = '_';
 		static const char TileBasic = 'A';
 
 		Room(u32 width, u32 height);
@@ -15,7 +15,10 @@ namespace Cockroach
 		u32 width, height;
 		char* data;
 
+		void Save(const std::string& filepath);
+		static Ref<Room> Load(const std::string& filepath);
+	private:
 		std::string Serialize();
-		static Room* Deserialize(std::string data);
+		static Ref<Room> Deserialize(std::string data);
 	};
 }

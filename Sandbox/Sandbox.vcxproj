@@ -138,6 +138,7 @@
   <ItemGroup>
     <ClCompile Include="src\Components.cpp" />
     <ClCompile Include="src\SandboxApp.cpp" />
+    <ClCompile Include="src\State.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cockroach\Cockroach.vcxproj">

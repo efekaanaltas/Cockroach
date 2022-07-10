@@ -13,10 +13,6 @@ namespace Cockroach
 		CameraController(float aspectRatio);
 
 		void OnUpdate(float dt);
-		void OnEvent(Event& e);
-	private:
-		bool OnMouseScrolled(MouseScrollEvent& e);
-		bool OnWindowResized(WindowResizeEvent& e);
 	private:
 		float aspectRatio;
 		float zoom = 10.0f;

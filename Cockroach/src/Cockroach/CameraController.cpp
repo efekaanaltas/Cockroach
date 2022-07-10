@@ -2,6 +2,7 @@
 #include "CameraController.h"
 
 #include "Cockroach/Core/Input.h"
+#include "Cockroach/Core/Application.h"
 
 namespace Cockroach
 {
@@ -26,27 +27,16 @@ namespace Cockroach
 		camera.SetPosition(position);
 
 		speed = zoom; // Change speed according to zoom level
-	}
 
-	void CameraController::OnEvent(Event& e)
-	{
-		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<MouseScrollEvent>(CR_BIND_EVENT_FN(CameraController::OnMouseScrolled));
-		dispatcher.Dispatch<WindowResizeEvent>(CR_BIND_EVENT_FN(CameraController::OnWindowResized));
-	}
-
-	bool CameraController::OnMouseScrolled(MouseScrollEvent& e)
-	{
-		zoom -= e.GetYOffset() * 0.1f * zoom;
+		zoom -= Input::scroll * 0.1f * zoom;
 		zoom = std::min(std::max(zoom, 5.0f), 100.0f);
 		camera.SetZoom(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
 
-		return false;
-	}
-	bool CameraController::OnWindowResized(WindowResizeEvent& e)
-	{
-		aspectRatio = (float)e.GetWidth() / (float)e.GetHeight();
-		camera.SetZoom(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
-		return false;
+		float newAspect = (float)Application::Get().GetWindow().Width() / (float)Application::Get().GetWindow().Height();
+		if (aspectRatio != newAspect)
+		{
+			aspectRatio = newAspect;
+			camera.SetZoom(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
+		}
 	}
 }

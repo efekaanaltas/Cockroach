@@ -18,17 +18,19 @@ namespace Cockroach
 		virtual ~Application();
 
 		void Run();
-		void ImGuiBegin();
-		void ImGuiEnd();
+		
 		virtual void Update(float dt) = 0;
 		virtual void Render() = 0;
-		virtual void OnEvent(Event& e) = 0;
+
+		void ImGuiInit();
+		void ImGuiBegin();
+		void ImGuiEnd();
 
 		inline Window& GetWindow() { return *window; }
 		
 		inline static Application& Get() { return *s_Instance; }
 	private:
-		void BaseOnEvent(Event& e);
+		void OnEvent(Event& e);
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);
 
@@ -40,6 +42,6 @@ namespace Cockroach
 		static Application* s_Instance;
 	};
 
-	// To be defined in CLIENT
+	// Defined in client
 	Application* CreateApplication();
 }
