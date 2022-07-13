@@ -46,18 +46,25 @@ namespace Cockroach
 		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResize));
 
 		ImGuiIO io = ImGui::GetIO();
-			
-		if (e.GetEventType() == EventType::KeyPressed && !io.WantCaptureKeyboard)
+
+		bool imguiFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow) || ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow);
+
+		if (e.GetEventType() == EventType::KeyPressed || e.GetEventType() == EventType::MouseButtonPressed)
+			if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
+				ImGui::SetWindowFocus(nullptr); // Lose focus if keys are pressed but the mouse is over the game world.
+
+		if (e.GetEventType() == EventType::KeyPressed && !imguiFocused)
 			Input::stateMap[dynamic_cast<KeyPressedEvent&>(e).GetKeyCode()].pressed = true;
 		if (e.GetEventType() == EventType::KeyReleased)
 			Input::stateMap[dynamic_cast<KeyReleasedEvent&>(e).GetKeyCode()].pressed = false;
 
-		if (e.GetEventType() == EventType::MouseButtonPressed && !io.WantCaptureMouse)
+		if (e.GetEventType() == EventType::MouseButtonPressed && !imguiFocused)
 			Input::stateMap[dynamic_cast<MouseButtonPressedEvent&>(e).GetMouseButton()].pressed = true;
 		if (e.GetEventType() == EventType::MouseButtonReleased)
 			Input::stateMap[dynamic_cast<MouseButtonReleasedEvent&>(e).GetMouseButton()].pressed = false;
 		if (e.GetEventType() == EventType::MouseScrolled)
 			Input::scroll = dynamic_cast<MouseScrollEvent&>(e).GetYOffset();
+
 
 		CR_CORE_TRACE("{0}", e);
 	}

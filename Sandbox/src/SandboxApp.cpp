@@ -52,25 +52,50 @@ public:
 
 		if (Input::IsDown(CR_MOUSE_BUTTON_LEFT))
 			Entities::CreateEntity(EntityPlacePosition(), Entities::EntityType::Cockroach);
-		else if (Input::IsDown(CR_MOUSE_BUTTON_RIGHT))
+		else if (Input::IsPressed(CR_MOUSE_BUTTON_RIGHT))
 		{
-			Entities::CreateEntity(EntityPlacePosition(), Entities::EntityType::Tile);
-			u32 roomPlacePosition = EntityPlacePosition().x / 8 + EntityPlacePosition().y / 8 * room->width;
+			for (auto& ent : scene->entities)
+			{
+				Ref<Hitbox> h = ent->GetComponent<Hitbox>();
+				if (!h) 
+					continue;
+				if (h->Contains(cameraController.camera.ScreenToWorldCoord(Input::MousePosition())))
+					break;
 
-			if (0 <= roomPlacePosition && roomPlacePosition < sizeof(char) * room->width * room->height)
-				room->data[roomPlacePosition] = 'B';
+				Entities::CreateEntity(EntityPlacePosition(), Entities::EntityType::Tile);
+				u32 roomPlacePosition = EntityPlacePosition().x / 8 + EntityPlacePosition().y / 8 * room->width;
 
-			room->Save("assets/scenes/room1.txt");
+				if (0 <= roomPlacePosition && roomPlacePosition < sizeof(char) * room->width * room->height)
+					room->data[roomPlacePosition] = 'B';
+
+				room->Save("assets/scenes/room1.txt");
+				break;
+			}
+		}
+		else if (Input::IsPressed(CR_MOUSE_BUTTON_MIDDLE))
+		{
+			for (auto& ent : scene->entities)
+			{
+				Ref<Hitbox> h = ent->GetComponent<Hitbox>();
+				if (h->Contains(cameraController.camera.ScreenToWorldCoord(Input::MousePosition())))
+				{
+					ent->sprite = scene->GetSubTexture("assets/textures/SpriteSheet.png", { 0,0 }, { 1,1 });
+					h->enabled = false;
+					u32 roomPlacePosition = EntityPlacePosition().x / 8 + EntityPlacePosition().y / 8 * room->width;
+
+					if (0 <= roomPlacePosition && roomPlacePosition < sizeof(char) * room->width * room->height)
+						room->data[roomPlacePosition] = '_';
+
+					room->Save("assets/scenes/room1.txt");
+				}
+			}
 		}
 	}
 
 	float2 EntityPlacePosition()
 	{
-		int2 mousePos = { (int)Cockroach::Input::GetMouseX(), (int)Cockroach::Input::GetMouseY() };
-		float2 worldPos = cameraController.camera.ScreenToWorldCoord(mousePos);
-		float2 worldCoord = cameraController.camera.ScreenToWorldCoord(mousePos);
-		float2 entityCenteredCoord = { worldCoord.x, worldCoord.y};
-		return float2(std::floor(entityCenteredCoord.x/8) * 8, std::floor(entityCenteredCoord.y/8) * 8);
+		float2 worldCoord = cameraController.camera.ScreenToWorldCoord(Input::MousePosition());
+		return float2(std::floor(worldCoord.x/8) * 8, std::floor(worldCoord.y/8) * 8);
 	}
 
 	virtual void Render() override
@@ -89,8 +114,8 @@ public:
 
 		for (auto& ent : scene->entities)
 		{
-			Cockroach::Ref<Hitbox> h = ent->GetComponent<Hitbox>();
-			if (h)
+			Ref<Hitbox> h = ent->GetComponent<Hitbox>();
+			if (h && h->enabled)
 				DrawHitbox(h);
 		}
 
@@ -107,14 +132,6 @@ public:
 		ImGuiIO io = ImGui::GetIO();
 		Begin("Frame Info");
 		Text("%.3f ms (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-
-		auto stats = Cockroach::Renderer::GetStats();
-		Text("Draw Calls: %d", stats.DrawCalls);
-		Text("Quad Count: %d", stats.QuadCount);
-		Text("Vertex Count: %d", stats.GetTotalVertexCount());
-		Text("Index Count: %d", stats.GetTotalIndexCount());
-
-		Spacing();
 
 		Text("Entity Count: %i", scene->entities.size());
 		End();

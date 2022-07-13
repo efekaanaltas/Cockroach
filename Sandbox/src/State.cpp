@@ -3,74 +3,87 @@
 
 #include "Components.h"
 
+void WalkingState::Enter(Player* player)
+{
+	player->coyoteTimer.remainingTime = 0.0f;
+}
+
 State<Player>* WalkingState::Update(Player* player, float dt)
 {
-	if (Input::IsDown(CR_KEY_SPACE))
-		jumpBufferTimer.Reset();
+	if (Input::IsDown(CR_KEY_SPACE) && !player->grounded && player->NextToWall())
+				return player->walljumpingState;
+
+	CR_CORE_INFO(player->jumpBufferTimer.Finished());
+
+	if (!player->coyoteTimer.Finished() && !player->jumpBufferTimer.Finished())
+		return player->jumpingState;
+
 	if (Input::IsDown(CR_KEY_LEFT_SHIFT))
-		return (State<Player>*)player->dashingState;
-	if (player->grounded && !jumpBufferTimer.Finished())
-		return (State<Player>*)player->jumpingState;
+		return player->dashingState;
 
 	player->velocity.y -= gravity * dt;
 	player->velocity.y = std::max(player->velocity.y, -maxFallSpeed);
 
-	if (player->InputDir() != 0)
+	if (player->InputDirX() != 0)
 	{
-		player->velocity.x += player->InputDir() * acceleration * dt;
+		player->velocity.x += player->InputDirX() * acceleration * dt;
 		player->velocity.x = std::clamp(player->velocity.x, -maxWalkSpeed, maxWalkSpeed);
 	}
 	else
 	{
 		player->velocity.x -= player->faceDir * deceleration * dt;
-		player->velocity.x = std::max(player->faceDir * player->velocity.x, 0.0f);
+		if (player->faceDir * player->velocity.x < 0.0f) player->velocity.x = 0.0f;
 	}
-
-	if (player->grounded)
-		groundedTimer.Reset();
-
-	jumpBufferTimer.Tick(1.0f);
-	groundedTimer.Tick(1.0f);
 
 	return nullptr;
 }
 
 void JumpingState::Enter(Player* player)
 {
+	WalkingState::Enter(player);
+
+	player->velocity.x += horizontalBoost * player->faceDir;
 	player->velocity.y = maxJumpSpeed;
 }
 
 State<Player>* JumpingState::Update(Player* player, float dt)
 {
-	player->velocity.y -= 120.0f * dt;
-
 	if (Input::IsUp(CR_KEY_SPACE))
 		player->velocity.y = std::min(player->velocity.y, minJumpSpeed);
 	else if (player->velocity.y <= 0)
-		return (State<Player>*)player->walkingState;
+		return player->walkingState;
 
-	return nullptr;
+	return WalkingState::Update(player, dt);
+}
+
+void ClingingState::Enter(Player* player)
+{
+	player->velocity.y = 0;
 }
 
 State<Player>* ClingingState::Update(Player* player, float dt)
 {
+	if (!player->NextToWall())
+		return player->walkingState;
+
 	if (Input::IsDown(CR_KEY_LEFT_SHIFT))
+		return player->dashingState;
+
+	if (!player->jumpBufferTimer.Finished())
 	{
-		player->faceDir *= -1;
-		return (State<Player>*)player->dashingState;
+		if (Input::IsPressed(CR_KEY_UP)) return player->climbingState;
+		else							 return player->walljumpingState;
 	}
 
-	if (Input::IsDown(CR_KEY_SPACE)) // TODO: Use jump buffer
+	if (Input::IsPressed(CR_KEY_UP)) player->velocity.y = 0.0f;
+	else
 	{
-		if (Input::IsPressed(CR_KEY_UP)) return (State<Player>*)player->climbingState; // Climbing
-		else return (State<Player>*)player->walljumpingState; // Walljump
+		player->velocity.y -= 500.0f * dt;
+		player->velocity.y = std::clamp(player->velocity.y, -fallSpeed, 0.0f);
 	}
 
-	if (!Input::IsPressed(CR_KEY_DOWN))
-		player->velocity.y = -fallSpeed;
-
-	if (player->InputDir() != player->faceDir)
-		return (State<Player>*)player->walkingState;
+	if (player->InputDirX() == -player->faceDir)
+		return player->walkingState;
 
 	return nullptr;
 }
@@ -81,25 +94,44 @@ void DashingState::Enter(Player* player)
 
 	player->velocity.y = 0;
 
-	if (player->InputDir() != 0)
-		player->faceDir = player->InputDir();
+	bool down = Input::IsPressed(CR_KEY_DOWN);
+	bool up = Input::IsPressed(CR_KEY_UP);
+	dashDir = { 0.0f, 0.0f };
+
+	if (player->InputDirX() != 0 || player->InputDirY() != 0)
+		dashDir = glm::normalize(float2(player->InputDirX(), player->InputDirY()));
+	else dashDir = { player->faceDir, 0.0f };
 }
 
 State<Player>* DashingState::Update(Player* player, float dt)
 {
-	if (Input::IsDown(CR_KEY_SPACE) && player->grounded)
-		return (State<Player>*)player->superjumpingState;
+	if (Input::IsDown(CR_KEY_SPACE) && player->GetCollidingHitbox(0, -1))
+		return player->superjumpingState;
 
 	if (dashTimer.Finished())
-		return (State<Player>*)player->walkingState;
+		return player->walkingState;
 	else
 	{
-		player->velocity.x = dashSpeed * player->faceDir;
+		dashTimer.Tick(dt);
+		player->velocity = dashSpeed * dashDir;
 
-		// TODO: Add edge correction (DashingState.cs could help)
+		Hitbox* wall = player->GetCollidingHitbox(player->faceDir, 0);
+		if (wall)
+		{
+			int heightDelta = wall->Top() - player->entity->GetComponent<Hitbox>()->Bottom();
+			if (heightDelta < 5)
+				player->MoveY(heightDelta);
+		}
+
+		Hitbox* ground = player->GetCollidingHitbox(0, -3);
+		if (ground)
+		{
+			int heightDelta = player->entity->GetComponent<Hitbox>()->Bottom() - ground->Top();
+			if (heightDelta < 4)
+				player->MoveY(-heightDelta);
+		}
 	}
 
-	dashTimer.Tick(dt);
 
 	return nullptr;
 }

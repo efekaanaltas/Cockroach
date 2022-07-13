@@ -18,6 +18,8 @@ public:
 
 	Hitbox();
 
+	bool enabled = true;
+
 	glm::ivec2 min = { 0, 0 };
 	glm::ivec2 max = { 8, 8 };
 
@@ -30,6 +32,7 @@ public:
 
 	bool OverlapsWith(Hitbox other, float xForesense = 0, float yForesense = 0); // TODO: Const reference of Hitbox can't call functions such as Left(), why?
 	bool Contains(Hitbox other);
+	bool Contains(int2 coord);
 };
 
 class StaticObject : public Component
@@ -77,11 +80,16 @@ public:
 	ClingingState* clingingState = nullptr;
 	DashingState* dashingState = nullptr;
 
+	Timer jumpBufferTimer = Timer(10.0f);
+	Timer coyoteTimer = Timer(10.0f);
+
 	i8 MoveX(float amount);
 	i8 MoveY(float amount);
 	Hitbox* GetCollidingHitbox(int xForesense, int yForesense);
 
-	i8 InputDir() const;
+	i8 InputDirX() const;
+	i8 InputDirY() const;
+	bool NextToWall();
 
 	void TrySwitchState(State<Player>* newState);
 };

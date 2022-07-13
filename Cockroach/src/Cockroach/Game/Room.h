@@ -8,7 +8,7 @@ namespace Cockroach
 	{
 	public:
 		static const char Air = '_';
-		static const char TileBasic = 'A';
+		static const char TileBasic = 'B';
 
 		Room(u32 width, u32 height);
 

@@ -23,9 +23,7 @@ namespace Cockroach
 		static bool IsPressed(u16 code);
 		static bool IsDown(u16 code);
 		static bool IsUp(u16 code);
-		static std::pair<float, float> GetMousePosition();
-		static float Input::GetMouseX();
-		static float Input::GetMouseY();
+		static float2 MousePosition();
 	};
 
 // from glfw3.h
