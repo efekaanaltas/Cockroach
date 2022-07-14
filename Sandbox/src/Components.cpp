@@ -9,7 +9,8 @@ using namespace Cockroach;
 
 std::vector<Hitbox*> Hitbox::all = std::vector<Hitbox*>();
 
-Hitbox::Hitbox()
+Hitbox::Hitbox(Entity* entity)
+	: Component(entity)
 {
 	Hitbox::all.push_back(this);
 }
@@ -38,8 +39,8 @@ bool Hitbox::Contains(int2 coord)
 	return x && y;
 }
 
-Player::Player()
-	: DynamicObject()
+Player::Player(Entity* entity)
+	: DynamicObject(entity)
 {
 	walkingState =		new WalkingState;
 	jumpingState =		new JumpingState(100.0f, 160.0f, 0.0f);
@@ -48,6 +49,21 @@ Player::Player()
 	climbingState =		new JumpingState(100.0f, 160.0f, 0.0f);
 	clingingState =		new ClingingState;
 	dashingState =		new DashingState;
+
+	std::string sheetPath = "assets/textures/SpriteSheet.png";
+	idleSheet.push_back(		Scene::current->GetSubTexture(sheetPath, { 0, 3 }, { 16, 16 }));
+	idleSheet.push_back(		Scene::current->GetSubTexture(sheetPath, { 1, 3 }, { 16, 16 }));
+	walkingSheet.push_back(		Scene::current->GetSubTexture(sheetPath, { 2, 3 }, { 16, 16 }));
+	walkingSheet.push_back(		Scene::current->GetSubTexture(sheetPath, { 3, 3 }, { 16, 16 }));
+	dashingSheet.push_back(		Scene::current->GetSubTexture(sheetPath, { 4, 3 }, { 16, 16 }));
+	dashingSheet.push_back(		Scene::current->GetSubTexture(sheetPath, { 5, 3 }, { 16, 16 }));
+	dashingSheet.push_back(		Scene::current->GetSubTexture(sheetPath, { 6, 3 }, { 16, 16 }));
+	jumpingSheet.push_back(		Scene::current->GetSubTexture(sheetPath, { 7, 3 }, { 16, 16 }));
+	clingingSheet.push_back(	Scene::current->GetSubTexture(sheetPath, { 8, 3 }, { 16, 16 }));
+	fallingSheet.push_back(		Scene::current->GetSubTexture(sheetPath, { 9, 3 }, { 16, 16 }));
+
+	animator = entity->GetComponent<Animator>();
+	animator->sheet = idleSheet;
 	
 	currentState = walkingState;
 	currentState->Enter(this);
@@ -82,7 +98,7 @@ void Player::OnCollide(Ref<DynamicObject> other, bool horizontalCollision)
 	else                     velocity.y = 0;
 }
 
-i8 Player::InputDirX() const
+i32 Player::InputDirX() const
 {
 	// Perhaps some kind of overwrite system where if both inputs are pressed, the latest pressed one takes precedence?
 	i8 inputDir = 0;
@@ -91,7 +107,7 @@ i8 Player::InputDirX() const
 	return inputDir;
 }
 
-i8 Player::InputDirY() const
+i32 Player::InputDirY() const
 {
 	i8 inputDir = 0;
 	if (Input::IsPressed(CR_KEY_DOWN))  inputDir = -1;
@@ -114,14 +130,16 @@ void Player::TrySwitchState(State<Player>* newState)
 
 std::vector<StaticObject*> StaticObject::all = std::vector<StaticObject*>();
 
-StaticObject::StaticObject()
+StaticObject::StaticObject(Entity* entity)
+	: Component(entity)
 {
 	StaticObject::all.push_back(this);
 }
 
 std::vector<DynamicObject*> DynamicObject::all = std::vector<DynamicObject*>();
 
-DynamicObject::DynamicObject()
+DynamicObject::DynamicObject(Entity* entity)
+	: Component(entity)
 {
 	DynamicObject::all.push_back(this);
 }
@@ -190,4 +208,10 @@ Hitbox* DynamicObject::GetCollidingHitbox(i32 xForesense, i32 yForesense)
 			if (thisHitbox->OverlapsWith(*h, xForesense, yForesense))
 				return h;
 	return nullptr;
+}
+
+void Animator::Update(float dt)
+{
+	i32 index = std::fmodf(Application::Get().frameCount * framePerSecond / 60.0f, sheet.size());
+	entity->sprite = sheet[index];
 }

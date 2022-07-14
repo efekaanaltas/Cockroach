@@ -16,7 +16,7 @@ class Hitbox : public Component
 public:
 	static std::vector<Hitbox*> all;
 
-	Hitbox();
+	Hitbox(Entity* entity);
 
 	bool enabled = true;
 
@@ -35,12 +35,26 @@ public:
 	bool Contains(int2 coord);
 };
 
+using Sheet = std::vector<Ref<SubTexture2D>>;
+class Animator : public Component
+{
+public:
+	Animator(Entity* entity)
+		: Component(entity)
+	{}
+
+	virtual void Update(float dt) override;
+
+	Sheet sheet;
+	i32 framePerSecond = 3;
+};
+
 class StaticObject : public Component
 {
 public:
 	static std::vector<StaticObject*> all;
 
-	StaticObject();
+	StaticObject(Entity* entity);
 };
 
 class DynamicObject : public Component
@@ -48,7 +62,7 @@ class DynamicObject : public Component
 public:
 	static std::vector<DynamicObject*> all;
 
-	DynamicObject();
+	DynamicObject(Entity* entity);
 
 	DynamicObject* parent = nullptr;
 	std::vector<DynamicObject*> children;
@@ -64,7 +78,7 @@ public:
 class Player : public DynamicObject
 {
 public:
-	Player();
+	Player(Entity* entity);
 	virtual void Update(float dt) override;
 
 	i8 faceDir = 1; // -1 for left, 1 for right
@@ -83,13 +97,16 @@ public:
 	ClingingState* clingingState = nullptr;
 	DashingState* dashingState = nullptr;
 
+	Sheet idleSheet, walkingSheet, fallingSheet, jumpingSheet, clingingSheet, dashingSheet;
+	Ref<Animator> animator = entity->GetComponent<Animator>();
+
 	Timer jumpBufferTimer = Timer(10.0f);
 	Timer coyoteTimer = Timer(10.0f);
 
 	virtual void OnCollide(Ref<DynamicObject> other, bool horizontalCollision) override;
 
-	i8 InputDirX() const;
-	i8 InputDirY() const;
+	i32 InputDirX() const;
+	i32 InputDirY() const;
 	bool NextToWall();
 
 	void TrySwitchState(State<Player>* newState);
@@ -98,5 +115,7 @@ public:
 class Hazard : public DynamicObject
 {
 public:
-	Hazard() {}
+	Hazard(Entity* entity)
+		: DynamicObject(entity)
+	{}
 };

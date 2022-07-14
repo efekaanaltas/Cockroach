@@ -9,8 +9,10 @@ namespace Cockroach
 	class Component
 	{
 	public:
-		Component() {};
+		Component(Entity* entity) 
+			: entity(entity)
+		{}
 		Entity* entity = nullptr;
-		virtual void Update(float dt) {};
+		virtual void Update(float dt) {}
 	};
 }

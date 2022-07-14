@@ -5,6 +5,7 @@
 using namespace Cockroach;
 
 class Player;
+#include "Components.h"
 
 template<typename T>
 class State
@@ -30,6 +31,8 @@ class JumpingState : public WalkingState
 public:
 	float minJumpSpeed = 100.0f, maxJumpSpeed = 160.0f;
 	float horizontalBoost = 0.0f;
+
+	Sheet jumpingSheet;
 
 	JumpingState(float minJumpSpeed, float maxJumpSpeed, float horizontalBoost)
 		: WalkingState(), minJumpSpeed(minJumpSpeed), maxJumpSpeed(maxJumpSpeed), horizontalBoost(horizontalBoost)

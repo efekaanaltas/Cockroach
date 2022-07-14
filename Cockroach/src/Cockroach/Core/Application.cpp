@@ -76,6 +76,7 @@ namespace Cockroach
 			float time = (float)glfwGetTime();
 			float dt = (time - lastFrameTime);
 			lastFrameTime = time;
+			frameCount++;
 
 			if (!minimized)
 			{

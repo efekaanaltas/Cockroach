@@ -26,6 +26,7 @@ namespace Entities
 			Ref<Hitbox> h = e->AddComponent<Hitbox>();
 			h->min = { 6, 0 };
 			h->max = { 10, 10 };
+			e->AddComponent<Animator>();
 			e->AddComponent<Player>();
 			break;
 		}

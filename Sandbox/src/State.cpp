@@ -3,6 +3,13 @@
 
 #include "Components.h"
 
+Sheet GetWalkingStateSheet(Player* player)
+{
+	if (!player->grounded && player->velocity.y <= 0.0f) return player->fallingSheet;
+	else if (player->velocity.x != 0.0f)				 return player->walkingSheet;
+	else												 return player->idleSheet;
+}
+
 void WalkingState::Enter(Player* player)
 {
 	player->coyoteTimer.remainingTime = 0.0f;
@@ -10,6 +17,8 @@ void WalkingState::Enter(Player* player)
 
 State<Player>* WalkingState::Update(Player* player, float dt)
 {
+	player->animator->sheet = GetWalkingStateSheet(player);
+
 	if (Input::IsDown(CR_KEY_SPACE) && !player->grounded && player->NextToWall())
 				return player->walljumpingState;
 
@@ -44,6 +53,8 @@ void JumpingState::Enter(Player* player)
 
 	player->velocity.x += horizontalBoost * player->faceDir;
 	player->velocity.y = maxJumpSpeed;
+
+	player->animator->sheet = player->jumpingSheet;
 }
 
 State<Player>* JumpingState::Update(Player* player, float dt)
@@ -59,6 +70,8 @@ State<Player>* JumpingState::Update(Player* player, float dt)
 void ClingingState::Enter(Player* player)
 {
 	player->velocity.y = 0;
+
+	player->animator->sheet = player->clingingSheet;
 }
 
 State<Player>* ClingingState::Update(Player* player, float dt)
@@ -101,6 +114,8 @@ void DashingState::Enter(Player* player)
 	if (player->InputDirX() != 0 || player->InputDirY() != 0)
 		dashDir = glm::normalize(float2(player->InputDirX(), player->InputDirY()));
 	else dashDir = { player->faceDir, 0.0f };
+
+	player->animator->sheet = player->dashingSheet;
 }
 
 State<Player>* DashingState::Update(Player* player, float dt)

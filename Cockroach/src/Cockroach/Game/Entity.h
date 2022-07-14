@@ -36,8 +36,7 @@ namespace Cockroach
 	template<typename T>
 	inline Ref<T> Entity::AddComponent()
 	{
-		Ref<T> c = CreateRef<T>();
-		c->entity = this;
+		Ref<T> c = CreateRef<T>(this);
 		components.push_back(c);
 		return c;
 	}
