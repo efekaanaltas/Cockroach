@@ -53,18 +53,21 @@ public:
 	DynamicObject* parent = nullptr;
 	std::vector<DynamicObject*> children;
 
-	void Move(float dx, float dy);
-	virtual void OnCollide(DynamicObject* other) = 0;
+	float xRemainder = 0.0f, yRemainder = 0.0f;
+
+	i8 MoveX(float amount);
+	i8 MoveY(float amount);
+	virtual void OnCollide(Ref<DynamicObject> other, bool horizontalCollision) = 0;
+	Hitbox* GetCollidingHitbox(i32 xForesense, i32 yForesense);
 };
 
-class Player : public Component
+class Player : public DynamicObject
 {
 public:
 	Player();
 	virtual void Update(float dt) override;
 
 	i8 faceDir = 1; // -1 for left, 1 for right
-	float xRemainder = 0.0f, yRemainder = 0.0f;
 	float gravity = 200.0f;
 	bool grounded = false;
 
@@ -83,9 +86,7 @@ public:
 	Timer jumpBufferTimer = Timer(10.0f);
 	Timer coyoteTimer = Timer(10.0f);
 
-	i8 MoveX(float amount);
-	i8 MoveY(float amount);
-	Hitbox* GetCollidingHitbox(int xForesense, int yForesense);
+	virtual void OnCollide(Ref<DynamicObject> other, bool horizontalCollision) override;
 
 	i8 InputDirX() const;
 	i8 InputDirY() const;

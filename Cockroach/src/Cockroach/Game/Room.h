@@ -15,6 +15,8 @@ namespace Cockroach
 		u32 width, height;
 		char* data;
 
+		void PlaceTile(char tileType, int2 worldPlacePosition);
+
 		void Save(const std::string& filepath);
 		static Ref<Room> Load(const std::string& filepath);
 	private:

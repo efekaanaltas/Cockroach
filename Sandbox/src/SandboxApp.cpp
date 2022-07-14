@@ -63,12 +63,7 @@ public:
 					break;
 
 				Entities::CreateEntity(EntityPlacePosition(), Entities::EntityType::Tile);
-				u32 roomPlacePosition = EntityPlacePosition().x / 8 + EntityPlacePosition().y / 8 * room->width;
-
-				if (0 <= roomPlacePosition && roomPlacePosition < sizeof(char) * room->width * room->height)
-					room->data[roomPlacePosition] = 'B';
-
-				room->Save("assets/scenes/room1.txt");
+				room->PlaceTile(Room::TileBasic, EntityPlacePosition());
 				break;
 			}
 		}
@@ -81,12 +76,7 @@ public:
 				{
 					ent->sprite = scene->GetSubTexture("assets/textures/SpriteSheet.png", { 0,0 }, { 1,1 });
 					h->enabled = false;
-					u32 roomPlacePosition = EntityPlacePosition().x / 8 + EntityPlacePosition().y / 8 * room->width;
-
-					if (0 <= roomPlacePosition && roomPlacePosition < sizeof(char) * room->width * room->height)
-						room->data[roomPlacePosition] = '_';
-
-					room->Save("assets/scenes/room1.txt");
+					room->PlaceTile(Room::Air, EntityPlacePosition());
 				}
 			}
 		}

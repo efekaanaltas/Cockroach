@@ -12,34 +12,14 @@ namespace Cockroach
 		memset(data, 0, sizeof(char) * width * height);
 	}
 
-	std::string Room::Serialize()
+	void Room::PlaceTile(char tileType, int2 placeWorldPosition)
 	{
-		u32 a = width;
-		u32 b = height;
-		return std::to_string(width) + " " + std::to_string(height) + " " + data;
-	}
+		u32 roomPlacePosition = placeWorldPosition.x / 8 + placeWorldPosition.y / 8 * width;
 
-	Ref<Room> Room::Deserialize(std::string data)
-	{
-		std::vector<std::string> strings = std::vector<std::string>();
-		i32 current = 0, i = 0, start = 0, end = 0;
-		while (i <= data.length())
-		{
-			if (data[i] == ' ' || i == data.length())
-			{
-				end = i;
-				std::string sub = "";
-				sub.append(data, start, end - start);
-				strings.push_back(sub);
-				current++;
-				start = end + 1;
-			}
-			i++;
-		}
+		if (0 <= roomPlacePosition && roomPlacePosition < sizeof(char) * width * height)
+			data[roomPlacePosition] = tileType;
 
-		Ref<Room> room = CreateRef<Room>(std::stoi(strings[0]), std::stoi(strings[1]));
-		strcpy(room->data, strings[2].c_str());
-		return room;
+		Save("assets/scenes/room1.txt");
 	}
 
 	void Room::Save(const std::string& filepath)
@@ -79,5 +59,35 @@ namespace Cockroach
 		in.close();
 
 		return Room::Deserialize(result);
+	}
+
+	std::string Room::Serialize()
+	{
+		u32 a = width;
+		u32 b = height;
+		return std::to_string(width) + " " + std::to_string(height) + " " + data;
+	}
+
+	Ref<Room> Room::Deserialize(std::string data)
+	{
+		std::vector<std::string> strings = std::vector<std::string>();
+		i32 current = 0, i = 0, start = 0, end = 0;
+		while (i <= data.length())
+		{
+			if (data[i] == ' ' || i == data.length())
+			{
+				end = i;
+				std::string sub = "";
+				sub.append(data, start, end - start);
+				strings.push_back(sub);
+				current++;
+				start = end + 1;
+			}
+			i++;
+		}
+
+		Ref<Room> room = CreateRef<Room>(std::stoi(strings[0]), std::stoi(strings[1]));
+		strcpy(room->data, strings[2].c_str());
+		return room;
 	}
 }

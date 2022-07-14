@@ -39,6 +39,7 @@ bool Hitbox::Contains(int2 coord)
 }
 
 Player::Player()
+	: DynamicObject()
 {
 	walkingState =		new WalkingState;
 	jumpingState =		new JumpingState(100.0f, 160.0f, 0.0f);
@@ -75,70 +76,10 @@ void ::Player::Update(float dt)
 		TrySwitchState(clingingState);
 }
 
-i8 Player::MoveX(float amount)
+void Player::OnCollide(Ref<DynamicObject> other, bool horizontalCollision)
 {
-	xRemainder += amount;
-	i32 move = (i32)xRemainder;
-
-	if (move != 0)
-	{
-		xRemainder -= move;
-		i8 sign = move > 0 ? 1 : -1;
-
-		while (move != 0)
-		{
-			Hitbox* collidingHitbox = GetCollidingHitbox(sign, 0);
-			if (!collidingHitbox)
-			{
-				entity->position.x += sign;
-				move -= sign;
-			}
-			else
-			{
-				velocity.x = 0;
-				return sign;
-			}
-		}
-
-		return 0;
-	}
-}
-
-i8 Player::MoveY(float amount)
-{
-	yRemainder += amount;
-	i32 move = (i32)yRemainder;
-
-	i8 sign = move > 0 ? 1 : -1;
-	yRemainder -= move;
-
-	while (move != 0)
-	{
-		Hitbox* collidingHitbox = GetCollidingHitbox(0, sign);
-		if (!collidingHitbox)
-		{
-			entity->position.y += sign;
-			move -= sign;
-		}
-		else
-		{
-			velocity.y = 0;
-			return sign;
-		}
-	}
-
-	if (GetCollidingHitbox(0, sign)) return sign;
-	else return 0;
-}
-
-Hitbox* Player::GetCollidingHitbox(int xForesense, int yForesense)
-{
-	Ref<Hitbox> playerHitbox = entity->GetComponent<Hitbox>();
-	for (auto& h : Hitbox::all)
-		if (h != entity->GetComponent<Hitbox>().get())
-			if (playerHitbox->OverlapsWith(*h, xForesense, yForesense))
-				return h;
-	return nullptr;
+	if (horizontalCollision) velocity.x = 0;
+	else                     velocity.y = 0;
 }
 
 i8 Player::InputDirX() const
@@ -176,4 +117,77 @@ std::vector<StaticObject*> StaticObject::all = std::vector<StaticObject*>();
 StaticObject::StaticObject()
 {
 	StaticObject::all.push_back(this);
+}
+
+std::vector<DynamicObject*> DynamicObject::all = std::vector<DynamicObject*>();
+
+DynamicObject::DynamicObject()
+{
+	DynamicObject::all.push_back(this);
+}
+
+i8 DynamicObject::MoveX(float amount)
+{
+	xRemainder += amount;
+	i32 move = (i32)xRemainder;
+
+	if (move != 0)
+	{
+		xRemainder -= move;
+		i8 sign = move > 0 ? 1 : -1;
+
+		while (move != 0)
+		{
+			Hitbox* collidingHitbox = GetCollidingHitbox(sign, 0);
+			if (!collidingHitbox)
+			{
+				entity->position.x += sign;
+				move -= sign;
+			}
+			else
+			{
+				OnCollide(collidingHitbox->entity->GetComponent<DynamicObject>(), true);
+				return sign;
+			}
+		}
+
+		return GetCollidingHitbox(sign, 0) ? sign : 0;
+	}
+}
+
+i8 DynamicObject::MoveY(float amount)
+{
+	yRemainder += amount;
+	i32 move = (i32)yRemainder;
+
+	i8 sign = move > 0 ? 1 : -1;
+	yRemainder -= move;
+
+	while (move != 0)
+	{
+		Hitbox* collidingHitbox = GetCollidingHitbox(0, sign);
+		if (!collidingHitbox)
+		{
+			entity->position.y += sign;
+			move -= sign;
+		}
+		else
+		{
+			OnCollide(collidingHitbox->entity->GetComponent<DynamicObject>(), false);
+			return sign;
+		}
+	}
+
+	return GetCollidingHitbox(0, sign) ? sign : 0;
+
+}
+
+Hitbox* DynamicObject::GetCollidingHitbox(i32 xForesense, i32 yForesense)
+{
+	Ref<Hitbox> thisHitbox = entity->GetComponent<Hitbox>();
+	for (auto& h : Hitbox::all)
+		if (h != thisHitbox.get())
+			if (thisHitbox->OverlapsWith(*h, xForesense, yForesense))
+				return h;
+	return nullptr;
 }
