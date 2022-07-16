@@ -12,12 +12,26 @@ namespace Cockroach
 		memset(data, 0, sizeof(char) * width * height);
 	}
 
-	void Room::PlaceTile(char tileType, int2 placeWorldPosition)
+	void Room::PlaceTile(char tileType, int2 worldPosition)
 	{
-		u32 roomPlacePosition = placeWorldPosition.x / 8 + placeWorldPosition.y / 8 * width;
+		i32 roomPosition = worldPosition.x / 8 + worldPosition.y / 8 * width;
 
-		if (0 <= roomPlacePosition && roomPlacePosition < sizeof(char) * width * height)
-			data[roomPlacePosition] = tileType;
+		if (0 <= roomPosition && roomPosition < sizeof(char) * width * height)
+			data[roomPosition] = tileType;
+
+		Save("assets/scenes/room1.txt");
+	}
+
+	void Room::PlaceTileBox(char tileType, int2 worldPositionMin, int2 worldPositionMax)
+	{
+		for (i32 y = worldPositionMin.y; y <= worldPositionMax.y; y++)
+			for (i32 x = worldPositionMin.x; x <= worldPositionMax.x; x++)
+			{
+				i32 roomPosition = x / 8 + y / 8 * width;
+
+				if (0 <= roomPosition && roomPosition < sizeof(char) * width * height)
+					data[roomPosition] = tileType;
+			}
 
 		Save("assets/scenes/room1.txt");
 	}

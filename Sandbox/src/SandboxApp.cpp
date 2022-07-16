@@ -33,14 +33,6 @@ public:
 		}
 	}
 
-	void DrawHitbox(Cockroach::Ref<Hitbox> h)
-	{
-		Cockroach::Renderer::DrawLine({ h->Left(), h->Bottom(), 0.0f }, { h->Left(), h->Top(), 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f });
-		Cockroach::Renderer::DrawLine({ h->Left(), h->Top(), 0.0f }, { h->Right(), h->Top(), 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f });
-		Cockroach::Renderer::DrawLine({ h->Right(), h->Top(), 0.0f }, { h->Right(), h->Bottom(), 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f });
-		Cockroach::Renderer::DrawLine({ h->Right(), h->Bottom(), 0.0f }, { h->Left(), h->Bottom(), 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f });
-	}
-
 	~Sandbox()
 	{
 	}
@@ -50,57 +42,111 @@ public:
 		cameraController.OnUpdate(dt);
 		scene->Update(dt);
 
-		if (Input::IsDown(CR_MOUSE_BUTTON_LEFT))
-			Entities::CreateEntity(EntityPlacePosition(), Entities::EntityType::Cockroach);
-		else if (Input::IsPressed(CR_MOUSE_BUTTON_RIGHT))
-		{
-			for (auto& ent : scene->entities)
-			{
-				Ref<Hitbox> h = ent->GetComponent<Hitbox>();
-				if (!h) 
-					continue;
-				if (h->Contains(cameraController.camera.ScreenToWorldCoord(Input::MousePosition())))
-					break;
+		if (Input::IsDown(CR_KEY_ESCAPE))
+			room->PlaceTileBox(Room::Air, { 0,0 }, { 1000,1000 });
 
-				Entities::CreateEntity(EntityPlacePosition(), Entities::EntityType::Tile);
-				room->PlaceTile(Room::TileBasic, EntityPlacePosition());
-				break;
+		if (Input::IsPressed(CR_KEY_LEFT_SHIFT) && (Input::IsPressed(CR_MOUSE_BUTTON_RIGHT) || Input::IsPressed(CR_MOUSE_BUTTON_MIDDLE)))
+		{
+			if (Input::IsDown(CR_KEY_LEFT_SHIFT) || Input::IsDown(CR_MOUSE_BUTTON_RIGHT) || Input::IsDown(CR_MOUSE_BUTTON_MIDDLE))
+			{
+				isBoxPlacing = true;
+				boxPlaceStartPos = EntityPlacePosition();
 			}
 		}
-		else if (Input::IsPressed(CR_MOUSE_BUTTON_MIDDLE))
+
+		if (isBoxPlacing)
 		{
-			for (auto& ent : scene->entities)
+			if (Input::IsUp(CR_KEY_LEFT_SHIFT) || Input::IsUp(CR_MOUSE_BUTTON_RIGHT))
 			{
-				Ref<Hitbox> h = ent->GetComponent<Hitbox>();
-				if (h->Contains(cameraController.camera.ScreenToWorldCoord(Input::MousePosition())))
+				int2 boxPlaceEndPos = EntityPlacePosition();
+				int2 minPos = { std::min(boxPlaceStartPos.x, boxPlaceEndPos.x), std::min(boxPlaceStartPos.y, boxPlaceEndPos.y) };
+				int2 maxPos = { std::max(boxPlaceStartPos.x, boxPlaceEndPos.x), std::max(boxPlaceStartPos.y, boxPlaceEndPos.y) };
+
+				for(i32 y = minPos.y; y <= maxPos.y; y+=8)
+					for (i32 x = minPos.x; x <= maxPos.x; x+=8)
+					{
+						Ref<Entity> ent = GetEntityAtPosition(cameraController.camera.ScreenToWorldCoord({ x,y }));
+
+						if (!ent)
+						{
+							Entities::CreateEntity({ x,y }, Entities::EntityType::Tile);
+						}
+					}
+				room->PlaceTileBox(Room::TileBasic, minPos, maxPos);
+				isBoxPlacing = false;
+			}
+			if (Input::IsUp(CR_KEY_LEFT_SHIFT) || Input::IsUp(CR_MOUSE_BUTTON_MIDDLE))
+			{
+				int2 boxPlaceEndPos = EntityPlacePosition();
+				int2 minPos = { std::min(boxPlaceStartPos.x, boxPlaceEndPos.x), std::min(boxPlaceStartPos.y, boxPlaceEndPos.y) };
+				int2 maxPos = { std::max(boxPlaceStartPos.x, boxPlaceEndPos.x), std::max(boxPlaceStartPos.y, boxPlaceEndPos.y) };
+
+				for (i32 y = minPos.y; y <= maxPos.y; y += 8)
+					for (i32 x = minPos.x; x <= maxPos.x; x += 8)
+					{
+						Ref<Entity> ent = GetEntityAtPosition({x,y});
+						if (ent)
+						{
+							ent->sprite = scene->GetSubTexture("assets/textures/SpriteSheet.png", { 0,0 }, { 1,1 });
+							ent->GetComponent<Hitbox>()->enabled = false;
+						}
+					}
+				room->PlaceTileBox(Room::Air, minPos, maxPos);
+				isBoxPlacing = false;
+			}
+		}
+		else
+		{
+			if (Input::IsDown(CR_MOUSE_BUTTON_LEFT))
+				Entities::CreateEntity(EntityPlacePosition(), Entities::EntityType::Cockroach);
+			else if (Input::IsPressed(CR_MOUSE_BUTTON_RIGHT))
+			{
+				Ref<Entity> ent = GetEntityAtPosition(cameraController.camera.ScreenToWorldCoord(Input::MousePosition()));
+
+				if (!ent)
+				{
+					Entities::CreateEntity(EntityPlacePosition(), Entities::EntityType::Tile);
+					room->PlaceTile(Room::TileBasic, EntityPlacePosition());
+				}
+			}
+			else if (Input::IsPressed(CR_MOUSE_BUTTON_MIDDLE))
+			{
+				Ref<Entity> ent = GetEntityAtPosition(cameraController.camera.ScreenToWorldCoord(Input::MousePosition()));
+				if (ent)
 				{
 					ent->sprite = scene->GetSubTexture("assets/textures/SpriteSheet.png", { 0,0 }, { 1,1 });
-					h->enabled = false;
+					ent->GetComponent<Hitbox>()->enabled = false;
 					room->PlaceTile(Room::Air, EntityPlacePosition());
 				}
 			}
 		}
-	}
 
-	float2 EntityPlacePosition()
-	{
-		float2 worldCoord = cameraController.camera.ScreenToWorldCoord(Input::MousePosition());
-		return float2(std::floor(worldCoord.x/8) * 8, std::floor(worldCoord.y/8) * 8);
 	}
 
 	virtual void Render() override
 	{
-		Cockroach::Renderer::ResetStats();
+		Renderer::ResetStats();
 
-		Cockroach::Renderer::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
-		Cockroach::Renderer::Clear();
+		Renderer::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+		Renderer::Clear();
 
-		Cockroach::Renderer::BeginScene(cameraController.camera);
+		Renderer::BeginScene(cameraController.camera);
 
 		RenderGrid();
 		scene->Render();
 
-		Cockroach::Renderer::DrawQuad(EntityPlacePosition(), {cursorSprite->XSize(), cursorSprite->YSize()}, cursorSprite);
+		if (!isBoxPlacing)
+			Renderer::DrawQuad(EntityPlacePosition(), { cursorSprite->XSize(), cursorSprite->YSize() }, cursorSprite);
+		else
+		{
+			int2 boxPlaceEndPos = EntityPlacePosition();
+			float2 start = { std::min(boxPlaceStartPos.x, boxPlaceEndPos.x), std::min(boxPlaceStartPos.y, boxPlaceEndPos.y) };
+			float2 end = { std::max(boxPlaceStartPos.x, boxPlaceEndPos.x) + 8.0f, std::max(boxPlaceStartPos.y, boxPlaceEndPos.y) + 8.0f };
+			Renderer::DrawLine({ start.x, start.y, 0.0f },	{ start.x, end.y, 0.0f },	{ 1.0f, 1.0f, 0.0f, 1.0f });
+			Renderer::DrawLine({ start.x, end.y, 0.0f },	{ end.x, end.y, 0.0f},		{ 1.0f, 1.0f, 0.0f, 1.0f });
+			Renderer::DrawLine({ end.x, end.y, 0.0f },		{ end.x, start.y, 0.0f },	{ 1.0f, 1.0f, 0.0f, 1.0f });
+			Renderer::DrawLine({ end.x, start.y, 0.0f },	{ start.x, start.y, 0.0f }, { 1.0f, 1.0f, 0.0f, 1.0f });
+		}
 
 		for (auto& ent : scene->entities)
 		{
@@ -129,6 +175,33 @@ public:
 		Application::ImGuiEnd();
 	}
 
+	Ref<Entity> GetEntityAtPosition(float2 position)
+	{
+		if (scene->entities.size() == 0)
+			return nullptr;
+		for (auto& ent : scene->entities)
+		{
+			Ref<Hitbox> h = ent->GetComponent<Hitbox>();
+			if (h && h->Contains(position))
+				return ent;
+		}
+		return false;
+	}
+
+	float2 EntityPlacePosition()
+	{
+		float2 worldCoord = cameraController.camera.ScreenToWorldCoord(Input::MousePosition());
+		return float2(std::floor(worldCoord.x / 8) * 8, std::floor(worldCoord.y / 8) * 8);
+	}
+
+	void DrawHitbox(Cockroach::Ref<Hitbox> h)
+	{
+		Cockroach::Renderer::DrawLine({ h->Left(), h->Bottom(), 0.0f }, { h->Left(), h->Top(), 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f });
+		Cockroach::Renderer::DrawLine({ h->Left(), h->Top(), 0.0f }, { h->Right(), h->Top(), 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f });
+		Cockroach::Renderer::DrawLine({ h->Right(), h->Top(), 0.0f }, { h->Right(), h->Bottom(), 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f });
+		Cockroach::Renderer::DrawLine({ h->Right(), h->Bottom(), 0.0f }, { h->Left(), h->Bottom(), 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f });
+	}
+
 	void RenderGrid()
 	{
 		for (int i = -80; i < 80; i++)
@@ -150,6 +223,9 @@ private:
 	Ref<SubTexture2D> cursorSprite;
 	Ref<Scene> scene;
 	Ref<Room> room;
+
+	bool isBoxPlacing = false;
+	int2 boxPlaceStartPos = { 0.0f, 0.0f };
 };
 
 Cockroach::Application* Cockroach::CreateApplication()
