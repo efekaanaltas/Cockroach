@@ -9,6 +9,49 @@
 #include "Components.h"
 #include "Entities.h"
 
+class Game : public Application
+{
+public:
+	Game()
+		: Application(), cameraController(16.0f / 9.0f)
+	{
+		player = Entities::CreateEntity({ 0.0f, 0.0f }, Entities::Cockroach);
+
+		room = Room::Load("assets/scenes/room1.txt");
+		for (i32 y = 0; y < room->height; y++)
+		{
+			for (i32 x = 0; x < room->width; x++)
+			{
+				if (room->data[x + y * room->width].type == Room::Air) continue;
+				Entities::CreateEntity({ 8 * x, 8 * y }, Entities::EntityType::Tile);
+			}
+		}
+	}
+
+	~Game() {}
+
+	virtual void Update(float dt) override
+	{
+		if (Room::current != nullptr)
+		{
+			player->Update(dt);
+			//room->Update(dt);
+			//cameraController->FollowPlayer(player);
+		}
+		else
+		{
+			//camera->TransitionTo(nextRoom);
+			//if (nextRoom.Contains(camera.bounds))
+				//Room::current = nextRoom;
+		}
+	}
+
+	CameraController cameraController;
+
+	Ref<Entity> player;
+	Ref<Room> room;
+};
+
 class Sandbox : public Cockroach::Application
 {
 public:
@@ -22,13 +65,16 @@ public:
 		cursorSprite = scene->GetSubTexture("assets/textures/SpriteSheet.png", { 0, 0 }, { 8, 8 });
 
 		room = Room::Load("assets/scenes/room1.txt");
-
-		for (u32 y = 0; y < room->height; y++)
+		for (i32 y = 0; y < room->height; y++)
 		{
-			for (u32 x = 0; x < room->width; x++)
+			for (i32 x = 0; x < room->width; x++)
 			{
-				if (room->data[x + y * room->width] == Room::Air) continue;
-				Entities::CreateEntity({ 8*x, 8*y }, Entities::EntityType::Tile);
+				if (room->data[x + y * room->width].type == Room::Air) continue;
+				Ref<Entity> ent = scene->AddEntity({ x*8, y*8 });
+				ent->sprite = scene->GetSubTexture("assets/textures/SpriteSheet.png", { 0,0 }, { 1,1 });
+				Ref<Hitbox> h = ent->AddComponent<Hitbox>();
+				h->min = { 0,0 };
+				h->max = { 8,8 };
 			}
 		}
 	}
@@ -65,7 +111,7 @@ public:
 				for(i32 y = minPos.y; y <= maxPos.y; y+=8)
 					for (i32 x = minPos.x; x <= maxPos.x; x+=8)
 					{
-						Ref<Entity> ent = GetEntityAtPosition(cameraController.camera.ScreenToWorldCoord({ x,y }));
+						Ref<Entity> ent = GetEntityAtPosition(cameraController.camera.ScreenToWorldPosition({ x,y }));
 
 						if (!ent)
 						{
@@ -101,7 +147,7 @@ public:
 				Entities::CreateEntity(EntityPlacePosition(), Entities::EntityType::Cockroach);
 			else if (Input::IsPressed(CR_MOUSE_BUTTON_RIGHT))
 			{
-				Ref<Entity> ent = GetEntityAtPosition(cameraController.camera.ScreenToWorldCoord(Input::MousePosition()));
+				Ref<Entity> ent = GetEntityAtPosition(cameraController.camera.ScreenToWorldPosition(Input::MousePosition()));
 
 				if (!ent)
 				{
@@ -111,7 +157,7 @@ public:
 			}
 			else if (Input::IsPressed(CR_MOUSE_BUTTON_MIDDLE))
 			{
-				Ref<Entity> ent = GetEntityAtPosition(cameraController.camera.ScreenToWorldCoord(Input::MousePosition()));
+				Ref<Entity> ent = GetEntityAtPosition(cameraController.camera.ScreenToWorldPosition(Input::MousePosition()));
 				if (ent)
 				{
 					ent->sprite = scene->GetSubTexture("assets/textures/SpriteSheet.png", { 0,0 }, { 1,1 });
@@ -134,6 +180,7 @@ public:
 
 		RenderGrid();
 		scene->Render();
+		room->Render();
 
 		if (!isBoxPlacing)
 			Renderer::DrawQuad(EntityPlacePosition(), { cursorSprite->XSize(), cursorSprite->YSize() }, cursorSprite);
@@ -190,7 +237,7 @@ public:
 
 	float2 EntityPlacePosition()
 	{
-		float2 worldCoord = cameraController.camera.ScreenToWorldCoord(Input::MousePosition());
+		float2 worldCoord = cameraController.camera.ScreenToWorldPosition(Input::MousePosition());
 		return float2(std::floor(worldCoord.x / 8) * 8, std::floor(worldCoord.y / 8) * 8);
 	}
 

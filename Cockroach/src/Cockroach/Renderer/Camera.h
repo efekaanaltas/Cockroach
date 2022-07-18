@@ -17,7 +17,7 @@ namespace Cockroach
 		const mat4& GetProjectionMatrix() const { return projectionMatrix; }
 		const mat4& GetViewProjectionMatrix() const { return viewProjectionMatrix; }
 
-		glm::vec2 ScreenToWorldCoord(const glm::ivec2& screenCoord);
+		glm::vec2 ScreenToWorldPosition(const glm::ivec2& screenCoord);
 	private:
 		void RecalculateViewMatrix();
 	private:

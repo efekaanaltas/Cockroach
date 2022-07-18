@@ -83,6 +83,8 @@ void ::Player::Update(float dt)
 
 	if (velocity.x != 0.0f) // Use InputDirX() instead?
 		faceDir = velocity.x < 0.0f ? -1 : 1;
+	entity->sprite->flipX = faceDir == -1;
+
 	i8 horizontalCollisions = MoveX(velocity.x * dt);
 	i8 verticalCollisions = MoveY((velocityLastFrame.y + velocity.y) * 0.5f * dt); // Verlet integrated vertical motion
 

@@ -2,38 +2,72 @@
 #include "Room.h"
 
 #include <fstream>
+#include "Cockroach/Renderer/Renderer.h"
 
 namespace Cockroach
 {
-	Room::Room(u32 width, u32 height)
+	Room::Room(int width, int height)
 		: width(width), height(height)
 	{
-		data = new char[width * height];
+		data = new Tile[width * height];
 		memset(data, 0, sizeof(char) * width * height);
 	}
 
-	void Room::PlaceTile(char tileType, int2 worldPosition)
+	void Room::Render()
 	{
-		i32 roomPosition = worldPosition.x / 8 + worldPosition.y / 8 * width;
+		Ref<Texture2D> texture = CreateRef<Texture2D>("assets/textures/SpriteSheet.png");
+		for (int i = 0; i < width * height; i++)
+		{
+			if (data[i].type == Air) continue;
+			Ref<SubTexture2D> sprite = SubTexture2D::CreateFromCoords(texture, { 11+data[i].texCoordOffset.x,2+data[i].texCoordOffset.y}, {8,8});
+			Renderer::DrawQuad(IndexToRoomPosition(i) * 8, { 8,8 }, sprite);
+		}
+	}
 
-		if (0 <= roomPosition && roomPosition < sizeof(char) * width * height)
-			data[roomPosition] = tileType;
+	void Room::PlaceTile(TileType tileType, int2 worldPosition)
+	{
+		int roomPosition = worldPosition.x / 8 + worldPosition.y / 8 * width;
+
+		if (0 <= roomPosition && roomPosition < width * height)
+			data[roomPosition].type = tileType;
 
 		Save("assets/scenes/room1.txt");
 	}
 
-	void Room::PlaceTileBox(char tileType, int2 worldPositionMin, int2 worldPositionMax)
+	void Room::PlaceTileBox(TileType tileType, int2 worldPositionMin, int2 worldPositionMax)
 	{
-		for (i32 y = worldPositionMin.y; y <= worldPositionMax.y; y++)
-			for (i32 x = worldPositionMin.x; x <= worldPositionMax.x; x++)
+		for (int y = worldPositionMin.y; y <= worldPositionMax.y; y++)
+			for (int x = worldPositionMin.x; x <= worldPositionMax.x; x++)
 			{
-				i32 roomPosition = x / 8 + y / 8 * width;
+				int roomPosition = x / 8 + y / 8 * width;
 
-				if (0 <= roomPosition && roomPosition < sizeof(char) * width * height)
-					data[roomPosition] = tileType;
+				if (0 <= roomPosition && roomPosition < width * height)
+					data[roomPosition].type = tileType;
 			}
 
 		Save("assets/scenes/room1.txt");
+	}
+
+	void Room::UpdateTile(int x, int y)
+	{
+		if (!IsFilled(x, y)) return;
+
+		int rightLeft = (IsFilled(x + 1, y) << 1) | IsFilled(x - 1, y);
+		int downUp =	(IsFilled(x, y - 1) << 1) | IsFilled(x, y + 1);
+
+		if (rightLeft == 3) rightLeft = 2;
+		else if (rightLeft == 2) rightLeft = 3;
+		if (downUp == 3) downUp = 2;
+		else if (downUp == 2) downUp = 3;
+
+		data[RoomPositionToIndex(x, y)].texCoordOffset = { -rightLeft, downUp };
+	}
+
+	bool Room::IsFilled(int x, int y)
+	{
+		int index = RoomPositionToIndex(x, y);
+		if (!Contains(index)) return true; // Little hack to make autotiling on borders easier
+		return data[index].type != Air;
 	}
 
 	void Room::Save(const std::string& filepath)
@@ -77,15 +111,16 @@ namespace Cockroach
 
 	std::string Room::Serialize()
 	{
-		u32 a = width;
-		u32 b = height;
-		return std::to_string(width) + " " + std::to_string(height) + " " + data;
+		std::string save = std::to_string(width) + " " + std::to_string(height) + " ";
+		for (int i = 0; i < width * height; i++)
+			save += data[i].type;
+		return save;
 	}
 
 	Ref<Room> Room::Deserialize(std::string data)
 	{
 		std::vector<std::string> strings = std::vector<std::string>();
-		i32 current = 0, i = 0, start = 0, end = 0;
+		int current = 0, i = 0, start = 0, end = 0;
 		while (i <= data.length())
 		{
 			if (data[i] == ' ' || i == data.length())
@@ -101,7 +136,12 @@ namespace Cockroach
 		}
 
 		Ref<Room> room = CreateRef<Room>(std::stoi(strings[0]), std::stoi(strings[1]));
-		strcpy(room->data, strings[2].c_str());
+		const char* tileData = strings[2].c_str();
+		for (int i = 0; i < room->width * room->height; i++)
+			room->data[i].type = (TileType)tileData[i];
+		for (int y = 0; y < room->height; y++)
+			for (int x = 0; x < room->width; x++)
+				room->UpdateTile(x, y);
 		return room;
 	}
 }

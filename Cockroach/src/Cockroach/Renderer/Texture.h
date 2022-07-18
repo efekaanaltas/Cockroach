@@ -53,6 +53,7 @@ namespace Cockroach
 
 		Ref<Texture2D> texture;
 		float2 min, max;
+		bool flipX = false, flipY = false;
 	};
 
 }

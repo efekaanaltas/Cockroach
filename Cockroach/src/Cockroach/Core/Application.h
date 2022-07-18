@@ -30,7 +30,7 @@ namespace Cockroach
 		
 		inline static Application& Get() { return *s_Instance; }
 		
-		i32 frameCount = 0;
+		int frameCount = 0;
 	private:
 		void OnEvent(Event& e);
 		bool OnWindowClose(WindowCloseEvent& e);
