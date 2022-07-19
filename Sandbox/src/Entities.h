@@ -11,10 +11,10 @@ namespace Entities
 
 	enum EntityType
 	{
-		Cockroach = 0, Tile, SpikeLeft, SpikeRight, SpikeDown, SpikeUp
+		Cockroach = 0, Camera, Tile, SpikeLeft, SpikeRight, SpikeDown, SpikeUp
 	};
 
-	Ref<Entity> CreateEntity(glm::ivec2 position, EntityType entityType)
+	Ref<Entity> Create(glm::ivec2 position, EntityType entityType)
 	{
 		Ref<Entity> e = Scene::current->AddEntity(position);
 		e->ID = entityType;
@@ -28,6 +28,15 @@ namespace Entities
 			h->max = { 10, 10 };
 			e->AddComponent<Animator>();
 			e->AddComponent<Player>();
+			break;
+		}
+		case EntityType::Camera:
+		{
+			e->sprite = Scene::current->GetSubTexture(spriteSheetPath, { 0,0 }, { 1,1 });
+			Ref<Hitbox> h = e->AddComponent<Hitbox>();
+			h->min = { -160, -90 };
+			h->max = { 160, 90 };
+			Ref<CameraController> cc = e->AddComponent<CameraController>();
 			break;
 		}
 		case EntityType::Tile:

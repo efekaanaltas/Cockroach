@@ -51,9 +51,6 @@
     <ClInclude Include="src\Cockroach.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Cockroach\CameraController.h">
-      <Filter>src\Cockroach</Filter>
-    </ClInclude>
     <ClInclude Include="src\Cockroach\Core\Application.h">
       <Filter>src\Cockroach\Core</Filter>
     </ClInclude>
@@ -1373,9 +1370,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Cockroach\CameraController.cpp">
-      <Filter>src\Cockroach</Filter>
-    </ClCompile>
     <ClCompile Include="src\Cockroach\Core\Application.cpp">
       <Filter>src\Cockroach\Core</Filter>
     </ClCompile>

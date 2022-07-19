@@ -141,7 +141,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Cockroach.h" />
-    <ClInclude Include="src\Cockroach\CameraController.h" />
     <ClInclude Include="src\Cockroach\Core\Application.h" />
     <ClInclude Include="src\Cockroach\Core\Core.h" />
     <ClInclude Include="src\Cockroach\Core\EntryPoint.h" />
@@ -583,7 +582,6 @@
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Cockroach\CameraController.cpp" />
     <ClCompile Include="src\Cockroach\Core\Application.cpp" />
     <ClCompile Include="src\Cockroach\Core\Input.cpp" />
     <ClCompile Include="src\Cockroach\Core\Log.cpp" />

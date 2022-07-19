@@ -6,7 +6,6 @@
 #include "Cockroach/Core/Log.h"
 
 #include "Cockroach/Core/Input.h"
-#include "Cockroach/CameraController.h"
 
 // ---Renderer-----------------------------
 #include "Cockroach/Renderer/Renderer.h"

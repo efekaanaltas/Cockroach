@@ -20,18 +20,30 @@ namespace Cockroach
 		{
 			if (data[i].type == Air) continue;
 			Ref<SubTexture2D> sprite = SubTexture2D::CreateFromCoords(texture, { 11+data[i].texCoordOffset.x,2+data[i].texCoordOffset.y}, {8,8});
-			Renderer::DrawQuad(IndexToRoomPosition(i) * 8, { 8,8 }, sprite);
+			int2 roomPos = IndexToRoomPosition(i);
+			Renderer::DrawQuad(RoomToWorldPosition(roomPos), {8,8}, sprite);
 		}
 	}
 
 	void Room::PlaceTile(TileType tileType, int2 worldPosition)
 	{
-		int roomPosition = worldPosition.x / 8 + worldPosition.y / 8 * width;
+		int2 roomPosition = WorldToRoomPosition(worldPosition);
+		int index = RoomPositionToIndex(roomPosition.x, roomPosition.y);
 
-		if (0 <= roomPosition && roomPosition < width * height)
-			data[roomPosition].type = tileType;
+		if (Contains(roomPosition))
+		{
+			data[index].type = tileType;
+			data[index].texCoordOffset = { 0,0 };
 
-		Save("assets/scenes/room1.txt");
+			UpdateTile(roomPosition.x, roomPosition.y);
+			UpdateTile(roomPosition.x + 1, roomPosition.y);
+			UpdateTile(roomPosition.x - 1, roomPosition.y);
+			UpdateTile(roomPosition.x, roomPosition.y - 1);
+			UpdateTile(roomPosition.x, roomPosition.y + 1);
+
+			Save("assets/scenes/room1.txt");
+		}
+
 	}
 
 	void Room::PlaceTileBox(TileType tileType, int2 worldPositionMin, int2 worldPositionMax)
@@ -39,10 +51,19 @@ namespace Cockroach
 		for (int y = worldPositionMin.y; y <= worldPositionMax.y; y++)
 			for (int x = worldPositionMin.x; x <= worldPositionMax.x; x++)
 			{
-				int roomPosition = x / 8 + y / 8 * width;
+				int2 roomPosition = WorldToRoomPosition({ x,y });
+				int index = RoomPositionToIndex(roomPosition.x, roomPosition.y);
 
-				if (0 <= roomPosition && roomPosition < width * height)
-					data[roomPosition].type = tileType;
+				if (Contains(roomPosition))
+				{
+					data[index].type = tileType;
+
+					UpdateTile(roomPosition.x, roomPosition.y);
+					UpdateTile(roomPosition.x + 1, roomPosition.y);
+					UpdateTile(roomPosition.x - 1, roomPosition.y);
+					UpdateTile(roomPosition.x, roomPosition.y - 1);
+					UpdateTile(roomPosition.x, roomPosition.y + 1);
+				}
 			}
 
 		Save("assets/scenes/room1.txt");
@@ -66,8 +87,14 @@ namespace Cockroach
 	bool Room::IsFilled(int x, int y)
 	{
 		int index = RoomPositionToIndex(x, y);
-		if (!Contains(index)) return true; // Little hack to make autotiling on borders easier
+		if (!Contains({x, y})) return true; // Little hack to make autotiling on borders easier
 		return data[index].type != Air;
+	}
+
+	bool Room::Contains(int2 roomPosition)
+	{
+		int index = RoomPositionToIndex(roomPosition.x, roomPosition.y);
+		return (0 <= roomPosition.x && roomPosition.x < width && 0 <= roomPosition.y && roomPosition.y < height && 0 <= index && index < width* height);
 	}
 
 	void Room::Save(const std::string& filepath)

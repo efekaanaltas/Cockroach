@@ -25,12 +25,12 @@ public:
 
 	glm::ivec2 Hitbox::Position() const { return entity->position; }
 
-	int32_t Hitbox::Left() const { return Position().x + min.x; }
-	int32_t Hitbox::Right() const { return Position().x + max.x; }
-	int32_t Hitbox::Bottom() const { return Position().y + min.y; }
-	int32_t Hitbox::Top() const { return Position().y + max.y; }
+	int Hitbox::Left() const { return Position().x + min.x; }
+	int Hitbox::Right() const { return Position().x + max.x; }
+	int Hitbox::Bottom() const { return Position().y + min.y; }
+	int Hitbox::Top() const { return Position().y + max.y; }
 
-	bool OverlapsWith(Hitbox other, float xForesense = 0, float yForesense = 0); // TODO: Const reference of Hitbox can't call functions such as Left(), why?
+	bool OverlapsWith(Hitbox other, int xForesense = 0, int yForesense = 0); // TODO: Const reference of Hitbox can't call functions such as Left(), why?
 	bool Contains(Hitbox other);
 	bool Contains(int2 coord);
 };
@@ -46,7 +46,7 @@ public:
 	virtual void Update(float dt) override;
 
 	Sheet sheet;
-	i32 framePerSecond = 3;
+	int framePerSecond = 3;
 };
 
 class StaticObject : public Component
@@ -69,10 +69,10 @@ public:
 
 	float xRemainder = 0.0f, yRemainder = 0.0f;
 
-	i8 MoveX(float amount);
-	i8 MoveY(float amount);
+	int MoveX(float amount);
+	int MoveY(float amount);
 	virtual void OnCollide(Ref<DynamicObject> other, bool horizontalCollision) = 0;
-	Hitbox* GetCollidingHitbox(i32 xForesense, i32 yForesense);
+	Hitbox* GetCollidingHitbox(int xForesense, int yForesense);
 };
 
 class Player : public DynamicObject
@@ -81,7 +81,7 @@ public:
 	Player(Entity* entity);
 	virtual void Update(float dt) override;
 
-	i8 faceDir = 1; // -1 for left, 1 for right
+	int faceDir = 1; // -1 for left, 1 for right
 	float gravity = 200.0f;
 	bool grounded = false;
 
@@ -105,8 +105,8 @@ public:
 
 	virtual void OnCollide(Ref<DynamicObject> other, bool horizontalCollision) override;
 
-	i32 InputDirX() const;
-	i32 InputDirY() const;
+	int InputDirX() const;
+	int InputDirY() const;
 	bool NextToWall();
 
 	void TrySwitchState(State<Player>* newState);
@@ -118,4 +118,21 @@ public:
 	Hazard(Entity* entity)
 		: DynamicObject(entity)
 	{}
+};
+
+class CameraController : public Component
+{
+public:
+	CameraController(Entity* entity);
+
+	virtual void Update(float dt) override;
+
+	float2 positionHighRes = { 0.0f, 0.0f };
+	
+	float aspectRatio = 16.0f/9.0f;
+	float zoom = 10.0f;
+
+	float speed = 1.0f;
+public:
+	Camera camera;
 };

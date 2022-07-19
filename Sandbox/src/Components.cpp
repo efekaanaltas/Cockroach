@@ -15,7 +15,7 @@ Hitbox::Hitbox(Entity* entity)
 	Hitbox::all.push_back(this);
 }
 
-bool Hitbox::OverlapsWith(Hitbox other, float xForesense, float yForesense)
+bool Hitbox::OverlapsWith(Hitbox other, int xForesense, int yForesense)
 {
 	if (!enabled || !other.enabled) return false;
 	bool x = (Left() + xForesense < other.Right()) && (Right() + xForesense > other.Left());
@@ -146,15 +146,15 @@ DynamicObject::DynamicObject(Entity* entity)
 	DynamicObject::all.push_back(this);
 }
 
-i8 DynamicObject::MoveX(float amount)
+int DynamicObject::MoveX(float amount)
 {
 	xRemainder += amount;
-	i32 move = (i32)xRemainder;
+	int move = (int)xRemainder;
 
 	if (move != 0)
 	{
 		xRemainder -= move;
-		i8 sign = move > 0 ? 1 : -1;
+		int sign = move > 0 ? 1 : -1;
 
 		while (move != 0)
 		{
@@ -175,12 +175,12 @@ i8 DynamicObject::MoveX(float amount)
 	}
 }
 
-i8 DynamicObject::MoveY(float amount)
+int DynamicObject::MoveY(float amount)
 {
 	yRemainder += amount;
-	i32 move = (i32)yRemainder;
+	int move = (int)yRemainder;
 
-	i8 sign = move > 0 ? 1 : -1;
+	int sign = move > 0 ? 1 : -1;
 	yRemainder -= move;
 
 	while (move != 0)
@@ -202,7 +202,7 @@ i8 DynamicObject::MoveY(float amount)
 
 }
 
-Hitbox* DynamicObject::GetCollidingHitbox(i32 xForesense, i32 yForesense)
+Hitbox* DynamicObject::GetCollidingHitbox(int xForesense, int yForesense)
 {
 	Ref<Hitbox> thisHitbox = entity->GetComponent<Hitbox>();
 	for (auto& h : Hitbox::all)
@@ -214,6 +214,38 @@ Hitbox* DynamicObject::GetCollidingHitbox(i32 xForesense, i32 yForesense)
 
 void Animator::Update(float dt)
 {
-	i32 index = std::fmodf(Application::Get().frameCount * framePerSecond / 60.0f, sheet.size());
+	int index = std::fmodf(Application::Get().frameCount * framePerSecond / 60.0f, (float)sheet.size());
 	entity->sprite = sheet[index];
+}
+
+CameraController::CameraController(Entity* entity)
+	: Component(entity), camera(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom)
+{
+}
+
+void CameraController::Update(float dt)
+{
+	if (Input::IsPressed(CR_KEY_A))
+		positionHighRes.x -= speed * dt;
+	if (Input::IsPressed(CR_KEY_D))
+		positionHighRes.x += speed * dt;
+	if (Input::IsPressed(CR_KEY_S))
+		positionHighRes.y -= speed * dt;
+	if (Input::IsPressed(CR_KEY_W))
+		positionHighRes.y += speed * dt;
+
+	entity->position = int2(positionHighRes.x, positionHighRes.y);
+
+	camera.SetPosition({positionHighRes.x, positionHighRes.y, 0.0f});
+
+	speed = zoom; // Change speed according to zoom level
+
+	zoom -= Input::scroll * 0.1f * zoom;
+	zoom = std::clamp(zoom, 5.0f, 100.0f);
+
+	float newAspect = (float)Application::Get().GetWindow().Width() / (float)Application::Get().GetWindow().Height();
+	if (aspectRatio != newAspect)
+		aspectRatio = newAspect;
+
+	camera.SetZoom(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
 }

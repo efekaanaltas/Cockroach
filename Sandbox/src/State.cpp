@@ -22,8 +22,6 @@ State<Player>* WalkingState::Update(Player* player, float dt)
 	if (Input::IsDown(CR_KEY_SPACE) && !player->grounded && player->NextToWall())
 				return player->walljumpingState;
 
-	CR_CORE_INFO(player->jumpBufferTimer.Finished());
-
 	if (!player->coyoteTimer.Finished() && !player->jumpBufferTimer.Finished())
 		return player->jumpingState;
 
@@ -135,7 +133,7 @@ State<Player>* DashingState::Update(Player* player, float dt)
 		{
 			int heightDelta = wall->Top() - player->entity->GetComponent<Hitbox>()->Bottom();
 			if (heightDelta < 5)
-				player->MoveY(heightDelta);
+				player->MoveY((float)heightDelta);
 		}
 
 		Hitbox* ground = player->GetCollidingHitbox(0, -3);
@@ -143,7 +141,7 @@ State<Player>* DashingState::Update(Player* player, float dt)
 		{
 			int heightDelta = player->entity->GetComponent<Hitbox>()->Bottom() - ground->Top();
 			if (heightDelta < 4)
-				player->MoveY(-heightDelta);
+				player->MoveY((float)-heightDelta);
 		}
 	}
 
