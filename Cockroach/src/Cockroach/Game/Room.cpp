@@ -6,6 +6,8 @@
 
 namespace Cockroach
 {
+	Ref<Room> Room::current = nullptr;
+
 	Room::Room(int width, int height)
 		: width(width), height(height)
 	{
@@ -89,6 +91,20 @@ namespace Cockroach
 		int index = RoomPositionToIndex(x, y);
 		if (!Contains({x, y})) return true; // Little hack to make autotiling on borders easier
 		return data[index].type != Air;
+	}
+
+	bool Room::CollidesWith(int left, int right, int bottom, int top)
+	{
+		int2 corners[] = { {left, bottom}, {right-1, bottom}, {left,top-1}, {right-1,top-1} }; // Not sure why -1 happens but it works
+
+		for (int i = 0; i < 4; i++)
+		{
+			int2 roomPosition = WorldToRoomPosition(corners[i]);
+			int index = RoomPositionToIndex(roomPosition.x, roomPosition.y);
+			if (Contains(roomPosition) && data[index].type != Air) // Do not use IsFilled() as it is intended for autotiling and not collisions
+				return true;
+		}
+		return false;
 	}
 
 	bool Room::Contains(int2 roomPosition)

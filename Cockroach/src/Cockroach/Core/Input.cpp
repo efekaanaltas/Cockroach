@@ -23,6 +23,8 @@ namespace Cockroach
 		{ CR_KEY_DOWN,				{} },
 		{ CR_KEY_RIGHT,				{} },
 		{ CR_KEY_SPACE,				{} },
+		{ CR_KEY_G,					{} },
+		{ CR_KEY_H,					{} },
 	};
 
 	float Input::scroll = 0.0f;

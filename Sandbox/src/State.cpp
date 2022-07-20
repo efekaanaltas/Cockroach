@@ -118,7 +118,7 @@ void DashingState::Enter(Player* player)
 
 State<Player>* DashingState::Update(Player* player, float dt)
 {
-	if (Input::IsDown(CR_KEY_SPACE) && player->GetCollidingHitbox(0, -1))
+	if (Input::IsDown(CR_KEY_SPACE) && player->GetCollision(0, -1).HasCollided())
 		return player->superjumpingState;
 
 	if (dashTimer.Finished())
@@ -127,22 +127,6 @@ State<Player>* DashingState::Update(Player* player, float dt)
 	{
 		dashTimer.Tick(dt);
 		player->velocity = dashSpeed * dashDir;
-
-		Hitbox* wall = player->GetCollidingHitbox(player->faceDir, 0);
-		if (wall)
-		{
-			int heightDelta = wall->Top() - player->entity->GetComponent<Hitbox>()->Bottom();
-			if (heightDelta < 5)
-				player->MoveY((float)heightDelta);
-		}
-
-		Hitbox* ground = player->GetCollidingHitbox(0, -3);
-		if (ground)
-		{
-			int heightDelta = player->entity->GetComponent<Hitbox>()->Bottom() - ground->Top();
-			if (heightDelta < 4)
-				player->MoveY((float)-heightDelta);
-		}
 	}
 
 

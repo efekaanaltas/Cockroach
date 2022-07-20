@@ -18,7 +18,7 @@ namespace Cockroach
 			int2 texCoordOffset;
 		};
 
-		static Room* current;
+		static Ref<Room> current;
 
 		static const int2 tileTexCoordLUT[4][4];
 
@@ -36,6 +36,7 @@ namespace Cockroach
 
 		bool IsFilled(int x, int y);
 
+		bool CollidesWith(int left, int right, int bottom, int top);
 		bool Contains(int2 roomPosition);
 		int RoomPositionToIndex(int x, int y) { return y * width + x; }
 		int2 IndexToRoomPosition(int index) { return { index % width, index / width }; }

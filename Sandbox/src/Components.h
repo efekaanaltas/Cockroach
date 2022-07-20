@@ -31,8 +31,8 @@ public:
 	int Hitbox::Top() const { return Position().y + max.y; }
 
 	bool OverlapsWith(Hitbox other, int xForesense = 0, int yForesense = 0); // TODO: Const reference of Hitbox can't call functions such as Left(), why?
-	bool Contains(Hitbox other);
-	bool Contains(int2 coord);
+	bool OverlapsWith(Hitbox other);
+	bool OverlapsWith(int2 coord);
 };
 
 using Sheet = std::vector<Ref<SubTexture2D>>;
@@ -49,12 +49,13 @@ public:
 	int framePerSecond = 3;
 };
 
-class StaticObject : public Component
+struct CollisionResult
 {
-public:
-	static std::vector<StaticObject*> all;
+	int horizontal = 0, vertical = 0;
+	Hitbox* collidedObject = nullptr;
+	bool staticCollision = false;
 
-	StaticObject(Entity* entity);
+	bool HasCollided() { return collidedObject || staticCollision; }
 };
 
 class DynamicObject : public Component
@@ -69,10 +70,9 @@ public:
 
 	float xRemainder = 0.0f, yRemainder = 0.0f;
 
-	int MoveX(float amount);
-	int MoveY(float amount);
-	virtual void OnCollide(Ref<DynamicObject> other, bool horizontalCollision) = 0;
-	Hitbox* GetCollidingHitbox(int xForesense, int yForesense);
+	CollisionResult Move(float dx, float dy);
+	virtual void OnCollide(CollisionResult collision) = 0;
+	CollisionResult GetCollision(int xForesense, int yForesense);
 };
 
 class Player : public DynamicObject
@@ -103,7 +103,7 @@ public:
 	Timer jumpBufferTimer = Timer(10.0f);
 	Timer coyoteTimer = Timer(10.0f);
 
-	virtual void OnCollide(Ref<DynamicObject> other, bool horizontalCollision) override;
+	virtual void OnCollide(CollisionResult collision) override;
 
 	int InputDirX() const;
 	int InputDirY() const;

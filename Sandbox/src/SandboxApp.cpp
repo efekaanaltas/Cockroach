@@ -19,14 +19,7 @@ public:
 		cameraController = Entities::Create({ 0.0f, 0.0f }, Entities::Camera)->GetComponent<CameraController>();
 
 		room = Room::Load("assets/scenes/room1.txt");
-		for (i32 y = 0; y < room->height; y++)
-		{
-			for (i32 x = 0; x < room->width; x++)
-			{
-				if (room->data[x + y * room->width].type == Room::Air) continue;
-				Entities::Create({ 8 * x, 8 * y }, Entities::EntityType::Tile);
-			}
-		}
+		Room::current = room;
 	}
 
 	~Game() {}
@@ -42,7 +35,7 @@ public:
 		else
 		{
 			//camera->TransitionTo(nextRoom);
-			//if (nextRoom.Contains(camera.bounds))
+			//if (nextRoom.OverlapsWith(camera.bounds))
 				//Room::current = nextRoom;
 		}
 	}
@@ -65,18 +58,7 @@ public:
 		cameraController = Entities::Create({ 0.0f, 0.0f }, Entities::Camera)->GetComponent<CameraController>();
 
 		room = Room::Load("assets/scenes/room1.txt");
-		for (i32 y = 0; y < room->height; y++)
-		{
-			for (i32 x = 0; x < room->width; x++)
-			{
-				if (room->data[x + y * room->width].type == Room::Air) continue;
-				Ref<Entity> ent = scene->AddEntity({ x*8, y*8 });
-				ent->sprite = scene->GetSubTexture("assets/textures/SpriteSheet.png", { 0,0 }, { 1,1 });
-				Ref<Hitbox> h = ent->AddComponent<Hitbox>();
-				h->min = { 0,0 };
-				h->max = { 8,8 };
-			}
-		}
+		Room::current = room;
 	}
 
 	~Sandbox()
@@ -133,15 +115,35 @@ public:
 
 		Renderer::BeginScene(cameraController->camera);
 
-		RenderGrid();
+		static bool renderGrid = true;
+		if (Input::IsDown(CR_KEY_G))
+			renderGrid = !renderGrid;
+		static bool renderHitboxes = true;
+		if (Input::IsDown(CR_KEY_H))
+			renderHitboxes = !renderHitboxes;
+
+		if(renderGrid)
+			RenderGrid();
 		scene->Render();
 		room->Render();
-
-		for (auto& ent : scene->entities)
+		
+		if (renderHitboxes)
 		{
-			Ref<Hitbox> h = ent->GetComponent<Hitbox>();
-			if (h && h->enabled)
-				DrawQuadOutline(h->Left(), h->Right(), h->Bottom(), h->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
+			for (auto& ent : scene->entities)
+			{
+				Ref<Hitbox> h = ent->GetComponent<Hitbox>();
+				if (h && h->enabled)
+					DrawQuadOutline(h->Left(), h->Right(), h->Bottom(), h->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
+			}
+
+			for (int i = 0; i < room->width * room->height; i++)
+			{
+				if (!room->data[i].type == Room::Air)
+				{
+					int2 worldPos = room->RoomToWorldPosition(room->IndexToRoomPosition(i));
+					DrawQuadOutline(worldPos.x, worldPos.x + 8, worldPos.y, worldPos.y + 8, { 1.0f, 0.0f, 0.0f, 1.0f });
+				}
+		}
 		}
 
 		if (!isBoxPlacing)
@@ -149,7 +151,7 @@ public:
 		int2 boxPlaceEndPos = EntityPlacePosition();
 		float2 start = { std::min(boxPlaceStartPos.x, boxPlaceEndPos.x), std::min(boxPlaceStartPos.y, boxPlaceEndPos.y) };
 		float2 end = { std::max(boxPlaceStartPos.x, boxPlaceEndPos.x) + 8.0f, std::max(boxPlaceStartPos.y, boxPlaceEndPos.y) + 8.0f };
-		DrawQuadOutline(start.x, end.x, start.y, end.y, { 1.0f, 1.0f, 0.0f ,1.0f });
+		DrawQuadOutline(start.x, end.x, start.y, end.y, { 1.0f, Input::IsPressed(CR_KEY_LEFT_CONTROL) ? 0.0f : 1.0f, 0.0f , 1.0f});
 
 		Cockroach::Renderer::EndScene();
 
@@ -178,7 +180,7 @@ public:
 		for (auto& ent : scene->entities)
 		{
 			Ref<Hitbox> h = ent->GetComponent<Hitbox>();
-			if (h && h->Contains(position))
+			if (h && h->OverlapsWith(position))
 				return ent;
 		}
 		return false;
