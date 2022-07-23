@@ -61,4 +61,5 @@ public:
 
 	virtual void Enter(Player* player) override;
 	virtual State<Player>* Update(Player* player, float dt) override;
+	virtual void Exit(Player* player) override;
 };

@@ -49,13 +49,11 @@ public:
 	int framePerSecond = 3;
 };
 
-struct CollisionResult
+struct Collision
 {
 	int horizontal = 0, vertical = 0;
 	Hitbox* collidedObject = nullptr;
-	bool staticCollision = false;
-
-	bool HasCollided() { return collidedObject || staticCollision; }
+	bool collided = false;
 };
 
 class DynamicObject : public Component
@@ -70,9 +68,9 @@ public:
 
 	float xRemainder = 0.0f, yRemainder = 0.0f;
 
-	CollisionResult Move(float dx, float dy);
-	virtual void OnCollide(CollisionResult collision) = 0;
-	CollisionResult GetCollision(int xForesense, int yForesense);
+	Collision Move(float dx, float dy);
+	virtual void OnCollide(Collision collision) = 0;
+	Collision GetCollision(int xForesense, int yForesense);
 };
 
 class Player : public DynamicObject
@@ -103,7 +101,7 @@ public:
 	Timer jumpBufferTimer = Timer(10.0f);
 	Timer coyoteTimer = Timer(10.0f);
 
-	virtual void OnCollide(CollisionResult collision) override;
+	virtual void OnCollide(Collision collision) override;
 
 	int InputDirX() const;
 	int InputDirY() const;
@@ -118,6 +116,8 @@ public:
 	Hazard(Entity* entity)
 		: DynamicObject(entity)
 	{}
+
+	virtual void OnCollide(Collision collision) override { return; }
 };
 
 class CameraController : public Component

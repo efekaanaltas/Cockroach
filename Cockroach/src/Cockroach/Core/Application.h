@@ -7,8 +7,6 @@
 #include "Cockroach/Events/Event.h"
 #include "Cockroach/Events/ApplicationEvent.h"
 
-#include "Cockroach/Game/Scene.h"
-
 namespace Cockroach
 {
 	class Application

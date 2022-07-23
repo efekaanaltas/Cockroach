@@ -118,7 +118,7 @@ void DashingState::Enter(Player* player)
 
 State<Player>* DashingState::Update(Player* player, float dt)
 {
-	if (Input::IsDown(CR_KEY_SPACE) && player->GetCollision(0, -1).HasCollided())
+	if (Input::IsDown(CR_KEY_SPACE) && player->GetCollision(0, -1).collided)
 		return player->superjumpingState;
 
 	if (dashTimer.Finished())
@@ -131,4 +131,9 @@ State<Player>* DashingState::Update(Player* player, float dt)
 
 
 	return nullptr;
+}
+
+void DashingState::Exit(Player* player)
+{
+	player->velocity = { 0.0f,0.0f };
 }

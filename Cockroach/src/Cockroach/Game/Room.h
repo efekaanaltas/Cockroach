@@ -1,15 +1,16 @@
 #pragma once
 
 #include <string>
+#include "Cockroach/Game/Entity.h"
 
 namespace Cockroach
 {
 	class Room
 	{
 	public:
-		enum TileType
+		enum TileType : char
 		{
-			Air, TileBasic
+			Air = '0', TileBasic = 'B'
 		};
 
 		struct Tile
@@ -26,9 +27,15 @@ namespace Cockroach
 
 		int width, height;
 		int2 position = { 0,0 };
-		Tile* data;
+		Tile* tiles;
+		Entity* entities[3000];
 
+		int entityCount = 0;
+
+		void Update(float dt);
 		void Render();
+
+		Entity* AddEntity(int2 position);
 
 		void PlaceTile(TileType tileType, int2 worldPosition);
 		void PlaceTileBox(TileType tileType, int2 worldPositionMin, int2 worldPositionMax);
@@ -45,9 +52,6 @@ namespace Cockroach
 		int2 RoomToWorldPosition(int2 roomPos) { return position + roomPos * 8; }
 
 		void Save(const std::string& filepath);
-		static Ref<Room> Load(const std::string& filepath);
-	private:
-		std::string Serialize();
-		static Ref<Room> Deserialize(std::string data);
+		static Ref<Room> Load(const std::string& filepath, std::function<Entity* (int2, int)> entityCreateFn);
 	};
 }

@@ -10,4 +10,7 @@
     <ClInclude Include="src\Entities.h" />
     <ClInclude Include="src\State.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="assets\scenes\room1.txt" />
+  </ItemGroup>
 </Project>

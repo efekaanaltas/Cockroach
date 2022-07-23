@@ -50,17 +50,17 @@ Player::Player(Entity* entity)
 	clingingState =		new ClingingState;
 	dashingState =		new DashingState;
 
-	std::string sheetPath = "assets/textures/SpriteSheet.png";
-	idleSheet.push_back(		Scene::current->GetSubTexture(sheetPath, { 0, 3 }, { 16, 16 }));
-	idleSheet.push_back(		Scene::current->GetSubTexture(sheetPath, { 1, 3 }, { 16, 16 }));
-	walkingSheet.push_back(		Scene::current->GetSubTexture(sheetPath, { 2, 3 }, { 16, 16 }));
-	walkingSheet.push_back(		Scene::current->GetSubTexture(sheetPath, { 3, 3 }, { 16, 16 }));
-	dashingSheet.push_back(		Scene::current->GetSubTexture(sheetPath, { 4, 3 }, { 16, 16 }));
-	dashingSheet.push_back(		Scene::current->GetSubTexture(sheetPath, { 5, 3 }, { 16, 16 }));
-	dashingSheet.push_back(		Scene::current->GetSubTexture(sheetPath, { 6, 3 }, { 16, 16 }));
-	jumpingSheet.push_back(		Scene::current->GetSubTexture(sheetPath, { 7, 3 }, { 16, 16 }));
-	clingingSheet.push_back(	Scene::current->GetSubTexture(sheetPath, { 8, 3 }, { 16, 16 }));
-	fallingSheet.push_back(		Scene::current->GetSubTexture(sheetPath, { 9, 3 }, { 16, 16 }));
+	Ref<Texture2D> texture = CreateRef<Texture2D>("assets/textures/SpriteSheet.png");
+	idleSheet.push_back(		SubTexture2D::CreateFromCoords(texture, { 0, 3 }, { 16, 16 }));
+	idleSheet.push_back(		SubTexture2D::CreateFromCoords(texture, { 1, 3 }, { 16, 16 }));
+	walkingSheet.push_back(		SubTexture2D::CreateFromCoords(texture, { 2, 3 }, { 16, 16 }));
+	walkingSheet.push_back(		SubTexture2D::CreateFromCoords(texture, { 3, 3 }, { 16, 16 }));
+	dashingSheet.push_back(		SubTexture2D::CreateFromCoords(texture, { 4, 3 }, { 16, 16 }));
+	dashingSheet.push_back(		SubTexture2D::CreateFromCoords(texture, { 5, 3 }, { 16, 16 }));
+	dashingSheet.push_back(		SubTexture2D::CreateFromCoords(texture, { 6, 3 }, { 16, 16 }));
+	jumpingSheet.push_back(		SubTexture2D::CreateFromCoords(texture, { 7, 3 }, { 16, 16 }));
+	clingingSheet.push_back(	SubTexture2D::CreateFromCoords(texture, { 8, 3 }, { 16, 16 }));
+	fallingSheet.push_back(		SubTexture2D::CreateFromCoords(texture, { 9, 3 }, { 16, 16 }));
 
 	animator = entity->GetComponent<Animator>();
 	animator->sheet = idleSheet;
@@ -85,12 +85,12 @@ void ::Player::Update(float dt)
 		faceDir = velocity.x < 0.0f ? -1 : 1;
 	entity->sprite->flipX = faceDir == -1;
 
-	CollisionResult result = Move(velocity.x * dt, (velocityLastFrame.y + velocity.y) * 0.5f * dt);
+	Collision result = Move(velocity.x * dt, (velocityLastFrame.y + velocity.y) * 0.5f * dt);
 
 	OnCollide(result);
 }
 
-void Player::OnCollide(CollisionResult collision)
+void Player::OnCollide(Collision collision)
 {
 	if (collision.horizontal) velocity.x = 0;
 	if (collision.vertical)   velocity.y = 0;
@@ -120,7 +120,7 @@ i32 Player::InputDirY() const
 
 bool Player::NextToWall()
 {
-	return GetCollision(-1, 0).HasCollided() || GetCollision(1, 0).HasCollided();
+	return GetCollision(-1, 0).collided || GetCollision(1, 0).collided;
 }
 
 void Player::TrySwitchState(State<Player>* newState)
@@ -139,9 +139,9 @@ DynamicObject::DynamicObject(Entity* entity)
 	DynamicObject::all.push_back(this);
 }
 
-CollisionResult DynamicObject::Move(float dx, float dy)
+Collision DynamicObject::Move(float dx, float dy)
 {
-	CollisionResult result;
+	Collision result;
 
 	xRemainder += dx;
 	int xMove = (int)xRemainder;
@@ -153,8 +153,8 @@ CollisionResult DynamicObject::Move(float dx, float dy)
 
 		while (xMove != 0)
 		{
-			CollisionResult xCollision = GetCollision(xSign, 0);
-			if (!xCollision.HasCollided())
+			Collision xCollision = GetCollision(xSign, 0);
+			if (!xCollision.collided)
 			{
 				entity->position.x += xSign;
 				xMove -= xSign;
@@ -177,8 +177,8 @@ CollisionResult DynamicObject::Move(float dx, float dy)
 
 		while (yMove != 0)
 		{
-			CollisionResult yCollision = GetCollision(0, ySign);
-			if (!yCollision.HasCollided())
+			Collision yCollision = GetCollision(0, ySign);
+			if (!yCollision.collided)
 			{
 				entity->position.y += ySign;
 				yMove -= ySign;
@@ -193,9 +193,9 @@ CollisionResult DynamicObject::Move(float dx, float dy)
 	return result;
 }
 
-CollisionResult DynamicObject::GetCollision(int xForesense, int yForesense)
+Collision DynamicObject::GetCollision(int xForesense, int yForesense)
 {
-	CollisionResult result;
+	Collision result;
 	result.horizontal = xForesense;
 	result.vertical = yForesense;
 
@@ -203,7 +203,7 @@ CollisionResult DynamicObject::GetCollision(int xForesense, int yForesense)
 	
 	if (Room::current->CollidesWith(thisHitbox->Left() + xForesense, thisHitbox->Right() + xForesense, thisHitbox->Bottom() + yForesense, thisHitbox->Top() + yForesense))
 	{
-		result.staticCollision = true;
+		result.collided = true;
 		return result;
 	}
 	return result;
@@ -211,6 +211,7 @@ CollisionResult DynamicObject::GetCollision(int xForesense, int yForesense)
 		if (h != thisHitbox.get())
 			if (thisHitbox->OverlapsWith(*h, xForesense, yForesense))
 			{
+				result.collided = true;
 				result.collidedObject = h;
 				return result;
 			}*/

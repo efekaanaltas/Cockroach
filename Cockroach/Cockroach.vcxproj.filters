@@ -90,9 +90,6 @@
     <ClInclude Include="src\Cockroach\Game\Room.h">
       <Filter>src\Cockroach\Game</Filter>
     </ClInclude>
-    <ClInclude Include="src\Cockroach\Game\Scene.h">
-      <Filter>src\Cockroach\Game</Filter>
-    </ClInclude>
     <ClInclude Include="src\Cockroach\Game\Timer.h">
       <Filter>src\Cockroach\Game</Filter>
     </ClInclude>
@@ -1386,9 +1383,6 @@
       <Filter>src\Cockroach\Game</Filter>
     </ClCompile>
     <ClCompile Include="src\Cockroach\Game\Room.cpp">
-      <Filter>src\Cockroach\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Cockroach\Game\Scene.cpp">
       <Filter>src\Cockroach\Game</Filter>
     </ClCompile>
     <ClCompile Include="src\Cockroach\Game\Timer.cpp">
