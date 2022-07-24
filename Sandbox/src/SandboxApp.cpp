@@ -74,8 +74,12 @@ public:
 		Room::current->Update(dt);
 
 		if (Input::IsDown(CR_KEY_ESCAPE))
-			Room::current->PlaceTileBox(Room::Air, { 0,0 }, { 29,29 });
-		
+		{
+			Entities::Create(EntityPlacePosition(), Entities::SpikeLeft); 
+			Room::current->Save("assets/scenes/room1.txt");
+		}
+			//Room::current->PlaceTileBox(Room::Air, { 0,0 }, { 29,29 });
+
 		if (Input::IsPressed(CR_MOUSE_BUTTON_LEFT))
 		{
 			Entity* ent = GetEntityAtPosition(cameraController->camera.ScreenToWorldPosition(Input::MousePosition()));
@@ -133,7 +137,7 @@ public:
 		{
 			for (int i = 0; i < Room::current->entityCount; i++)
 			{
-				Ref<Hitbox> h = Room::current->entities[i]->GetComponent<Hitbox>();
+				Ref<Hitbox> h = Room::current->entities[i].GetComponent<Hitbox>();
 				if (h && h->enabled)
 					DrawQuadOutline(h->Left(), h->Right(), h->Bottom(), h->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
 			}
@@ -179,11 +183,11 @@ public:
 	{
 		if (Room::current->entityCount == 0)
 			return nullptr;
-		for (auto& ent : Room::current->entities)
+		for (int i = 0; i < Room::current->entityCount; i++)
 		{
-			Ref<Hitbox> h = ent->GetComponent<Hitbox>();
+			Ref<Hitbox> h = Room::current->entities[i].GetComponent<Hitbox>();
 			if (h && h->OverlapsWith(position))
-				return ent;
+				return &Room::current->entities[i];
 		}
 		return false;
 	}

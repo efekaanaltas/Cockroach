@@ -13,12 +13,17 @@ namespace Cockroach
 	{
 		tiles = new Tile[width * height];
 		memset(tiles, 0, sizeof(char) * width * height);
+
+		entities = new Entity[3000];
+		Entity* e = new Entity();
+		entities[0] = *e;
+		delete e;
 	}
 
 	void Room::Update(float dt)
 	{
 		for (int i = 0; i < entityCount; i++)
-			entities[i]->Update(dt);
+			entities[i].Update(dt);
 	}
 
 	void Room::Render()
@@ -33,13 +38,17 @@ namespace Cockroach
 		}
 		for (int i = 0; i < entityCount; i++)
 		{
-			entities[i]->Render();
+			entities[i].Render();
 		}
 	}
 
 	Entity* Room::AddEntity(int2 position)
 	{
-		return entities[entityCount++] = new Entity(position);
+		Entity* e = new Entity(position);
+		Room::current->entities[0];
+		entities[Room::current->entityCount] = *e;
+		delete e;
+		return &entities[Room::current->entityCount++];
 	}
 
 	void Room::PlaceTile(TileType tileType, int2 worldPosition)
@@ -144,15 +153,12 @@ namespace Cockroach
 			out << height << ' ';
 			for (int i = 0; i < width * height; i++)
 				out << tiles[i].type;
-			out << '\n';
-			if (entityCount != 0)
+			for (int i = 0; i < entityCount; i++)
 			{
-				for (auto& ent : entities)
-				{
-					out << "ID: " << ent->ID << ", ";
-					out << "X: " << ent->position.x << ", ";
-					out << "Y: " << ent->position.y << '\n';
-				}
+				out << '\n';
+				out << "ID: " << entities[i].ID << ", ";
+				out << "X: " << entities[i].position.x << ", ";
+				out << "Y: " << entities[i].position.y;
 			}
 		}
 		else
@@ -179,6 +185,8 @@ namespace Cockroach
 			stream >> data;
 
 			room = CreateRef<Room>(width, height);
+			if (Room::current == nullptr)
+				Room::current = room; // bruh
 
 			for (int i = 0; i < room->width * room->height; i++)
 				room->tiles[i].type = (TileType)data[i];
@@ -188,31 +196,18 @@ namespace Cockroach
 
 			while (std::getline(in, line))
 			{
-				size_t keyPos = 0;
+				std::stringstream stream(line);
 
-				int ID = 0;
-				int pX = 0;
-				int pY = 0;
-				keyPos = line.find("ID:", keyPos) + 3;
-				in >> ID;
-				keyPos = line.find("X:", keyPos) + 2;
-				in >> pX;
-				keyPos = line.find("Y:", keyPos) + 2;
-				in >> pY;
+				int ID = 0, pX = 0, pY = 0;
+				stream.seekg(line.find("ID:") + 3);
+				stream >> ID;
+				stream.seekg(line.find("X:") + 2);
+				stream >> pX;
+				stream.seekg(line.find("Y:") + 2);
+				stream >> pY;
 
-				room->entities[room->entityCount] = entityCreateFn(int2(pX, pY), ID);
+				room->entities[room->entityCount++] = *entityCreateFn(int2(pX, pY), ID);
 			}
-			/*in.seekg(0, std::ios::end);
-			size_t size = in.tellg();
-			if (size != -1)
-			{
-				result.resize(size);
-				in.seekg(0, std::ios::beg);
-				in.read(&result[0], size);
-			}
-			else
-				CR_CORE_ERROR("Could not read from file '{0}'", filepath);
-				*/
 		}
 		else
 			CR_CORE_ERROR("Could not open file '{0}'", filepath);

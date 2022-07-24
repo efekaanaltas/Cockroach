@@ -28,7 +28,7 @@ namespace Cockroach
 		int width, height;
 		int2 position = { 0,0 };
 		Tile* tiles;
-		Entity* entities[3000];
+		Entity* entities;
 
 		int entityCount = 0;
 
