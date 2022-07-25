@@ -5,7 +5,7 @@
 
 Sheet GetWalkingStateSheet(Player* player)
 {
-	if (!player->grounded && player->velocity.y <= 0.0f) return player->fallingSheet;
+	if (!player->grounded && player->velocity.y < 0.0f)  return player->fallingSheet;
 	else if (player->velocity.x != 0.0f)				 return player->walkingSheet;
 	else												 return player->idleSheet;
 }

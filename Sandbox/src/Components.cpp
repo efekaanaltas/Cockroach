@@ -67,6 +67,8 @@ Player::Player(Entity* entity)
 	
 	currentState = walkingState;
 	currentState->Enter(this);
+
+	jumpBufferTimer.remainingTime = 0.0f;
 }
 
 void ::Player::Update(float dt)
@@ -153,8 +155,8 @@ Collision DynamicObject::Move(float dx, float dy)
 
 		while (xMove != 0)
 		{
-			Collision xCollision = GetCollision(xSign, 0);
-			if (!xCollision.collided)
+			bool xCollision = GetCollision(xSign, 0).collided;
+			if (!xCollision)
 			{
 				entity->position.x += xSign;
 				xMove -= xSign;
@@ -177,8 +179,8 @@ Collision DynamicObject::Move(float dx, float dy)
 
 		while (yMove != 0)
 		{
-			Collision yCollision = GetCollision(0, ySign);
-			if (!yCollision.collided)
+			bool yCollision = GetCollision(0, ySign).collided;
+			if (!yCollision)
 			{
 				entity->position.y += ySign;
 				yMove -= ySign;
@@ -190,20 +192,26 @@ Collision DynamicObject::Move(float dx, float dy)
 			}
 		}
 	}
+	
+	if(result.horizontal == 0)
+		result.horizontal = GetCollision(std::signbit(xRemainder) ? -1 : 1, 0).horizontal;
+	if(result.vertical == 0)
+		result.vertical = GetCollision(0, std::signbit(yRemainder) ? -1 : 1).vertical;
+
 	return result;
 }
 
 Collision DynamicObject::GetCollision(int xForesense, int yForesense)
 {
 	Collision result;
-	result.horizontal = xForesense;
-	result.vertical = yForesense;
 
 	Ref<Hitbox> thisHitbox = entity->GetComponent<Hitbox>();
 	
 	if (Room::current->CollidesWith(thisHitbox->Left() + xForesense, thisHitbox->Right() + xForesense, thisHitbox->Bottom() + yForesense, thisHitbox->Top() + yForesense))
 	{
 		result.collided = true;
+		if (result.horizontal == 0) result.horizontal = xForesense;
+		if (result.vertical == 0) result.vertical = yForesense;
 		return result;
 	}
 	return result;
