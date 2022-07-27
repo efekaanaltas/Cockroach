@@ -49,6 +49,8 @@ void JumpingState::Enter(Player* player)
 {
 	WalkingState::Enter(player);
 
+	player->grounded = false;
+
 	player->velocity.x += horizontalBoost * player->faceDir;
 	player->velocity.y = maxJumpSpeed;
 
@@ -118,7 +120,7 @@ void DashingState::Enter(Player* player)
 
 State<Player>* DashingState::Update(Player* player, float dt)
 {
-	if (Input::IsDown(CR_KEY_SPACE) && player->GetCollision(0, -1).collided)
+	if (Input::IsDown(CR_KEY_SPACE) && player->GetCollision(0, -1))
 		return player->superjumpingState;
 
 	if (dashTimer.Finished())

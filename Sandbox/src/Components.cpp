@@ -44,7 +44,7 @@ Player::Player(Entity* entity)
 {
 	walkingState =		new WalkingState;
 	jumpingState =		new JumpingState(100.0f, 160.0f, 0.0f);
-	superjumpingState = new JumpingState(100.0f, 150.0f, 150.0f);
+	superjumpingState = new JumpingState(100.0f, 150.0f, 250.0f);
 	walljumpingState =  new JumpingState(100.0f, 130.0f, -140.0);
 	climbingState =		new JumpingState(100.0f, 160.0f, 0.0f);
 	clingingState =		new ClingingState;
@@ -81,26 +81,39 @@ void ::Player::Update(float dt)
 	if (grounded) coyoteTimer.Reset();
 	else		  coyoteTimer.Tick(1.0f);
 
+	CR_CORE_INFO(grounded);
+
 	TrySwitchState(currentState->Update(this, dt));
 
 	if (velocity.x != 0.0f) // Use InputDirX() instead?
 		faceDir = velocity.x < 0.0f ? -1 : 1;
 	entity->sprite->flipX = faceDir == -1;
 
-	Collision result = Move(velocity.x * dt, (velocityLastFrame.y + velocity.y) * 0.5f * dt);
+	int horizontalCollision = MoveX(velocity.x * dt);
+	int verticalCollision = MoveY((velocityLastFrame.y + velocity.y) * 0.5f * dt);
 
-	OnCollide(result);
+	OnCollideX(nullptr, horizontalCollision);
+	OnCollideY(nullptr, verticalCollision);
 }
 
-void Player::OnCollide(Collision collision)
+void Player::OnCollideX(Ref<DynamicObject> other, int dir)
 {
-	if (collision.horizontal) velocity.x = 0;
-	if (collision.vertical)   velocity.y = 0;
+	if (dir)
+	{
+		velocity.x = 0.0f;
+		if(!grounded && velocity.y < 0.0f && InputDirX() == dir)
+			TrySwitchState(clingingState);
+	}
+}
 
-	grounded = collision.vertical == -1;
+void Player::OnCollideY(Ref<DynamicObject> other, int dir)
+{
+	if (dir)
+	{
+		velocity.y = 0.0f;
+	}
 
-	if (collision.horizontal != 0)
-		TrySwitchState(clingingState);
+	grounded = dir == -1;
 }
 
 i32 Player::InputDirX() const
@@ -122,7 +135,7 @@ i32 Player::InputDirY() const
 
 bool Player::NextToWall()
 {
-	return GetCollision(-1, 0).collided || GetCollision(1, 0).collided;
+	return GetCollision(-1, 0) || GetCollision(1, 0);
 }
 
 void Player::TrySwitchState(State<Player>* newState)
@@ -141,88 +154,84 @@ DynamicObject::DynamicObject(Entity* entity)
 	DynamicObject::all.push_back(this);
 }
 
-Collision DynamicObject::Move(float dx, float dy)
+int DynamicObject::MoveX(float amount)
 {
-	Collision result;
+	xRemainder += amount;
+	int move = (int)xRemainder;
+	int sign = move > 0 ? 1 : -1;
 
-	xRemainder += dx;
-	int xMove = (int)xRemainder;
-
-	if (xMove != 0)
+	if (move != 0)
 	{
-		xRemainder -= xMove;
-		int xSign = xMove > 0 ? 1 : -1;
+		xRemainder -= move;
 
-		while (xMove != 0)
+		while (move != 0)
 		{
-			bool xCollision = GetCollision(xSign, 0).collided;
-			if (!xCollision)
+			Ref<DynamicObject> collidingHitbox = GetEntityCollision(sign, 0);
+			bool tilemapCollision = GetTilemapCollision(sign, 0);
+			if (!collidingHitbox && !tilemapCollision)
 			{
-				entity->position.x += xSign;
-				xMove -= xSign;
+				entity->position.x += sign;
+				move -= sign;
 			}
 			else
 			{
-				result.horizontal = xSign;
-				break;
+				OnCollideX(collidingHitbox, sign);
+				return sign;
 			}
 		}
 	}
-
-	yRemainder += dy;
-	int yMove = (int)yRemainder;
-	
-	if (yMove != 0)
-	{
-		yRemainder -= yMove;
-		int ySign = yMove > 0 ? 1 : -1;
-
-		while (yMove != 0)
-		{
-			bool yCollision = GetCollision(0, ySign).collided;
-			if (!yCollision)
-			{
-				entity->position.y += ySign;
-				yMove -= ySign;
-			}
-			else
-			{
-				result.vertical = ySign;
-				break;
-			}
-		}
-	}
-	
-	if(result.horizontal == 0)
-		result.horizontal = GetCollision(std::signbit(xRemainder) ? -1 : 1, 0).horizontal;
-	if(result.vertical == 0)
-		result.vertical = GetCollision(0, std::signbit(yRemainder) ? -1 : 1).vertical;
-
-	return result;
+	return GetCollision(sign, 0) ? sign : 0;
 }
 
-Collision DynamicObject::GetCollision(int xForesense, int yForesense)
+int DynamicObject::MoveY(float amount)
 {
-	Collision result;
+	yRemainder += amount;
+	int move = (int)yRemainder;
+	int sign = move > 0 ? 1 : -1;
+	
+	if (move != 0)
+	{
+		yRemainder -= move;
 
+		while (move != 0)
+		{
+			Ref<DynamicObject> collidingHitbox = GetEntityCollision(0, sign);
+			bool tilemapCollision = GetTilemapCollision(0, sign);
+			if (!collidingHitbox && !tilemapCollision)
+			{
+				entity->position.y += sign;
+				move -= sign;
+			}
+			else
+			{
+				OnCollideY(collidingHitbox, sign);
+				return sign;
+			}
+		}
+	}
+	return GetCollision(0, sign) ? sign : 0;
+}
+
+Ref<DynamicObject> DynamicObject::GetEntityCollision(int xForesense, int yForesense)
+{
 	Ref<Hitbox> thisHitbox = entity->GetComponent<Hitbox>();
 	
-	if (Room::current->CollidesWith(thisHitbox->Left() + xForesense, thisHitbox->Right() + xForesense, thisHitbox->Bottom() + yForesense, thisHitbox->Top() + yForesense))
-	{
-		result.collided = true;
-		if (result.horizontal == 0) result.horizontal = xForesense;
-		if (result.vertical == 0) result.vertical = yForesense;
-		return result;
-	}
-	return result;
-	/*for (auto& h : Hitbox::all)
+	for (auto& h : Hitbox::all)
 		if (h != thisHitbox.get())
 			if (thisHitbox->OverlapsWith(*h, xForesense, yForesense))
-			{
-				result.collided = true;
-				result.collidedObject = h;
-				return result;
-			}*/
+				return h->entity->GetComponent<DynamicObject>();
+	return nullptr;
+}
+
+bool DynamicObject::GetTilemapCollision(int xForesense, int yForesense)
+{
+	Ref<Hitbox> h = entity->GetComponent<Hitbox>();
+	return Room::current->CollidesWith(h->Left() + xForesense, h->Right() + xForesense, h->Bottom() + yForesense, h->Top() + yForesense);
+}
+
+bool DynamicObject::GetCollision(int xForesense, int yForesense)
+{
+	return GetTilemapCollision(xForesense, yForesense) || GetEntityCollision(xForesense, yForesense);
 }
 
 void Animator::Update(float dt)

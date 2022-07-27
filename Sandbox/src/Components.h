@@ -49,13 +49,6 @@ public:
 	int framePerSecond = 3;
 };
 
-struct Collision
-{
-	int horizontal = 0, vertical = 0;
-	Hitbox* collidedObject = nullptr;
-	bool collided = false;
-};
-
 class DynamicObject : public Component
 {
 public:
@@ -68,9 +61,13 @@ public:
 
 	float xRemainder = 0.0f, yRemainder = 0.0f;
 
-	Collision Move(float dx, float dy);
-	virtual void OnCollide(Collision collision) = 0;
-	Collision GetCollision(int xForesense, int yForesense);
+	int MoveX(float amount);
+	int MoveY(float amount);
+	virtual void OnCollideX(Ref<DynamicObject> other, int dir) = 0;
+	virtual void OnCollideY(Ref<DynamicObject> other, int dir) = 0;
+	Ref<DynamicObject> GetEntityCollision(int xForesense, int yForesense);
+	bool GetTilemapCollision(int xForesense, int yForesense);
+	bool GetCollision(int xForesense, int yForesense);
 };
 
 class Player : public DynamicObject
@@ -101,7 +98,8 @@ public:
 	Timer jumpBufferTimer = Timer(10.0f);
 	Timer coyoteTimer = Timer(10.0f);
 
-	virtual void OnCollide(Collision collision) override;
+	virtual void OnCollideX(Ref<DynamicObject> other, int dir) override;
+	virtual void OnCollideY(Ref<DynamicObject> other, int dir) override;
 
 	int InputDirX() const;
 	int InputDirY() const;
@@ -117,7 +115,8 @@ public:
 		: DynamicObject(entity)
 	{}
 
-	virtual void OnCollide(Collision collision) override { return; }
+	virtual void OnCollideX(Ref<DynamicObject> other, int dir) override { return; }
+	virtual void OnCollideY(Ref<DynamicObject> other, int dir) override { return; }
 };
 
 class CameraController : public Component
