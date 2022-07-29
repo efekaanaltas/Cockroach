@@ -1,6 +1,6 @@
 workspace "Cockroach"
     architecture "x64"
-    startproject "Sandbox"
+    startproject "Game"
 
     configurations
     {
@@ -97,8 +97,8 @@ project "Cockroach"
         runtime "Release"
         optimize "on"
 
-project "Sandbox"
-    location "Sandbox"
+project "Game"
+    location "Game"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"

@@ -16,9 +16,6 @@
     <Filter Include="src\Cockroach\Game">
       <UniqueIdentifier>{D28F9F90-BE73-60E6-27D4-5A3913D74A68}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Cockroach\ImGui">
-      <UniqueIdentifier>{73B0BBA4-DF11-99B2-687F-DF64D4DFCF71}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\Cockroach\Renderer">
       <UniqueIdentifier>{4FA6E04F-3BA0-09A2-240D-A0B210A66F0E}</UniqueIdentifier>
     </Filter>
