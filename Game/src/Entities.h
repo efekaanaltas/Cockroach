@@ -12,7 +12,7 @@ namespace Entities
 
 	enum EntityType
 	{
-		Cockroach = 0, Camera, Tile, SpikeLeft, SpikeRight, SpikeDown, SpikeUp
+		Cockroach = 0, Camera, SpikeLeft, SpikeRight, SpikeDown, SpikeUp, PushBlock
 	};
 
 	Entity* Create(int2 position, int entityType)
@@ -42,12 +42,6 @@ namespace Entities
 			h->min = { -160, -90 };
 			h->max = { 160, 90 };
 			Ref<CameraController> cc = e->AddComponent<CameraController>();
-			break;
-		}
-		case EntityType::Tile:
-		{
-			e->sprite = SubTexture2D::CreateFromCoords(spriteSheet, { 11, 2 }, { 8, 8 });
-			e->AddComponent<Hitbox>();
 			break;
 		}
 		case EntityType::SpikeLeft:
@@ -84,6 +78,15 @@ namespace Entities
 			h->min = { 4, 0 };
 			h->max = { 8, 4 };
 			e->AddComponent<Hazard>();
+			break;
+		}
+		case EntityType::PushBlock:
+		{
+			e->sprite = SubTexture2D::CreateFromCoords(spriteSheet, { 11,2 }, { 8,8 });
+			Ref<Hitbox> h = e->AddComponent<Hitbox>();
+			h->min = { 0,0 };
+			h->max = { 8,8 };
+			e->AddComponent<Pusher>();
 			break;
 		}
 		}

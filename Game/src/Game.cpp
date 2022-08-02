@@ -21,9 +21,9 @@ public:
 		Entity* e = new Entity({ 0,0 });
 		e->ID = Entities::Camera;
 		e->sprite = SubTexture2D::CreateFromCoords(spriteSheet, { 0,0 }, { 1,1 });
-		Ref<Hitbox> h = e->AddComponent<Hitbox>();
-		h->min = { -160, -90 };
-		h->max = { 160, 90 };
+		//Ref<Hitbox> h = e->AddComponent<Hitbox>();
+		//h->min = { -160, -90 };
+		//h->max = { 160, 90 };
 		cameraController = e->AddComponent<CameraController>();
 	}
 
@@ -38,7 +38,7 @@ public:
 
 		if (Input::IsDown(CR_KEY_ESCAPE))
 		{
-			Entities::Create(EntityPlacePosition(), Entities::SpikeLeft); 
+			Entities::Create(EntityPlacePosition(), Entities::PushBlock); 
 			Room::current->Save("assets/scenes/room1.txt");
 		};
 

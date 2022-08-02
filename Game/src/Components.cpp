@@ -81,8 +81,6 @@ void ::Player::Update(float dt)
 	if (grounded) coyoteTimer.Reset();
 	else		  coyoteTimer.Tick(1.0f);
 
-	CR_CORE_INFO(grounded);
-
 	TrySwitchState(currentState->Update(this, dt));
 
 	if (velocity.x != 0.0f) // Use InputDirX() instead?
@@ -91,29 +89,28 @@ void ::Player::Update(float dt)
 
 	int horizontalCollision = MoveX(velocity.x * dt);
 	int verticalCollision = MoveY((velocityLastFrame.y + velocity.y) * 0.5f * dt);
-
-	OnCollideX(nullptr, horizontalCollision);
-	OnCollideY(nullptr, verticalCollision);
 }
 
-void Player::OnCollideX(Ref<DynamicObject> other, int dir)
+bool Player::OnCollide(Ref<DynamicObject> other, int horizontal, int vertical)
 {
-	if (dir)
+	if (std::dynamic_pointer_cast<Hazard>(other))
+		entity->position = { 0,0 };
+
+	if (horizontal)
 	{
 		velocity.x = 0.0f;
-		if(!grounded && velocity.y < 0.0f && InputDirX() == dir)
+		if(!grounded && velocity.y < 0.0f && InputDirX() == horizontal)
 			TrySwitchState(clingingState);
 	}
-}
 
-void Player::OnCollideY(Ref<DynamicObject> other, int dir)
-{
-	if (dir)
+	if (vertical)
 	{
 		velocity.y = 0.0f;
 	}
 
-	grounded = dir == -1;
+	grounded = vertical == -1;
+
+	return true;
 }
 
 i32 Player::InputDirX() const
@@ -146,6 +143,24 @@ void Player::TrySwitchState(State<Player>* newState)
 	currentState->Enter(this);
 }
 
+bool Pusher::OnCollide(Ref<DynamicObject> other, int horizontal, int vertical)
+{
+	if (other)
+	{
+		if (horizontal == -1)
+			other->entity->position.x += entity->GetComponent<Hitbox>()->Left() - other->entity->GetComponent<Hitbox>()->Right() - 1;
+		if (horizontal == 1)
+			other->entity->position.x += entity->GetComponent<Hitbox>()->Right() - other->entity->GetComponent<Hitbox>()->Left() + 1;
+		if (vertical == -1)
+			other->entity->position.y += entity->GetComponent<Hitbox>()->Bottom() - other->entity->GetComponent<Hitbox>()->Top() - 1;
+		if (vertical == 1)
+			other->entity->position.y += entity->GetComponent<Hitbox>()->Top() - other->entity->GetComponent<Hitbox>()->Bottom() + 1;
+		// Shouldn't have to add or subtract 1, investigate.
+		return false;
+	}
+	return true;
+}
+
 std::vector<DynamicObject*> DynamicObject::all = std::vector<DynamicObject*>();
 
 DynamicObject::DynamicObject(Entity* entity)
@@ -173,11 +188,8 @@ int DynamicObject::MoveX(float amount)
 				entity->position.x += sign;
 				move -= sign;
 			}
-			else
-			{
-				OnCollideX(collidingHitbox, sign);
-				return sign;
-			}
+			else if (OnCollide(collidingHitbox, sign, 0))
+					return sign;
 		}
 	}
 	return GetCollision(sign, 0) ? sign : 0;
@@ -202,11 +214,8 @@ int DynamicObject::MoveY(float amount)
 				entity->position.y += sign;
 				move -= sign;
 			}
-			else
-			{
-				OnCollideY(collidingHitbox, sign);
+			else if (OnCollide(collidingHitbox, 0, sign))
 				return sign;
-			}
 		}
 	}
 	return GetCollision(0, sign) ? sign : 0;

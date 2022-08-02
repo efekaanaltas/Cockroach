@@ -63,8 +63,7 @@ public:
 
 	int MoveX(float amount);
 	int MoveY(float amount);
-	virtual void OnCollideX(Ref<DynamicObject> other, int dir) = 0;
-	virtual void OnCollideY(Ref<DynamicObject> other, int dir) = 0;
+	virtual bool OnCollide(Ref<DynamicObject> other, int horizontal, int vertical) = 0;
 	Ref<DynamicObject> GetEntityCollision(int xForesense, int yForesense);
 	bool GetTilemapCollision(int xForesense, int yForesense);
 	bool GetCollision(int xForesense, int yForesense);
@@ -98,8 +97,7 @@ public:
 	Timer jumpBufferTimer = Timer(10.0f);
 	Timer coyoteTimer = Timer(10.0f);
 
-	virtual void OnCollideX(Ref<DynamicObject> other, int dir) override;
-	virtual void OnCollideY(Ref<DynamicObject> other, int dir) override;
+	virtual bool OnCollide(Ref<DynamicObject> other, int horizontal, int vertical) override;
 
 	int InputDirX() const;
 	int InputDirY() const;
@@ -115,8 +113,29 @@ public:
 		: DynamicObject(entity)
 	{}
 
-	virtual void OnCollideX(Ref<DynamicObject> other, int dir) override { return; }
-	virtual void OnCollideY(Ref<DynamicObject> other, int dir) override { return; }
+	virtual bool OnCollide(Ref<DynamicObject> other, int horizontal, int vertical) override { return true; }
+};
+
+class Pusher : public DynamicObject
+{
+public:
+	Pusher(Entity* entity)
+		: DynamicObject(entity)
+	{}
+
+	int dir = 1;
+
+	virtual void Update(float dt) override
+	{
+		if (entity->position.y > 10 || entity->position.y < -10)
+		{
+			entity->position.y = std::clamp(entity->position.y, -10, 10);
+			dir = dir * -1;
+		}
+		MoveY(5 * dir * dt);
+	}
+
+	virtual bool OnCollide(Ref<DynamicObject> other, int horizontal, int vertical) override;
 };
 
 class CameraController : public Component
