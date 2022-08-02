@@ -80,7 +80,7 @@ namespace Cockroach
 
 			if (!minimized)
 			{
-				Update(dt*0.5f);
+				Update(dt);
 				Render();
 				Input::Update();
 			}
