@@ -6,6 +6,7 @@
 
 #include "Cockroach/Events/Event.h"
 #include "Cockroach/Events/ApplicationEvent.h"
+#include "Cockroach/Game/Timer.h"
 
 namespace Cockroach
 {
@@ -29,6 +30,7 @@ namespace Cockroach
 		inline static Application& Get() { return *s_Instance; }
 		
 		int frameCount = 0;
+		Timer freezeTimer = Timer(0.0f);
 	private:
 		void OnEvent(Event& e);
 		bool OnWindowClose(WindowCloseEvent& e);

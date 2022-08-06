@@ -80,9 +80,13 @@ namespace Cockroach
 
 			if (!minimized)
 			{
-				Update(dt);
-				Render();
-				Input::Update();
+				if (freezeTimer.Finished())
+				{
+					Update(dt);
+					Render();
+					Input::Update();
+				}
+				else freezeTimer.Tick(1.0f);
 			}
 
 			window->OnUpdate();

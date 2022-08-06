@@ -25,6 +25,15 @@ public:
 		//h->min = { -160, -90 };
 		//h->max = { 160, 90 };
 		cameraController = e->AddComponent<CameraController>();
+
+		Entity* pe = new Entity({ 10,10 });
+		pe->ID = Entities::Cockroach;
+		pe->sprite = SubTexture2D::CreateFromCoords(spriteSheet, { 0, 3 }, { 16, 16 });
+		Ref<Hitbox> h = pe->AddComponent<Hitbox>();
+		h->min = { 6, 0 };
+		h->max = { 10, 8 };
+		pe->AddComponent<Animator>();
+		player = pe->AddComponent<Player>();
 	}
 
 	~Game()
@@ -33,7 +42,8 @@ public:
 
 	virtual void Update(float dt) override
 	{
-		cameraController->Update(dt);
+		cameraController->entity->Update(dt);
+		player->entity->Update(dt);
 		Room::current->Update(dt);
 
 		if (Input::IsDown(CR_KEY_ESCAPE))
@@ -83,6 +93,7 @@ public:
 			RenderGrid();
 
 		Room::current->Render();
+		player->entity->Render();
 		
 		if (renderHitboxes)
 			RenderHitboxes();
@@ -104,6 +115,8 @@ public:
 		Text("%.3f ms (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 
 		Text("Entity Count: %i", Room::current->entityCount);
+		Text("Player Position: %i %i", player->entity->position.x, player->entity->position.y);
+		Text("Player Velocity: %.1f, %.1f", player->velocity.x, player->velocity.y);
 		End();
 
 		Application::ImGuiEnd();
@@ -163,6 +176,9 @@ public:
 
 	void RenderHitboxes()
 	{
+		Ref<Hitbox> pH = player->entity->GetComponent<Hitbox>();
+		DrawQuadOutline(pH->Left(), pH->Right(), pH->Bottom(), pH->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
+
 		for (int i = 0; i < Room::current->entityCount; i++)
 		{
 			Ref<Hitbox> h = Room::current->entities[i].GetComponent<Hitbox>();
@@ -180,9 +196,9 @@ public:
 		}
 	}
 	
-private:
 	Ref<CameraController> cameraController;
-
+	Ref<Player> player;
+private:
 	bool renderGrid = true;
 	bool renderHitboxes = true;
 

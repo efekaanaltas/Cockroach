@@ -116,6 +116,8 @@ void DashingState::Enter(Player* player)
 	else dashDir = { player->faceDir, 0.0f };
 
 	player->animator->sheet = player->dashingSheet;
+
+	Application::Get().freezeTimer = Timer(3.0f);
 }
 
 State<Player>* DashingState::Update(Player* player, float dt)
@@ -131,11 +133,10 @@ State<Player>* DashingState::Update(Player* player, float dt)
 		player->velocity = dashSpeed * dashDir;
 	}
 
-
 	return nullptr;
 }
 
 void DashingState::Exit(Player* player)
 {
-	player->velocity = { 0.0f,0.0f };
+	player->velocity = { 0.0f, 0.0f };
 }

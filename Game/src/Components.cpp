@@ -71,7 +71,7 @@ Player::Player(Entity* entity)
 	jumpBufferTimer.remainingTime = 0.0f;
 }
 
-void ::Player::Update(float dt)
+void Player::Update(float dt)
 {
 	velocityLastFrame = velocity;
 
