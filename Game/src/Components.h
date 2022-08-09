@@ -11,30 +11,6 @@ class JumpingState;
 class ClingingState;
 class DashingState;
 
-class Hitbox : public Component
-{
-public:
-	static std::vector<Hitbox*> all;
-
-	Hitbox(Entity* entity);
-
-	bool enabled = true;
-
-	glm::ivec2 min = { 0, 0 };
-	glm::ivec2 max = { 8, 8 };
-
-	glm::ivec2 Hitbox::Position() const { return entity->position; }
-
-	int Hitbox::Left() const { return Position().x + min.x; }
-	int Hitbox::Right() const { return Position().x + max.x; }
-	int Hitbox::Bottom() const { return Position().y + min.y; }
-	int Hitbox::Top() const { return Position().y + max.y; }
-
-	bool OverlapsWith(Hitbox other, int xForesense = 0, int yForesense = 0); // TODO: Const reference of Hitbox can't call functions such as Left(), why?
-	bool OverlapsWith(Hitbox other);
-	bool OverlapsWith(int2 coord);
-};
-
 using Sheet = std::vector<Ref<SubTexture2D>>;
 class Animator : public Component
 {
@@ -52,18 +28,31 @@ public:
 class DynamicObject : public Component
 {
 public:
-	static std::vector<DynamicObject*> all;
-
 	DynamicObject(Entity* entity);
 
 	DynamicObject* parent = nullptr;
 	std::vector<DynamicObject*> children;
 
+	Rect hitbox;
 	float xRemainder = 0.0f, yRemainder = 0.0f;
+
+	int Left() const { return entity->position.x + hitbox.min.x; }
+	int Right() const { return entity->position.x + hitbox.max.x; }
+	int Bottom() const { return entity->position.y + hitbox.min.y; }
+	int Top() const { return entity->position.y + hitbox.max.y; }
+
+	bool OverlapsWith(Ref<DynamicObject> other, int xForesense, int yForesense) const
+	{ return hitbox.OverlapsWith(other->hitbox, entity->position.x + xForesense, entity->position.y + yForesense); }
+
+	bool Contains(Ref<DynamicObject> other, int xForesense, int yForesense) const
+	{ return hitbox.Contains(other->hitbox, entity->position.x + xForesense, entity->position.y + yForesense); }
+
+	bool Contains(int2 coord) const { return hitbox.Contains(coord); }
 
 	int MoveX(float amount);
 	int MoveY(float amount);
 	virtual bool OnCollide(Ref<DynamicObject> other, int horizontal, int vertical) = 0;
+
 	Ref<DynamicObject> GetEntityCollision(int xForesense, int yForesense);
 	bool GetTilemapCollision(int xForesense, int yForesense);
 	bool GetCollision(int xForesense, int yForesense);

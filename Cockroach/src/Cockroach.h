@@ -30,4 +30,5 @@
 #include "Cockroach/Game/Entity.h"
 #include "Cockroach/Game/Component.h"
 #include "Cockroach/Game/Timer.h"
+#include "Cockroach/Game/Rect.h"
 // ----------------------------------------

@@ -12,7 +12,7 @@ namespace Entities
 
 	enum EntityType
 	{
-		Cockroach = 0, Camera, SpikeLeft, SpikeRight, SpikeDown, SpikeUp, PushBlock
+		Cockroach, Camera, SpikeLeft, SpikeRight, SpikeDown, SpikeUp, PushBlock
 	};
 
 	Entity* Create(int2 position, int entityType)
@@ -25,68 +25,49 @@ namespace Entities
 		e->ID = entityType;
 		switch (entityType)
 		{
-		case EntityType::Cockroach: 
+		case EntityType::Cockroach:
 		{
-			e->sprite = SubTexture2D::CreateFromCoords(spriteSheet, { 0, 3 }, { 16, 16 });
-			Ref<Hitbox> h = e->AddComponent<Hitbox>();
-			h->min = { 6, 0 };
-			h->max = { 10, 8 };
-			e->AddComponent<Animator>();
-			e->AddComponent<Player>();
+			CR_CORE_WARN("Do not create an instance of Cockroach");
 			break;
 		}
 		case EntityType::Camera:
 		{
-			e->sprite = SubTexture2D::CreateFromCoords(spriteSheet, { 0,0 }, { 1,1 });
-			Ref<Hitbox> h = e->AddComponent<Hitbox>();
-			h->min = { -160, -90 };
-			h->max = { 160, 90 };
-			Ref<CameraController> cc = e->AddComponent<CameraController>();
+			CR_CORE_WARN("Do not create an instance of Camera");
 			break;
 		}
 		case EntityType::SpikeLeft:
 		{
 			e->sprite = SubTexture2D::CreateFromCoords(spriteSheet, { 9, 1 }, { 8, 8 });
-			Ref<Hitbox> h = e->AddComponent<Hitbox>();
-			h->min = { 4, 0 };
-			h->max = { 8, 8 };
-			e->AddComponent<Hazard>();
+			Ref<DynamicObject> dyn = e->AddComponent<Hazard>();
+			dyn->hitbox = Rect({ 4,0 }, { 8,8 });
 			break;
 		}
 		case EntityType::SpikeRight:
 		{
 			e->sprite = SubTexture2D::CreateFromCoords(spriteSheet, { 9, 0 }, { 8, 8 });
-			Ref<Hitbox> h = e->AddComponent<Hitbox>();
-			h->min = { 0, 0 };
-			h->max = { 4, 8 };
-			e->AddComponent<Hazard>();
+			Ref<DynamicObject> dyn = e->AddComponent<Hazard>();
+			dyn->hitbox = Rect({ 0,0 }, { 4,8 });
 			break;
 		}
 		case EntityType::SpikeDown:
 		{
 			e->sprite = SubTexture2D::CreateFromCoords(spriteSheet, { 8, 1 }, { 8, 8 });
-			Ref<Hitbox> h = e->AddComponent<Hitbox>();
-			h->min = { 0, 4 };
-			h->max = { 8, 8 };
-			e->AddComponent<Hazard>();
+			Ref<DynamicObject> dyn = e->AddComponent<Hazard>();
+			dyn->hitbox = Rect({ 0,4 }, { 8,8 });
 			break;
 		}
 		case EntityType::SpikeUp:
 		{
 			e->sprite = SubTexture2D::CreateFromCoords(spriteSheet, { 8, 0 }, { 8, 8 });
-			Ref<Hitbox> h = e->AddComponent<Hitbox>();
-			h->min = { 4, 0 };
-			h->max = { 8, 4 };
-			e->AddComponent<Hazard>();
+			Ref<DynamicObject> dyn = e->AddComponent<Hazard>();
+			dyn->hitbox = Rect({ 4,8 }, { 8,4 });
 			break;
 		}
 		case EntityType::PushBlock:
 		{
 			e->sprite = SubTexture2D::CreateFromCoords(spriteSheet, { 11,2 }, { 8,8 });
-			Ref<Hitbox> h = e->AddComponent<Hitbox>();
-			h->min = { 0,0 };
-			h->max = { 8,8 };
-			e->AddComponent<Pusher>();
+			Ref<DynamicObject> dyn = e->AddComponent<Pusher>();
+			dyn->hitbox = Rect({ 0,0 }, { 8,8 });
 			break;
 		}
 		}

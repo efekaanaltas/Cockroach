@@ -29,11 +29,9 @@ public:
 		Entity* pe = new Entity({ 10,10 });
 		pe->ID = Entities::Cockroach;
 		pe->sprite = SubTexture2D::CreateFromCoords(spriteSheet, { 0, 3 }, { 16, 16 });
-		Ref<Hitbox> h = pe->AddComponent<Hitbox>();
-		h->min = { 6, 0 };
-		h->max = { 10, 8 };
 		pe->AddComponent<Animator>();
 		player = pe->AddComponent<Player>();
+		player->hitbox = Rect({ 6,0 }, { 10,8 });
 	}
 
 	~Game()
@@ -128,8 +126,8 @@ public:
 			return nullptr;
 		for (int i = 0; i < Room::current->entityCount; i++)
 		{
-			Ref<Hitbox> h = Room::current->entities[i].GetComponent<Hitbox>();
-			if (h && h->OverlapsWith(position))
+			Ref<DynamicObject> dyn = Room::current->entities[i].GetComponent<DynamicObject>();
+			if(dyn && dyn->hitbox.Contains(position))
 				return &Room::current->entities[i];
 		}
 		return false;
@@ -176,14 +174,14 @@ public:
 
 	void RenderHitboxes()
 	{
-		Ref<Hitbox> pH = player->entity->GetComponent<Hitbox>();
-		DrawQuadOutline(pH->Left(), pH->Right(), pH->Bottom(), pH->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
+		Ref<DynamicObject> dyn = player->entity->GetComponent<DynamicObject>();
+		DrawQuadOutline(dyn->Left(), dyn->Right(), dyn->Bottom(), dyn->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
 
 		for (int i = 0; i < Room::current->entityCount; i++)
 		{
-			Ref<Hitbox> h = Room::current->entities[i].GetComponent<Hitbox>();
-			if (h && h->enabled)
-				DrawQuadOutline(h->Left(), h->Right(), h->Bottom(), h->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
+			Ref<DynamicObject> dyn = Room::current->entities[i].GetComponent<DynamicObject>();
+			if (dyn)
+				DrawQuadOutline(dyn->Left(), dyn->Right(), dyn->Bottom(), dyn->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
 		}
 
 		for (int i = 0; i < Room::current->width * Room::current->height; i++)

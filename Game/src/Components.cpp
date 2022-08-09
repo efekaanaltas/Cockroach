@@ -7,38 +7,6 @@
 
 using namespace Cockroach;
 
-std::vector<Hitbox*> Hitbox::all = std::vector<Hitbox*>();
-
-Hitbox::Hitbox(Entity* entity)
-	: Component(entity)
-{
-	Hitbox::all.push_back(this);
-}
-
-bool Hitbox::OverlapsWith(Hitbox other, int xForesense, int yForesense)
-{
-	if (!enabled || !other.enabled) return false;
-	bool x = (Left() + xForesense < other.Right()) && (Right() + xForesense > other.Left());
-	bool y = (Bottom() + yForesense < other.Top()) && (Top() + yForesense > other.Bottom());
-	return x && y;
-}
-
-bool Hitbox::OverlapsWith(Hitbox other)
-{
-	if (!enabled || !other.enabled) return false;
-	bool x = (Left() <= other.Left()) && (other.Right() <= Right());
-	bool y = (Bottom() <= other.Bottom()) && (other.Top() <= Top());
-	return x && y;
-}
-
-bool Hitbox::OverlapsWith(int2 coord)
-{
-	if (!enabled) return false;
-	bool x = Left() <= coord.x && coord.x <= Right();
-	bool y = Bottom() <= coord.y && coord.y <= Top();
-	return x && y;
-}
-
 Player::Player(Entity* entity)
 	: DynamicObject(entity)
 {
@@ -148,25 +116,22 @@ bool Pusher::OnCollide(Ref<DynamicObject> other, int horizontal, int vertical)
 	if (other)
 	{
 		if (horizontal == -1)
-			other->entity->position.x += entity->GetComponent<Hitbox>()->Left() - other->entity->GetComponent<Hitbox>()->Right() - 1;
+			other->entity->position.x += Left() - other->Right() - 1;
 		if (horizontal == 1)
-			other->entity->position.x += entity->GetComponent<Hitbox>()->Right() - other->entity->GetComponent<Hitbox>()->Left() + 1;
+			other->entity->position.x += Right() - other->Left() + 1;
 		if (vertical == -1)
-			other->entity->position.y += entity->GetComponent<Hitbox>()->Bottom() - other->entity->GetComponent<Hitbox>()->Top() - 1;
+			other->entity->position.y += Bottom() - other->Top() - 1;
 		if (vertical == 1)
-			other->entity->position.y += entity->GetComponent<Hitbox>()->Top() - other->entity->GetComponent<Hitbox>()->Bottom() + 1;
+			other->entity->position.y += Top() - other->Bottom() + 1;
 		// Shouldn't have to add or subtract 1, investigate.
 		return false;
 	}
 	return true;
 }
 
-std::vector<DynamicObject*> DynamicObject::all = std::vector<DynamicObject*>();
-
 DynamicObject::DynamicObject(Entity* entity)
 	: Component(entity)
 {
-	DynamicObject::all.push_back(this);
 }
 
 int DynamicObject::MoveX(float amount)
@@ -222,20 +187,19 @@ int DynamicObject::MoveY(float amount)
 }
 
 Ref<DynamicObject> DynamicObject::GetEntityCollision(int xForesense, int yForesense)
-{
-	Ref<Hitbox> thisHitbox = entity->GetComponent<Hitbox>();
-	
-	for (auto& h : Hitbox::all)
-		if (h != thisHitbox.get())
-			if (thisHitbox->OverlapsWith(*h, xForesense, yForesense))
-				return h->entity->GetComponent<DynamicObject>();
+{	
+	for (int i = 0; i < Room::current->entityCount; i++)
+	{
+		if (&Room::current->entities[i] != entity)
+			if (OverlapsWith(Room::current->entities[i].GetComponent<DynamicObject>(), xForesense, yForesense))
+				return Room::current->entities->GetComponent<DynamicObject>();
+	}
 	return nullptr;
 }
 
 bool DynamicObject::GetTilemapCollision(int xForesense, int yForesense)
 {
-	Ref<Hitbox> h = entity->GetComponent<Hitbox>();
-	return Room::current->CollidesWith(h->Left() + xForesense, h->Right() + xForesense, h->Bottom() + yForesense, h->Top() + yForesense);
+	return Room::current->CollidesWith(Left() + xForesense, Right() + xForesense, Bottom() + yForesense, Top() + yForesense);
 }
 
 bool DynamicObject::GetCollision(int xForesense, int yForesense)

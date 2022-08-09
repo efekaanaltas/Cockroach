@@ -153,6 +153,7 @@
     <ClInclude Include="src\Cockroach\Events\MouseEvent.h" />
     <ClInclude Include="src\Cockroach\Game\Component.h" />
     <ClInclude Include="src\Cockroach\Game\Entity.h" />
+    <ClInclude Include="src\Cockroach\Game\Rect.h" />
     <ClInclude Include="src\Cockroach\Game\Room.h" />
     <ClInclude Include="src\Cockroach\Game\Timer.h" />
     <ClInclude Include="src\Cockroach\Renderer\Buffer.h" />
@@ -586,6 +587,7 @@
     <ClCompile Include="src\Cockroach\Core\Log.cpp" />
     <ClCompile Include="src\Cockroach\Core\Window.cpp" />
     <ClCompile Include="src\Cockroach\Game\Entity.cpp" />
+    <ClCompile Include="src\Cockroach\Game\Rect.cpp" />
     <ClCompile Include="src\Cockroach\Game\Room.cpp" />
     <ClCompile Include="src\Cockroach\Game\Timer.cpp" />
     <ClCompile Include="src\Cockroach\Renderer\Buffer.cpp" />
