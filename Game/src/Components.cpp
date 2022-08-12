@@ -5,6 +5,8 @@
 
 #include "State.h"
 
+#include "Game.h"
+
 using namespace Cockroach;
 
 Player::Player(Entity* entity)
@@ -18,17 +20,17 @@ Player::Player(Entity* entity)
 	clingingState =		new ClingingState;
 	dashingState =		new DashingState;
 
-	Ref<Texture2D> texture = CreateRef<Texture2D>("assets/textures/SpriteSheet.png");
-	idleSheet.push_back(		SubTexture2D::CreateFromCoords(texture, { 0, 3 }, { 16, 16 }));
-	idleSheet.push_back(		SubTexture2D::CreateFromCoords(texture, { 1, 3 }, { 16, 16 }));
-	walkingSheet.push_back(		SubTexture2D::CreateFromCoords(texture, { 2, 3 }, { 16, 16 }));
-	walkingSheet.push_back(		SubTexture2D::CreateFromCoords(texture, { 3, 3 }, { 16, 16 }));
-	dashingSheet.push_back(		SubTexture2D::CreateFromCoords(texture, { 4, 3 }, { 16, 16 }));
-	dashingSheet.push_back(		SubTexture2D::CreateFromCoords(texture, { 5, 3 }, { 16, 16 }));
-	dashingSheet.push_back(		SubTexture2D::CreateFromCoords(texture, { 6, 3 }, { 16, 16 }));
-	jumpingSheet.push_back(		SubTexture2D::CreateFromCoords(texture, { 7, 3 }, { 16, 16 }));
-	clingingSheet.push_back(	SubTexture2D::CreateFromCoords(texture, { 8, 3 }, { 16, 16 }));
-	fallingSheet.push_back(		SubTexture2D::CreateFromCoords(texture, { 9, 3 }, { 16, 16 }));
+	Ref<Texture2D> texture = Game::baseSpriteSheet;
+	idleSheet.push_back(		Sprite::CreateFromCoords(texture, { 0, 3 }, { 16, 16 }));
+	idleSheet.push_back(		Sprite::CreateFromCoords(texture, { 1, 3 }, { 16, 16 }));
+	walkingSheet.push_back(		Sprite::CreateFromCoords(texture, { 2, 3 }, { 16, 16 }));
+	walkingSheet.push_back(		Sprite::CreateFromCoords(texture, { 3, 3 }, { 16, 16 }));
+	dashingSheet.push_back(		Sprite::CreateFromCoords(texture, { 4, 3 }, { 16, 16 }));
+	dashingSheet.push_back(		Sprite::CreateFromCoords(texture, { 5, 3 }, { 16, 16 }));
+	dashingSheet.push_back(		Sprite::CreateFromCoords(texture, { 6, 3 }, { 16, 16 }));
+	jumpingSheet.push_back(		Sprite::CreateFromCoords(texture, { 7, 3 }, { 16, 16 }));
+	clingingSheet.push_back(	Sprite::CreateFromCoords(texture, { 8, 3 }, { 16, 16 }));
+	fallingSheet.push_back(		Sprite::CreateFromCoords(texture, { 9, 3 }, { 16, 16 }));
 
 	animator = entity->GetComponent<Animator>();
 	animator->sheet = idleSheet;
@@ -53,7 +55,7 @@ void Player::Update(float dt)
 
 	if (velocity.x != 0.0f) // Use InputDirX() instead?
 		faceDir = velocity.x < 0.0f ? -1 : 1;
-	entity->sprite->flipX = faceDir == -1;
+	entity->sprite.flipX = faceDir == -1;
 
 	int horizontalCollision = MoveX(velocity.x * dt);
 	int verticalCollision = MoveY((velocityLastFrame.y + velocity.y) * 0.5f * dt);
@@ -115,14 +117,8 @@ bool Pusher::OnCollide(Ref<DynamicObject> other, int horizontal, int vertical)
 {
 	if (other)
 	{
-		if (horizontal == -1)
-			other->entity->position.x += Left() - other->Right() - 1;
-		if (horizontal == 1)
-			other->entity->position.x += Right() - other->Left() + 1;
-		if (vertical == -1)
-			other->entity->position.y += Bottom() - other->Top() - 1;
-		if (vertical == 1)
-			other->entity->position.y += Top() - other->Bottom() + 1;
+		other->MoveX(horizontal * (Right() - other->Left() + 1));
+		other->MoveY(vertical * (Top() - other->Bottom() + 1));
 		// Shouldn't have to add or subtract 1, investigate.
 		return false;
 	}
@@ -191,9 +187,15 @@ Ref<DynamicObject> DynamicObject::GetEntityCollision(int xForesense, int yForese
 	for (int i = 0; i < Room::current->entityCount; i++)
 	{
 		if (&Room::current->entities[i] != entity)
-			if (OverlapsWith(Room::current->entities[i].GetComponent<DynamicObject>(), xForesense, yForesense))
-				return Room::current->entities->GetComponent<DynamicObject>();
+		{
+			Ref<DynamicObject> dyn = Room::current->entities[i].GetComponent<DynamicObject>();
+			if (OverlapsWith(dyn, xForesense, yForesense))
+				return dyn;
+		}
 	}
+	// Also check for collisions with player
+	if (Game::player->entity != entity && OverlapsWith(Game::player, xForesense, yForesense))
+		return Game::player;
 	return nullptr;
 }
 

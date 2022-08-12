@@ -26,13 +26,12 @@ namespace Cockroach
 			entities[i].Update(dt);
 	}
 
-	void Room::Render()
+	void Room::Render(Ref<Texture2D> tilemapTexture)
 	{
-		Ref<Texture2D> texture = CreateRef<Texture2D>("assets/textures/SpriteSheet.png");
 		for (int i = 0; i < width * height; i++)
 		{
 			if (tiles[i].type == Air) continue;
-			Ref<SubTexture2D> sprite = SubTexture2D::CreateFromCoords(texture, { 11+tiles[i].texCoordOffset.x,2+tiles[i].texCoordOffset.y}, {8,8});
+			Sprite sprite = Sprite::CreateFromCoords(tilemapTexture, { 11+tiles[i].texCoordOffset.x,2+tiles[i].texCoordOffset.y}, {8,8});
 			int2 roomPos = IndexToRoomPosition(i);
 			Renderer::DrawQuad(RoomToWorldPosition(roomPos), {8,8}, sprite);
 		}
@@ -44,11 +43,11 @@ namespace Cockroach
 
 	Entity* Room::AddEntity(int2 position)
 	{
+		entityCount += 1;
 		Entity* e = new Entity(position);
-		Room::current->entities[0];
-		entities[Room::current->entityCount] = *e;
+		entities[entityCount] = *e;
 		delete e;
-		return &entities[Room::current->entityCount++];
+		return &entities[entityCount-1];
 	}
 
 	void Room::PlaceTile(TileType tileType, int2 worldPosition)
@@ -206,7 +205,7 @@ namespace Cockroach
 				stream.seekg(line.find("Y:") + 2);
 				stream >> pY;
 
-				room->entities[room->entityCount++] = *entityCreateFn(int2(pX, pY), ID);
+				room->entities[room->entityCount] = *entityCreateFn(int2(pX, pY), ID);
 			}
 		}
 		else

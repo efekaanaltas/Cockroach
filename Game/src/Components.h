@@ -11,7 +11,7 @@ class JumpingState;
 class ClingingState;
 class DashingState;
 
-using Sheet = std::vector<Ref<SubTexture2D>>;
+using Sheet = std::vector<Sprite>;
 class Animator : public Component
 {
 public:
@@ -42,10 +42,14 @@ public:
 	int Top() const { return entity->position.y + hitbox.max.y; }
 
 	bool OverlapsWith(Ref<DynamicObject> other, int xForesense, int yForesense) const
-	{ return hitbox.OverlapsWith(other->hitbox, entity->position.x + xForesense, entity->position.y + yForesense); }
+	{
+		Rect thisRect = Rect(hitbox.min + entity->position, hitbox.max + entity->position);
+		Rect otherRect = Rect(other->hitbox.min + other->entity->position, other->hitbox.max + other->entity->position);
+		return thisRect.OverlapsWith(otherRect, xForesense, yForesense);
+	}
 
 	bool Contains(Ref<DynamicObject> other, int xForesense, int yForesense) const
-	{ return hitbox.Contains(other->hitbox, entity->position.x + xForesense, entity->position.y + yForesense); }
+	{ return hitbox.Contains(other->hitbox, entity->position.x - other->entity->position.x + xForesense, entity->position.y - other->entity->position.y + yForesense); }
 
 	bool Contains(int2 coord) const { return hitbox.Contains(coord); }
 

@@ -10,7 +10,7 @@ namespace Cockroach
 
 	bool Rect::OverlapsWith(Rect other, int xForesense, int yForesense) const
 	{
-		bool x = (min.x + xForesense < max.x) && (max.x + xForesense > other.min.x);
+		bool x = (min.x + xForesense < other.max.x) && (max.x + xForesense > other.min.x);
 		bool y = (min.y + yForesense < other.max.y) && (max.y + yForesense > other.min.y);
 		return x && y;
 	}

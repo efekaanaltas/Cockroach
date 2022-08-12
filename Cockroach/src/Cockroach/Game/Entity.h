@@ -21,7 +21,7 @@ namespace Cockroach
 
 		std::vector<Ref<Component>> components = std::vector<Ref<Component>>();
 		glm::ivec2 position;
-		Ref<SubTexture2D> sprite;
+		Sprite sprite;
 
 		void Update(float dt);
 		void Render();

@@ -26,10 +26,12 @@ namespace Cockroach
 
 		static void DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture, const float2& min, const float2& max);
 		static void DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture);
-		static void DrawQuad(const float3& position, const float2& size, const Ref<SubTexture2D>& subTexture);
-		static void DrawQuad(const float2& position, const float2& size, const Ref<SubTexture2D>& subTexture);
+		static void DrawQuad(const float3& position, const float2& size, const Sprite& subTexture);
+		static void DrawQuad(const float2& position, const float2& size, const Sprite& subTexture);
 		
 		static void DrawQuad(const float2& position, const float2& size, const Ref<Texture2D>& texture, const float2& min, const float2& max);
+
+		static void DrawQuadOutline(float x0, float x1, float y0, float y1, float4 color);
 
 		static void DrawLine(const float3& p0, const float3& p1, const float4& color);
 

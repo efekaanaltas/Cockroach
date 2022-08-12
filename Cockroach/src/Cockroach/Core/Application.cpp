@@ -15,6 +15,8 @@
 #include "backends/imgui_impl_opengl3.cpp"
 #include "backends/imgui_impl_glfw.cpp"
 
+#include "Cockroach/Audio/Audio.h"
+
 namespace Cockroach
 {
 
@@ -31,6 +33,7 @@ namespace Cockroach
 		window->SetEventCallback(BIND_EVENT_FN(OnEvent));
 
 		Renderer::Init();
+		Audio::Init();
 		ImGuiInit();
 	}
 

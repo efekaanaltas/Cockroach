@@ -133,6 +133,7 @@
   <ItemGroup>
     <ClInclude Include="src\Components.h" />
     <ClInclude Include="src\Entities.h" />
+    <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\State.h" />
   </ItemGroup>
   <ItemGroup>

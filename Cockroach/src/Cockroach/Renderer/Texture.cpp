@@ -55,15 +55,15 @@ namespace Cockroach
 		glBindTextureUnit(slot, rendererID);
 	}
 
-	SubTexture2D::SubTexture2D(const Ref<Texture2D>& texture, const float2& min, const float2& max)
+	Sprite::Sprite(const Ref<Texture2D>& texture, const float2& min, const float2& max)
 		: texture(texture), min(min), max(max)
 	{
 	}
 
-	Ref<SubTexture2D> SubTexture2D::CreateFromCoords(const Ref<Texture2D>& texture, const float2& coords, const float2& spriteSize)
+	Sprite Sprite::CreateFromCoords(const Ref<Texture2D>& texture, const float2& coords, const float2& spriteSize)
 	{
 		float2 min = { coords.x * spriteSize.x / texture->GetWidth(), coords.y * spriteSize.y / texture->GetHeight() };
 		float2 max = { (coords.x + 1) * spriteSize.x / texture->GetWidth(), (coords.y + 1) * spriteSize.y / texture->GetHeight() };
-		return CreateRef<SubTexture2D>(texture, min, max);
+		return Sprite(texture, min, max);
 	}
 }

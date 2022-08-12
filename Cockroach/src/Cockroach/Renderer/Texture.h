@@ -41,12 +41,13 @@ namespace Cockroach
 		uint32_t rendererID;
 	};
 
-	class SubTexture2D
+	class Sprite
 	{
 	public:
-		SubTexture2D(const Ref<Texture2D>& texture, const float2& min, const float2& max);
+		Sprite() {}
+		Sprite(const Ref<Texture2D>& texture, const float2& min, const float2& max);
 
-		static Ref<SubTexture2D> CreateFromCoords(const Ref<Texture2D>& texture, const float2& coords, const float2& spriteSize);
+		static Sprite CreateFromCoords(const Ref<Texture2D>& texture, const float2& coords, const float2& spriteSize);
 
 		inline float XSize() { return (max.x - min.x) * texture->GetWidth(); }
 		inline float YSize() { return (max.y - min.y) * texture->GetHeight(); }

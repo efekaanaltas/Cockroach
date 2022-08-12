@@ -62,6 +62,7 @@ project "Cockroach"
         "%{IncludeDir.ImGui}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.stb_image}",
+        "%{prj.name}/vendor/miniaudio"
     }
 
     links
@@ -79,7 +80,7 @@ project "Cockroach"
         {
             "CR_PLATFORM_WINDOWS",
             "CR_BUILD_DLL",
-            "GLFW_INCLUDE_NONE"
+            "GLFW_INCLUDE_NONE",
         }
 
     filter "configurations:Debug"
@@ -119,7 +120,7 @@ project "Game"
         "Cockroach/src",
         "Cockroach/vendor",
         "%{IncludeDir.glm}",
-        "%{IncludeDir.GLFW}"
+        "%{IncludeDir.GLFW}",
     }
 
     links

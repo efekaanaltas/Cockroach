@@ -33,7 +33,7 @@ namespace Cockroach
 		int entityCount = 0;
 
 		void Update(float dt);
-		void Render();
+		void Render(Ref<Texture2D> tilemapTexture);
 
 		Entity* AddEntity(int2 position);
 
