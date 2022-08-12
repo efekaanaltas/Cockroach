@@ -7,6 +7,21 @@ namespace Cockroach
 
 	void Audio::Init()
 	{
+		ma_resource_manager resourceManager;
         ma_result result;
+
+		result = ma_engine_init(NULL, &engine);
+		
+		if (result != MA_SUCCESS)
+		{
+			CR_CORE_WARN("Failed to initialize audio engine.");
+			return;
+		}
+	}
+
+	void Audio::Play(std::string filepath)
+	{
+		//ma_sound_init_from_file()
+		ma_engine_play_sound(&engine, filepath.c_str(), NULL);
 	}
 }

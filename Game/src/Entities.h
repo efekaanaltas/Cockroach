@@ -17,7 +17,7 @@ namespace Entities
 	Entity* Create(int2 position, int entityType)
 	{
 		Entity* e = Room::current->AddEntity(position);
-		e->ID = entityType;
+		e->type = entityType;
 		switch (entityType)
 		{
 		case EntityType::Cockroach:

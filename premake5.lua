@@ -121,6 +121,7 @@ project "Game"
         "Cockroach/vendor",
         "%{IncludeDir.glm}",
         "%{IncludeDir.GLFW}",
+        "Cockroach/vendor/miniaudio",
     }
 
     links

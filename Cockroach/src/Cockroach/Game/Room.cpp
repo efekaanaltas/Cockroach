@@ -15,9 +15,6 @@ namespace Cockroach
 		memset(tiles, 0, sizeof(char) * width * height);
 
 		entities = new Entity[3000];
-		Entity* e = new Entity();
-		entities[0] = *e;
-		delete e;
 	}
 
 	void Room::Update(float dt)
@@ -155,7 +152,7 @@ namespace Cockroach
 			for (int i = 0; i < entityCount; i++)
 			{
 				out << '\n';
-				out << "ID: " << entities[i].ID << ", ";
+				out << "E: " << entities[i].type << ", ";
 				out << "X: " << entities[i].position.x << ", ";
 				out << "Y: " << entities[i].position.y;
 			}
@@ -197,15 +194,15 @@ namespace Cockroach
 			{
 				std::stringstream stream(line);
 
-				int ID = 0, pX = 0, pY = 0;
-				stream.seekg(line.find("ID:") + 3);
-				stream >> ID;
+				int type = 0, pX = 0, pY = 0;
+				stream.seekg(line.find("E:") + 2);
+				stream >> type;
 				stream.seekg(line.find("X:") + 2);
 				stream >> pX;
 				stream.seekg(line.find("Y:") + 2);
 				stream >> pY;
 
-				room->entities[room->entityCount] = *entityCreateFn(int2(pX, pY), ID);
+				room->entities[room->entityCount] = *entityCreateFn(int2(pX, pY), type);
 			}
 		}
 		else

@@ -17,7 +17,9 @@ namespace Cockroach
 		Entity();
 		Entity(const glm::ivec2& position);
 
-		int32_t ID = -1;
+		static int lastID;
+		int ID = 0;
+		int type = -1;
 
 		std::vector<Ref<Component>> components = std::vector<Ref<Component>>();
 		glm::ivec2 position;

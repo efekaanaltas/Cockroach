@@ -23,12 +23,12 @@ Game::Game()
 	Room::current = Room::Load("assets/scenes/room1.txt", Entities::Create);
 
 	Entity* e = new Entity({ 0,0 });
-	e->ID = Entities::Camera;
+	e->type = Entities::Camera;
 	e->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0,0 }, { 1,1 });
 	cameraController = e->AddComponent<CameraController>();
 
 	Entity* pe = new Entity({ 10,10 });
-	pe->ID = Entities::Cockroach;
+	pe->type = Entities::Cockroach;
 	pe->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 3 }, { 16, 16 });
 	pe->AddComponent<Animator>();
 	player = pe->AddComponent<Player>();
@@ -52,6 +52,7 @@ void Game::Update(float dt)
 
 	else if (Input::IsDown(CR_MOUSE_BUTTON_RIGHT))
 	{
+		Audio::Play("assets/audio/Dash.wav");
 		isBoxPlacing = true;
 		boxPlaceStartPos = EntityPlacePosition();
 	}
