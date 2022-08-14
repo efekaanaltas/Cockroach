@@ -11,7 +11,15 @@ class JumpingState;
 class ClingingState;
 class DashingState;
 
-using Sheet = std::vector<Sprite>;
+struct Sheet
+{
+	std::vector<Sprite> sheet;
+	int framePerSecond = 4;
+
+	void Add(const Sprite& sprite) { sheet.push_back(sprite); }
+	int Size() const { return sheet.size(); }
+	Sprite operator[](int i) { return sheet[i]; }
+};
 class Animator : public Component
 {
 public:
@@ -22,13 +30,19 @@ public:
 	virtual void Update(float dt) override;
 
 	Sheet sheet;
-	int framePerSecond = 3;
 };
 
 class DynamicObject : public Component
 {
 public:
+	enum CollisionLayer
+	{
+		Trigger, Light, Heavy, All
+	};
+
 	DynamicObject(Entity* entity);
+
+	CollisionLayer layer = CollisionLayer::Light;
 
 	DynamicObject* parent = nullptr;
 	std::vector<DynamicObject*> children;
@@ -41,25 +55,19 @@ public:
 	int Bottom() const { return entity->position.y + hitbox.min.y; }
 	int Top() const { return entity->position.y + hitbox.max.y; }
 
-	bool OverlapsWith(Ref<DynamicObject> other, int xForesense, int yForesense) const
-	{
-		Rect thisRect = Rect(hitbox.min + entity->position, hitbox.max + entity->position);
-		Rect otherRect = Rect(other->hitbox.min + other->entity->position, other->hitbox.max + other->entity->position);
-		return thisRect.OverlapsWith(otherRect, xForesense, yForesense);
-	}
+	Rect GetWorldHitbox() const { return Rect(hitbox.min + entity->position, hitbox.max + entity->position); }
 
-	bool Contains(Ref<DynamicObject> other, int xForesense, int yForesense) const
-	{ return hitbox.Contains(other->hitbox, entity->position.x - other->entity->position.x + xForesense, entity->position.y - other->entity->position.y + yForesense); }
-
-	bool Contains(int2 coord) const { return hitbox.Contains(coord); }
+	bool OverlapsWith(Ref<DynamicObject> other, int xForesense, int yForesense) const { return GetWorldHitbox().OverlapsWith(other->GetWorldHitbox(), xForesense, yForesense); }
+	bool Contains(Ref<DynamicObject> other, int xForesense, int yForesense) const { return GetWorldHitbox().Contains(other->GetWorldHitbox(), xForesense, yForesense); }
+	bool Contains(int2 coord) const { return GetWorldHitbox().Contains(coord); }
 
 	int MoveX(float amount);
 	int MoveY(float amount);
 	virtual bool OnCollide(Ref<DynamicObject> other, int horizontal, int vertical) = 0;
 
-	Ref<DynamicObject> GetEntityCollision(int xForesense, int yForesense);
+	Ref<DynamicObject> GetEntityCollision(int xForesense, int yForesense, CollisionLayer layer = CollisionLayer::All);
 	bool GetTilemapCollision(int xForesense, int yForesense);
-	bool GetCollision(int xForesense, int yForesense);
+	bool GetCollision(int xForesense, int yForesense, CollisionLayer layer = CollisionLayer::All);
 };
 
 class Player : public DynamicObject
@@ -114,15 +122,18 @@ class Pusher : public DynamicObject
 public:
 	Pusher(Entity* entity)
 		: DynamicObject(entity)
-	{}
+	{
+		startPos = entity->position;
+	}
 
 	int dir = 1;
+	int2 startPos;
 
 	virtual void Update(float dt) override
 	{
-		if (entity->position.y > 10 || entity->position.y < -10)
+		if (entity->position.y > startPos.y+10 || entity->position.y < startPos.y-10)
 		{
-			entity->position.y = std::clamp(entity->position.y, -10, 10);
+			entity->position.y = std::clamp(entity->position.y, startPos.y-10, startPos.y+10);
 			dir = dir * -1;
 		}
 		MoveY(5 * dir * dt);

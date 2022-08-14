@@ -21,16 +21,24 @@ Player::Player(Entity* entity)
 	dashingState =		new DashingState;
 
 	Ref<Texture2D> texture = Game::baseSpriteSheet;
-	idleSheet.push_back(		Sprite::CreateFromCoords(texture, { 0, 3 }, { 16, 16 }));
-	idleSheet.push_back(		Sprite::CreateFromCoords(texture, { 1, 3 }, { 16, 16 }));
-	walkingSheet.push_back(		Sprite::CreateFromCoords(texture, { 2, 3 }, { 16, 16 }));
-	walkingSheet.push_back(		Sprite::CreateFromCoords(texture, { 3, 3 }, { 16, 16 }));
-	dashingSheet.push_back(		Sprite::CreateFromCoords(texture, { 4, 3 }, { 16, 16 }));
-	dashingSheet.push_back(		Sprite::CreateFromCoords(texture, { 5, 3 }, { 16, 16 }));
-	dashingSheet.push_back(		Sprite::CreateFromCoords(texture, { 6, 3 }, { 16, 16 }));
-	jumpingSheet.push_back(		Sprite::CreateFromCoords(texture, { 7, 3 }, { 16, 16 }));
-	clingingSheet.push_back(	Sprite::CreateFromCoords(texture, { 8, 3 }, { 16, 16 }));
-	fallingSheet.push_back(		Sprite::CreateFromCoords(texture, { 9, 3 }, { 16, 16 }));
+
+	idleSheet.framePerSecond = 3;
+	idleSheet.Add(		Sprite::CreateFromCoords(texture, { 0, 3 }, { 16, 16 }));
+	idleSheet.Add(		Sprite::CreateFromCoords(texture, { 1, 3 }, { 16, 16 }));
+
+	walkingSheet.framePerSecond = 6;
+	walkingSheet.Add(	Sprite::CreateFromCoords(texture, { 2, 3 }, { 16, 16 }));
+	walkingSheet.Add(	Sprite::CreateFromCoords(texture, { 3, 3 }, { 16, 16 }));
+	walkingSheet.Add(	Sprite::CreateFromCoords(texture, { 4, 3 }, { 16, 16 }));
+
+	dashingSheet.framePerSecond = 20;
+	dashingSheet.Add(	Sprite::CreateFromCoords(texture, { 5, 3 }, { 16, 16 }));
+	dashingSheet.Add(	Sprite::CreateFromCoords(texture, { 6, 3 }, { 16, 16 }));
+	dashingSheet.Add(	Sprite::CreateFromCoords(texture, { 7, 3 }, { 16, 16 }));
+
+	jumpingSheet.Add(	Sprite::CreateFromCoords(texture, { 8, 3 }, { 16, 16 }));
+	clingingSheet.Add(	Sprite::CreateFromCoords(texture, { 9, 3 }, { 16, 16 }));
+	fallingSheet.Add(	Sprite::CreateFromCoords(texture, {10, 3 }, { 16, 16 }));
 
 	animator = entity->GetComponent<Animator>();
 	animator->sheet = idleSheet;
@@ -115,12 +123,13 @@ void Player::TrySwitchState(State<Player>* newState)
 
 bool Pusher::OnCollide(Ref<DynamicObject> other, int horizontal, int vertical)
 {
+	return true;
 	if (other)
 	{
 		other->MoveX(horizontal * (Right() - other->Left() + 1));
 		other->MoveY(vertical * (Top() - other->Bottom() + 1));
 		// Shouldn't have to add or subtract 1, investigate.
-		return false;
+		return true;
 	}
 	return true;
 }
@@ -182,36 +191,36 @@ int DynamicObject::MoveY(float amount)
 	return GetCollision(0, sign) ? sign : 0;
 }
 
-Ref<DynamicObject> DynamicObject::GetEntityCollision(int xForesense, int yForesense)
+Ref<DynamicObject> DynamicObject::GetEntityCollision(int xForesense, int yForesense, CollisionLayer layer)
 {	
 	for (int i = 0; i < Room::current->entityCount; i++)
 	{
 		if (&Room::current->entities[i] != entity)
 		{
 			Ref<DynamicObject> dyn = Room::current->entities[i].GetComponent<DynamicObject>();
-			if (OverlapsWith(dyn, xForesense, yForesense))
+			if (OverlapsWith(dyn, xForesense, yForesense) && (layer == All || layer == dyn->layer))
 				return dyn;
 		}
 	}
 	// Also check for collisions with player
-	if (Game::player->entity != entity && OverlapsWith(Game::player, xForesense, yForesense))
+	if (Game::player->entity != entity && OverlapsWith(Game::player, xForesense, yForesense) && (layer == All || layer == Game::player->layer))
 		return Game::player;
 	return nullptr;
 }
 
 bool DynamicObject::GetTilemapCollision(int xForesense, int yForesense)
 {
-	return Room::current->CollidesWith(Left() + xForesense, Right() + xForesense, Bottom() + yForesense, Top() + yForesense);
+	return Room::current->CollidesWith(GetWorldHitbox(), xForesense, yForesense);
 }
 
-bool DynamicObject::GetCollision(int xForesense, int yForesense)
+bool DynamicObject::GetCollision(int xForesense, int yForesense, CollisionLayer layer)
 {
-	return GetTilemapCollision(xForesense, yForesense) || GetEntityCollision(xForesense, yForesense);
+	return GetTilemapCollision(xForesense, yForesense) || GetEntityCollision(xForesense, yForesense, layer);
 }
 
 void Animator::Update(float dt)
 {
-	int index = std::fmodf(Application::Get().frameCount * framePerSecond / 60.0f, (float)sheet.size());
+	int index = std::fmodf(Application::Get().frameCount * sheet.framePerSecond / 60.0f, (float)sheet.Size());
 	entity->sprite = sheet[index];
 }
 

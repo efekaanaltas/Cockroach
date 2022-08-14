@@ -119,13 +119,13 @@ namespace Cockroach
 		return tiles[index].type != Air;
 	}
 
-	bool Room::CollidesWith(int left, int right, int bottom, int top)
+	bool Room::CollidesWith(Rect rect, int xForesense, int yForesense)
 	{
-		int2 corners[] = { {left, bottom}, {right-1, bottom}, {left,top-1}, {right-1,top-1} }; // Decrement right and top so they don't sample the next tile
+		int2 corners[] = { {rect.min.x, rect.min.y}, {rect.max.x-1, rect.min.y}, {rect.min.x,rect.max.y-1}, {rect.max.x-1,rect.max.y-1} }; // Decrement right and top so they don't sample the next tile
 
 		for (int i = 0; i < 4; i++)
 		{
-			int2 roomPosition = WorldToRoomPosition(corners[i]);
+			int2 roomPosition = WorldToRoomPosition(corners[i] + int2(xForesense, yForesense));
 			int index = RoomPositionToIndex(roomPosition.x, roomPosition.y);
 			if (Contains(roomPosition) && tiles[index].type != Air) // Do not use IsFilled() as it is intended for autotiling and not collisions
 				return true;

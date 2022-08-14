@@ -55,8 +55,8 @@ public:
 class DashingState : public State<Player>
 {
 public:
-	float dashSpeed = 180.0f;
-	Timer dashTimer = Timer(0.15f);
+	float dashSpeed = 200.0f;
+	Timer dashTimer = Timer(0.2f);
 	float2 dashDir = { 1.0f, 0.0f };
 
 	virtual void Enter(Player* player) override;

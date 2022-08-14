@@ -32,7 +32,7 @@ Game::Game()
 	pe->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 3 }, { 16, 16 });
 	pe->AddComponent<Animator>();
 	player = pe->AddComponent<Player>();
-	player->hitbox = Rect({ 6,0 }, { 10,8 });
+	player->hitbox = Rect({ 6,0 }, { 10,12 });
 }
 
 void Game::Update(float dt)
@@ -103,12 +103,11 @@ void Game::ImGuiRender()
 	Application::ImGuiBegin();
 
 	ImGuiIO io = ImGui::GetIO();
-	Begin("Frame Info");
+	Begin("Info");
 	Text("%.3f ms (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 
-	Text("Entity Count: %i", Room::current->entityCount);
-	Text("Player Position: %i %i", player->entity->position.x, player->entity->position.y);
-	Text("Player Velocity: %.1f, %.1f", player->velocity.x, player->velocity.y);
+	Text("Pos: %i %i", player->entity->position.x, player->entity->position.y);
+	Text("Vel: %.1f, %.1f", player->velocity.x, player->velocity.y);
 	End();
 
 	Application::ImGuiEnd();

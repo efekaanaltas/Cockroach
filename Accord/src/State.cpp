@@ -5,14 +5,19 @@
 
 Sheet GetWalkingStateSheet(Player* player)
 {
-	if (!player->grounded && player->velocity.y < 0.0f)  return player->fallingSheet;
-	else if (player->velocity.x != 0.0f)				 return player->walkingSheet;
-	else												 return player->idleSheet;
+	if (!player->grounded)
+	{
+		if (player->velocity.y < 0.0f)		return player->fallingSheet;
+		if (player->velocity.y >= 0.0f)		return player->jumpingSheet;
+	}
+	else if (player->velocity.x != 0.0f)	return player->walkingSheet;
+	else									return player->idleSheet;
 }
 
 void WalkingState::Enter(Player* player)
 {
 	player->coyoteTimer.remainingTime = 0.0f;
+	player->jumpBufferTimer.remainingTime = 0.0f;
 }
 
 State<Player>* WalkingState::Update(Player* player, float dt)
@@ -31,7 +36,7 @@ State<Player>* WalkingState::Update(Player* player, float dt)
 	player->velocity.y -= gravity * dt;
 	player->velocity.y = std::max(player->velocity.y, -maxFallSpeed);
 
-	if (player->InputDirX() != 0)
+	if (player->InputDirX() != 0 && (std::abs(player->velocity.x) <= maxWalkSpeed))
 	{
 		player->velocity.x += player->InputDirX() * acceleration * dt;
 		player->velocity.x = std::clamp(player->velocity.x, -maxWalkSpeed, maxWalkSpeed);

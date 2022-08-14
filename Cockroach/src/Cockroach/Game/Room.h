@@ -2,6 +2,7 @@
 
 #include <string>
 #include "Cockroach/Game/Entity.h"
+#include "Rect.h"
 
 namespace Cockroach
 {
@@ -43,7 +44,7 @@ namespace Cockroach
 
 		bool IsFilled(int x, int y);
 
-		bool CollidesWith(int left, int right, int bottom, int top);
+		bool CollidesWith(Rect rect, int xForesense, int yForesense);
 		bool Contains(int2 roomPosition);
 		int RoomPositionToIndex(int x, int y) { return y * width + x; }
 		int2 IndexToRoomPosition(int index) { return { index % width, index / width }; }
