@@ -11,7 +11,7 @@ namespace Entities
 {
 	enum EntityType
 	{
-		Cockroach, Camera, SpikeLeft, SpikeRight, SpikeDown, SpikeUp, PushBlock
+		Cockroach, Camera, SpikeLeft, SpikeRight, SpikeDown, SpikeUp
 	};
 
 	Entity* Create(int2 position, int entityType)
@@ -35,6 +35,7 @@ namespace Entities
 			e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 1 }, { 8, 8 });
 			Ref<DynamicObject> dyn = e->AddComponent<Hazard>();
 			dyn->hitbox = Rect({ 4,0 }, { 8,8 });
+			dyn->layer = Trigger;
 			break;
 		}
 		case EntityType::SpikeRight:
@@ -42,6 +43,7 @@ namespace Entities
 			e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 0 }, { 8, 8 });
 			Ref<DynamicObject> dyn = e->AddComponent<Hazard>();
 			dyn->hitbox = Rect({ 0,0 }, { 4,8 });
+			dyn->layer = Trigger;
 			break;
 		}
 		case EntityType::SpikeDown:
@@ -49,6 +51,7 @@ namespace Entities
 			e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 8, 1 }, { 8, 8 });
 			Ref<DynamicObject> dyn = e->AddComponent<Hazard>();
 			dyn->hitbox = Rect({ 0,4 }, { 8,8 });
+			dyn->layer = Trigger;
 			break;
 		}
 		case EntityType::SpikeUp:
@@ -56,13 +59,7 @@ namespace Entities
 			e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 8, 0 }, { 8, 8 });
 			Ref<DynamicObject> dyn = e->AddComponent<Hazard>();
 			dyn->hitbox = Rect({ 4,8 }, { 8,4 });
-			break;
-		}
-		case EntityType::PushBlock:
-		{
-			e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
-			Ref<DynamicObject> dyn = e->AddComponent<Pusher>();
-			dyn->hitbox = Rect({ 0,0 }, { 8,8 });
+			dyn->layer = Trigger;
 			break;
 		}
 		}

@@ -22,6 +22,13 @@ Game::Game()
 	Game::baseSpriteSheet = CreateRef<Texture2D>("assets/textures/SpriteSheet.png");
 	Room::current = Room::Load("assets/scenes/room1.txt", Entities::Create);
 
+	rooms.push_back(Room::Load("assets/scenes/room1.txt", Entities::Create));
+	rooms.push_back(Room::Load("assets/scenes/room2.txt", Entities::Create));
+	rooms.push_back(Room::Load("assets/scenes/room3.txt", Entities::Create));
+	rooms.push_back(Room::Load("assets/scenes/room4.txt", Entities::Create));
+
+	Room::current = rooms[0];
+
 	Entity* e = new Entity({ 0,0 });
 	e->type = Entities::Camera;
 	e->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0,0 }, { 1,1 });
@@ -33,6 +40,7 @@ Game::Game()
 	pe->AddComponent<Animator>();
 	player = pe->AddComponent<Player>();
 	player->hitbox = Rect({ 6,0 }, { 10,12 });
+	player->layer = Light;
 }
 
 void Game::Update(float dt)
@@ -41,18 +49,11 @@ void Game::Update(float dt)
 	player->entity->Update(dt);
 	Room::current->Update(dt);
 
-	if (Input::IsDown(CR_KEY_ESCAPE))
-	{
-		Entities::Create(EntityPlacePosition(), Entities::PushBlock);
-		Room::current->Save("assets/scenes/room1.txt");
-	};
-
 	if (Input::IsPressed(CR_MOUSE_BUTTON_LEFT))
 		Room::current->PlaceTile(Input::IsPressed(CR_KEY_LEFT_CONTROL) ? Room::Air : Room::TileBasic, EntityPlacePosition());
 
 	else if (Input::IsDown(CR_MOUSE_BUTTON_RIGHT))
 	{
-		Audio::Play("assets/audio/Dash.wav");
 		isBoxPlacing = true;
 		boxPlaceStartPos = EntityPlacePosition();
 	}
@@ -76,19 +77,32 @@ void Game::Render()
 
 	Renderer::BeginScene(cameraController->camera);
 
-	if (Input::IsDown(CR_KEY_G))
-		renderGrid = !renderGrid;
-	if (Input::IsDown(CR_KEY_H))
-		renderHitboxes = !renderHitboxes;
+	if (Input::IsDown(CR_KEY_G)) renderGrid = !renderGrid;
+	if (Input::IsDown(CR_KEY_H)) renderHitboxes = !renderHitboxes;
+	if (Input::IsDown(CR_KEY_R)) renderAllRooms = !renderAllRooms;
 
-	if (renderGrid)
-		RenderGrid();
+	if (renderGrid) RenderGrid();
 
-	Room::current->Render(Game::baseSpriteSheet);
+	for (int i = 0; i < rooms.size(); i++)
+	{
+		if (rooms[i] == Room::current || renderAllRooms)
+		{
+			rooms[i]->Render(Game::baseSpriteSheet);
+
+			if (renderRoomBoundaries)
+			{
+				float worldWidth = rooms[i]->width * 8.0f;
+				float worldHeight = rooms[i]->height * 8.0f;
+				float2 worldPosition = rooms[i]->RoomToWorldPosition({ 0,0 });
+
+				Renderer::DrawQuadOutline(worldPosition.x, worldPosition.x + worldWidth, worldPosition.y, worldPosition.y + worldHeight, { 0.0f, 1.0f, 0.0f, 1.0f });
+			}
+		}
+	}
+
 	player->entity->Render();
 
-	if (renderHitboxes)
-		RenderHitboxes();
+	if (renderHitboxes) RenderHitboxes();
 
 	RenderCursor();
 
@@ -108,6 +122,11 @@ void Game::ImGuiRender()
 
 	Text("Pos: %i %i", player->entity->position.x, player->entity->position.y);
 	Text("Vel: %.1f, %.1f", player->velocity.x, player->velocity.y);
+
+	Checkbox("Render Hitboxes", &renderHitboxes);
+	Checkbox("Render Grid", &renderGrid);
+	Checkbox("Render All Rooms", &renderAllRooms);
+	Checkbox("Render Room Boundaries", &renderRoomBoundaries);
 	End();
 
 	Application::ImGuiEnd();
@@ -160,21 +179,21 @@ void Game::RenderCursor()
 void Game::RenderHitboxes()
 {
 	Ref<DynamicObject> dyn = player->entity->GetComponent<DynamicObject>();
-	Renderer::DrawQuadOutline(dyn->Left(), dyn->Right(), dyn->Bottom(), dyn->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
+	Renderer::DrawQuadOutline((float)dyn->Left(), (float)dyn->Right(), (float)dyn->Bottom(), (float)dyn->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
 
 	for (int i = 0; i < Room::current->entityCount; i++)
 	{
 		Ref<DynamicObject> dyn = Room::current->entities[i].GetComponent<DynamicObject>();
 		if (dyn)
-			Renderer::DrawQuadOutline(dyn->Left(), dyn->Right(), dyn->Bottom(), dyn->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
+			Renderer::DrawQuadOutline((float)dyn->Left(), (float)dyn->Right(), (float)dyn->Bottom(), (float)dyn->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
 	}
 
 	for (int i = 0; i < Room::current->width * Room::current->height; i++)
 	{
 		if (Room::current->tiles[i].type != Room::Air)
 		{
-			int2 worldPos = Room::current->RoomToWorldPosition(Room::current->IndexToRoomPosition(i));
-			Renderer::DrawQuadOutline(worldPos.x, worldPos.x + 8, worldPos.y, worldPos.y + 8, { 1.0f, 0.0f, 0.0f, 1.0f });
+			float2 worldPos = Room::current->RoomToWorldPosition(Room::current->IndexToRoomPosition(i));
+			Renderer::DrawQuadOutline(worldPos.x, worldPos.x + 8.0f, worldPos.y, worldPos.y + 8.0f, { 1.0f, 0.0f, 0.0f, 1.0f });
 		}
 	}
 }

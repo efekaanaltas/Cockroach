@@ -28,6 +28,10 @@ namespace Cockroach
 		void Update(float dt);
 		void Render();
 
+		int operator+(int a) { return this->ID+a; }
+		bool operator==(const Entity& other) { return ID == other.ID; }
+		bool operator!=(const Entity& other) { return ID != other.ID; }
+
 		template<typename T>
 		Ref<T> AddComponent();
 

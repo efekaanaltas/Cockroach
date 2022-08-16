@@ -21,9 +21,12 @@ public:
 
 	static Ref<Texture2D> baseSpriteSheet;
 
+	std::vector<Ref<Room>> rooms;;
 private:
 	bool renderGrid = true;
 	bool renderHitboxes = true;
+	bool renderAllRooms = false;
+	bool renderRoomBoundaries = false;
 
 	bool isBoxPlacing = false;
 	int2 boxPlaceStartPos = { 0.0f, 0.0f };

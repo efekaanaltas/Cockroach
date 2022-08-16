@@ -7,7 +7,6 @@ namespace Cockroach
 
 	void Audio::Init()
 	{
-		ma_resource_manager resourceManager;
         ma_result result;
 
 		result = ma_engine_init(NULL, &engine);

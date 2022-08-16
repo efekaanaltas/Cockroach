@@ -17,7 +17,7 @@ struct Sheet
 	int framePerSecond = 4;
 
 	void Add(const Sprite& sprite) { sheet.push_back(sprite); }
-	int Size() const { return sheet.size(); }
+	int Size() const { return (int)sheet.size(); }
 	Sprite operator[](int i) { return sheet[i]; }
 };
 class Animator : public Component
@@ -32,13 +32,13 @@ public:
 	Sheet sheet;
 };
 
+enum CollisionLayer
+{
+	Trigger = 0b001, Light = 0b010, Heavy = 0b100, All = 0b111
+};
 class DynamicObject : public Component
 {
 public:
-	enum CollisionLayer
-	{
-		Trigger, Light, Heavy, All
-	};
 
 	DynamicObject(Entity* entity);
 
@@ -115,31 +115,6 @@ public:
 	{}
 
 	virtual bool OnCollide(Ref<DynamicObject> other, int horizontal, int vertical) override { return true; }
-};
-
-class Pusher : public DynamicObject
-{
-public:
-	Pusher(Entity* entity)
-		: DynamicObject(entity)
-	{
-		startPos = entity->position;
-	}
-
-	int dir = 1;
-	int2 startPos;
-
-	virtual void Update(float dt) override
-	{
-		if (entity->position.y > startPos.y+10 || entity->position.y < startPos.y-10)
-		{
-			entity->position.y = std::clamp(entity->position.y, startPos.y-10, startPos.y+10);
-			dir = dir * -1;
-		}
-		MoveY(5 * dir * dt);
-	}
-
-	virtual bool OnCollide(Ref<DynamicObject> other, int horizontal, int vertical) override;
 };
 
 class CameraController : public Component

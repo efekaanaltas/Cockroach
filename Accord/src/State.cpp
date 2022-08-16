@@ -11,7 +11,7 @@ Sheet GetWalkingStateSheet(Player* player)
 		if (player->velocity.y >= 0.0f)		return player->jumpingSheet;
 	}
 	else if (player->velocity.x != 0.0f)	return player->walkingSheet;
-	else									return player->idleSheet;
+											return player->idleSheet;
 }
 
 void WalkingState::Enter(Player* player)

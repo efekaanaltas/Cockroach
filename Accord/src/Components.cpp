@@ -121,19 +121,6 @@ void Player::TrySwitchState(State<Player>* newState)
 	currentState->Enter(this);
 }
 
-bool Pusher::OnCollide(Ref<DynamicObject> other, int horizontal, int vertical)
-{
-	return true;
-	if (other)
-	{
-		other->MoveX(horizontal * (Right() - other->Left() + 1));
-		other->MoveY(vertical * (Top() - other->Bottom() + 1));
-		// Shouldn't have to add or subtract 1, investigate.
-		return true;
-	}
-	return true;
-}
-
 DynamicObject::DynamicObject(Entity* entity)
 	: Component(entity)
 {
@@ -177,7 +164,7 @@ int DynamicObject::MoveY(float amount)
 
 		while (move != 0)
 		{
-			Ref<DynamicObject> collidingHitbox = GetEntityCollision(0, sign);
+			Ref<DynamicObject> collidingHitbox = GetEntityCollision(0, sign, Heavy);
 			bool tilemapCollision = GetTilemapCollision(0, sign);
 			if (!collidingHitbox && !tilemapCollision)
 			{
@@ -195,7 +182,7 @@ Ref<DynamicObject> DynamicObject::GetEntityCollision(int xForesense, int yForese
 {	
 	for (int i = 0; i < Room::current->entityCount; i++)
 	{
-		if (&Room::current->entities[i] != entity)
+		if (Room::current->entities[i] != *entity)
 		{
 			Ref<DynamicObject> dyn = Room::current->entities[i].GetComponent<DynamicObject>();
 			if (OverlapsWith(dyn, xForesense, yForesense) && (layer == All || layer == dyn->layer))
@@ -220,7 +207,7 @@ bool DynamicObject::GetCollision(int xForesense, int yForesense, CollisionLayer 
 
 void Animator::Update(float dt)
 {
-	int index = std::fmodf(Application::Get().frameCount * sheet.framePerSecond / 60.0f, (float)sheet.Size());
+	int index = (int)std::fmodf(Application::Get().frameCount * sheet.framePerSecond / 60.0f, (float)sheet.Size());
 	entity->sprite = sheet[index];
 }
 
@@ -247,7 +234,7 @@ void CameraController::Update(float dt)
 	speed = zoom; // Change speed according to zoom level
 
 	zoom -= Input::scroll * 0.1f * zoom;
-	zoom = std::clamp(zoom, 5.0f, 100.0f);
+	zoom = std::clamp(zoom, 5.0f, 200.0f);
 
 	float newAspect = (float)Application::Get().GetWindow().Width() / (float)Application::Get().GetWindow().Height();
 	if (aspectRatio != newAspect)

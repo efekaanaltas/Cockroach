@@ -8,9 +8,10 @@ namespace Cockroach
 {
 	Ref<Room> Room::current = nullptr;
 
-	Room::Room(int width, int height)
+	Room::Room(int width, int height, int posX, int posY)
 		: width(width), height(height)
 	{
+		position = { posX, posY };
 		tiles = new Tile[width * height];
 		memset(tiles, 0, sizeof(char) * width * height);
 
@@ -101,8 +102,8 @@ namespace Cockroach
 	{
 		if (!IsFilled(x, y)) return;
 
-		int rightLeft = (IsFilled(x + 1, y) << 1) | IsFilled(x - 1, y);
-		int downUp =	(IsFilled(x, y - 1) << 1) | IsFilled(x, y + 1);
+		int rightLeft = (IsFilled(x + 1, y) << 1) | (int)IsFilled(x - 1, y);
+		int downUp =	(IsFilled(x, y - 1) << 1) | (int)IsFilled(x, y + 1);
 
 		if (rightLeft == 3) rightLeft = 2;
 		else if (rightLeft == 2) rightLeft = 3;
@@ -147,6 +148,8 @@ namespace Cockroach
 		{
 			out << width << ' ';
 			out << height << ' ';
+			out << position.x << ' ';
+			out << position.y << ' ';
 			for (int i = 0; i < width * height; i++)
 				out << tiles[i].type;
 			for (int i = 0; i < entityCount; i++)
@@ -173,14 +176,16 @@ namespace Cockroach
 			std::getline(in, line);
 			std::stringstream stream(line);
 
-			int width, height;
+			int width, height, posX, posY;
 			stream >> width;
 			stream >> height;
+			stream >> posX;
+			stream >> posY;
 
 			char* data = new char[width*height];
 			stream >> data;
 
-			room = CreateRef<Room>(width, height);
+			room = CreateRef<Room>(width, height, posX, posY);
 			if (Room::current == nullptr)
 				Room::current = room; // bruh
 

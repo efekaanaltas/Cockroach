@@ -24,7 +24,7 @@ namespace Cockroach
 
 		static const int2 tileTexCoordLUT[4][4];
 
-		Room(int width, int height);
+		Room(int width, int height, int posX, int posY);
 
 		int width, height;
 		int2 position = { 0,0 };
@@ -50,7 +50,7 @@ namespace Cockroach
 		int2 IndexToRoomPosition(int index) { return { index % width, index / width }; }
 		int2 CenterPoint() { return position + int2(width*4 - 4, height*4 - 4); }
 		int2 WorldToRoomPosition(int2 worldPos) { return (worldPos - position) / 8; }
-		int2 RoomToWorldPosition(int2 roomPos) { return position + roomPos * 8; }
+		int2 RoomToWorldPosition(int2 roomPos) { return position * 8 + roomPos * 8; }
 
 		void Save(const std::string& filepath);
 		static Ref<Room> Load(const std::string& filepath, std::function<Entity* (int2, int)> entityCreateFn);

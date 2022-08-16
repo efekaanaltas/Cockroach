@@ -15,6 +15,6 @@ namespace Cockroach
 
 	inline bool Timer::Finished() { return remainingTime <= 0; }
 	inline float Timer::ElapsedTime() { return duration - remainingTime; }
-	inline float Timer::GetProgress01() { (duration - remainingTime) / duration; }
+	inline float Timer::GetProgress01() { return (duration - remainingTime) / duration; }
 	void Timer::Reset() { remainingTime = duration; }
 }
