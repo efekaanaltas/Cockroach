@@ -45,6 +45,7 @@ public:
 class ClingingState : public State<Player>
 {
 public:
+	float reducedGravity = 100.0f;
 	float fallSpeed = 50.0f;
 	float jumpExhaustionTime = 0.1f;
 

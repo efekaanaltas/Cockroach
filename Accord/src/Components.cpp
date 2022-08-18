@@ -16,7 +16,6 @@ Player::Player(Entity* entity)
 	jumpingState =		new JumpingState(100.0f, 160.0f, 0.0f);
 	superjumpingState = new JumpingState(100.0f, 150.0f, 250.0f);
 	walljumpingState =  new JumpingState(100.0f, 130.0f, -140.0);
-	climbingState =		new JumpingState(100.0f, 160.0f, 0.0f);
 	clingingState =		new ClingingState;
 	dashingState =		new DashingState;
 
@@ -31,14 +30,10 @@ Player::Player(Entity* entity)
 	walkingSheet.Add(	Sprite::CreateFromCoords(texture, { 3, 3 }, { 16, 16 }));
 	walkingSheet.Add(	Sprite::CreateFromCoords(texture, { 4, 3 }, { 16, 16 }));
 
-	dashingSheet.framePerSecond = 20;
 	dashingSheet.Add(	Sprite::CreateFromCoords(texture, { 5, 3 }, { 16, 16 }));
-	dashingSheet.Add(	Sprite::CreateFromCoords(texture, { 6, 3 }, { 16, 16 }));
-	dashingSheet.Add(	Sprite::CreateFromCoords(texture, { 7, 3 }, { 16, 16 }));
-
-	jumpingSheet.Add(	Sprite::CreateFromCoords(texture, { 8, 3 }, { 16, 16 }));
-	clingingSheet.Add(	Sprite::CreateFromCoords(texture, { 9, 3 }, { 16, 16 }));
-	fallingSheet.Add(	Sprite::CreateFromCoords(texture, {10, 3 }, { 16, 16 }));
+	jumpingSheet.Add(	Sprite::CreateFromCoords(texture, { 6, 3 }, { 16, 16 }));
+	clingingSheet.Add(	Sprite::CreateFromCoords(texture, { 7, 3 }, { 16, 16 }));
+	fallingSheet.Add(	Sprite::CreateFromCoords(texture, { 8, 3 }, { 16, 16 }));
 
 	animator = entity->GetComponent<Animator>();
 	animator->sheet = idleSheet;
@@ -87,6 +82,7 @@ bool Player::OnCollide(Ref<DynamicObject> other, int horizontal, int vertical)
 	}
 
 	grounded = vertical == -1;
+	if(grounded) canDash = true;
 
 	return true;
 }

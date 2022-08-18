@@ -30,7 +30,7 @@ State<Player>* WalkingState::Update(Player* player, float dt)
 	if (!player->coyoteTimer.Finished() && !player->jumpBufferTimer.Finished())
 		return player->jumpingState;
 
-	if (Input::IsDown(CR_KEY_LEFT_SHIFT))
+	if (Input::IsDown(CR_KEY_LEFT_SHIFT) && player->canDash)
 		return player->dashingState;
 
 	player->velocity.y -= gravity * dt;
@@ -84,21 +84,14 @@ State<Player>* ClingingState::Update(Player* player, float dt)
 	if (!player->NextToWall())
 		return player->walkingState;
 
-	if (Input::IsDown(CR_KEY_LEFT_SHIFT))
+	if (Input::IsDown(CR_KEY_LEFT_SHIFT) && player->canDash)
 		return player->dashingState;
 
 	if (!player->jumpBufferTimer.Finished())
-	{
-		if (Input::IsPressed(CR_KEY_UP)) return player->climbingState;
-		else							 return player->walljumpingState;
-	}
+		return player->walljumpingState;
 
-	if (Input::IsPressed(CR_KEY_UP)) player->velocity.y = 0.0f;
-	else
-	{
-		player->velocity.y -= 500.0f * dt;
-		player->velocity.y = std::clamp(player->velocity.y, -fallSpeed, 0.0f);
-	}
+	player->velocity.y -= reducedGravity * dt;
+	player->velocity.y = std::clamp(player->velocity.y, -fallSpeed, 0.0f);
 
 	if (player->InputDirX() == -player->faceDir)
 		return player->walkingState;
@@ -108,6 +101,7 @@ State<Player>* ClingingState::Update(Player* player, float dt)
 
 void DashingState::Enter(Player* player)
 {
+	player->canDash = false;
 	dashTimer.Reset();
 
 	player->velocity.y = 0;
@@ -136,6 +130,28 @@ State<Player>* DashingState::Update(Player* player, float dt)
 	{
 		dashTimer.Tick(dt);
 		player->velocity = dashSpeed * dashDir;
+
+		if (player->GetCollision(player->faceDir, 0))
+		{
+			int height = 0;
+			while (++height < 5)
+				if (!player->GetCollision(player->faceDir, height))
+				{
+					player->MoveY(height);
+					break;
+				}
+		}
+
+		if (player->GetCollision(0, -3))
+		{
+			int height = 0;
+			while (--height > -4)
+				if (player->GetCollision(0, height) && height < -1)
+				{
+					player->MoveY(height+1);
+					break;
+				}
+		}
 	}
 
 	return nullptr;

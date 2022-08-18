@@ -79,6 +79,7 @@ public:
 	int faceDir = 1; // -1 for left, 1 for right
 	float gravity = 200.0f;
 	bool grounded = false;
+	bool canDash = false;
 
 	float2 velocity = { 0.0f, 0.0f };
 	float2 velocityLastFrame = { 0.0f, 0.0f };
@@ -88,7 +89,6 @@ public:
 	JumpingState* jumpingState = nullptr;
 	JumpingState* superjumpingState = nullptr;
 	JumpingState* walljumpingState = nullptr;
-	JumpingState* climbingState = nullptr;
 	ClingingState* clingingState = nullptr;
 	DashingState* dashingState = nullptr;
 
