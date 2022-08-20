@@ -20,7 +20,7 @@ Game::Game()
 	: Application()
 {
 	Game::baseSpriteSheet = CreateRef<Texture2D>("assets/textures/SpriteSheet.png");
-	Room::current = Room::Load("assets/scenes/room1.txt", Entities::Create);
+	//Room::current = Room::Load("assets/scenes/room1.txt", Entities::Create);
 
 	rooms.push_back(Room::Load("assets/scenes/room1.txt", Entities::Create));
 	rooms.push_back(Room::Load("assets/scenes/room2.txt", Entities::Create));
@@ -48,6 +48,9 @@ void Game::Update(float dt)
 	cameraController->entity->Update(dt);
 	player->entity->Update(dt);
 	Room::current->Update(dt);
+
+	if (Input::IsPressed(CR_KEY_Q))
+		player->entity->position = { 10,10 };
 
 	if (Input::IsPressed(CR_MOUSE_BUTTON_LEFT))
 		Room::current->PlaceTile(Input::IsPressed(CR_KEY_LEFT_CONTROL) ? Room::Air : Room::TileBasic, EntityPlacePosition());
@@ -83,9 +86,13 @@ void Game::Render()
 
 	if (renderGrid) RenderGrid();
 
+	bool renderAllVisibleRooms = !Room::current->Contains(player->WorldHitbox());
+
 	for (int i = 0; i < rooms.size(); i++)
 	{
-		if (rooms[i] == Room::current || renderAllRooms)
+		bool roomVisible = rooms[i]->CollidesWith(cameraController->Bounds(), 0, 0);
+		if(roomVisible) CR_TRACE("Room visible: {0}", i);
+		if (rooms[i] == Room::current || renderAllRooms || (renderAllVisibleRooms && rooms[i]->CollidesWith(cameraController->Bounds(), 0, 0)))
 		{
 			rooms[i]->Render(Game::baseSpriteSheet);
 

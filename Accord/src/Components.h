@@ -55,11 +55,11 @@ public:
 	int Bottom() const { return entity->position.y + hitbox.min.y; }
 	int Top() const { return entity->position.y + hitbox.max.y; }
 
-	Rect GetWorldHitbox() const { return Rect(hitbox.min + entity->position, hitbox.max + entity->position); }
+	Rect WorldHitbox() const { return Rect(hitbox.min + entity->position, hitbox.max + entity->position); }
 
-	bool OverlapsWith(Ref<DynamicObject> other, int xForesense, int yForesense) const { return GetWorldHitbox().OverlapsWith(other->GetWorldHitbox(), xForesense, yForesense); }
-	bool Contains(Ref<DynamicObject> other, int xForesense, int yForesense) const { return GetWorldHitbox().Contains(other->GetWorldHitbox(), xForesense, yForesense); }
-	bool Contains(int2 coord) const { return GetWorldHitbox().Contains(coord); }
+	bool OverlapsWith(Ref<DynamicObject> other, int xForesense, int yForesense) const { return WorldHitbox().OverlapsWith(other->WorldHitbox(), xForesense, yForesense); }
+	bool Contains(Ref<DynamicObject> other, int xForesense, int yForesense) const { return WorldHitbox().Contains(other->WorldHitbox(), xForesense, yForesense); }
+	bool Contains(int2 coord) const { return WorldHitbox().Contains(coord); }
 
 	int MoveX(float amount);
 	int MoveY(float amount);
@@ -130,6 +130,8 @@ public:
 	float zoom = 10.0f;
 
 	float speed = 1.0f;
+
+	Rect Bounds() { return Rect((float2)camera.GetPosition() - float2(aspectRatio * zoom, zoom), { (float2)camera.GetPosition() + float2(aspectRatio * zoom, zoom)}); }
 public:
 	Camera camera;
 };

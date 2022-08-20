@@ -193,7 +193,7 @@ Ref<DynamicObject> DynamicObject::GetEntityCollision(int xForesense, int yForese
 
 bool DynamicObject::GetTilemapCollision(int xForesense, int yForesense)
 {
-	return Room::current->CollidesWith(GetWorldHitbox(), xForesense, yForesense);
+	return Room::current->CollidesWith(WorldHitbox(), xForesense, yForesense);
 }
 
 bool DynamicObject::GetCollision(int xForesense, int yForesense, CollisionLayer layer)

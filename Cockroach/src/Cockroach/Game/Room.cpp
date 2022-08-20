@@ -137,10 +137,21 @@ namespace Cockroach
 		return false;
 	}
 
+	bool Room::OverlapsWith(Rect rect, int xForesense, int yForesense)
+	{
+		Rect roomRect = Rect(RoomToWorldPosition({0,0}), RoomToWorldPosition({width-1, height-1}));
+		return roomRect.OverlapsWith(rect, xForesense, yForesense);
+	}
+
 	bool Room::Contains(int2 roomPosition)
 	{
 		int index = RoomPositionToIndex(roomPosition.x, roomPosition.y);
 		return (0 <= roomPosition.x && roomPosition.x < width && 0 <= roomPosition.y && roomPosition.y < height && 0 <= index && index < width* height);
+	}
+
+	bool Room::Contains(Rect rect)
+	{
+		return Contains(WorldToRoomPosition(rect.min)) && Contains(WorldToRoomPosition(rect.max));
 	}
 
 	void Room::Save(const std::string& filepath)

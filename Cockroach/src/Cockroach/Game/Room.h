@@ -45,11 +45,13 @@ namespace Cockroach
 		bool IsFilled(int x, int y);
 
 		bool CollidesWith(Rect rect, int xForesense, int yForesense);
+		bool OverlapsWith(Rect rect, int xForesense, int yForesense);
 		bool Contains(int2 roomPosition);
+		bool Contains(Rect rect);
 		int RoomPositionToIndex(int x, int y) { return y * width + x; }
 		int2 IndexToRoomPosition(int index) { return { index % width, index / width }; }
 		int2 CenterPoint() { return position + int2(width*4 - 4, height*4 - 4); }
-		int2 WorldToRoomPosition(int2 worldPos) { return (worldPos - position) / 8; }
+		int2 WorldToRoomPosition(int2 worldPos) { return glm::floor((float2)(worldPos - 8*position) / 8.0f); }
 		int2 RoomToWorldPosition(int2 roomPos) { return position * 8 + roomPos * 8; }
 
 		void Save(const std::string& filepath);
