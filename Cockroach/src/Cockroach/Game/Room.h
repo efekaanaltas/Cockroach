@@ -24,8 +24,9 @@ namespace Cockroach
 
 		static const int2 tileTexCoordLUT[4][4];
 
-		Room(int width, int height, int posX, int posY);
+		Room(std::string filepath, int width, int height, int posX, int posY);
 
+		std::string filepath;
 		int width, height;
 		int2 position = { 0,0 };
 		Tile* tiles;

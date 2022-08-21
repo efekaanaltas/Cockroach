@@ -8,8 +8,8 @@ namespace Cockroach
 {
 	Ref<Room> Room::current = nullptr;
 
-	Room::Room(int width, int height, int posX, int posY)
-		: width(width), height(height)
+	Room::Room(std::string filepath, int width, int height, int posX, int posY)
+		: filepath(filepath), width(width), height(height)
 	{
 		position = { posX, posY };
 		tiles = new Tile[width * height];
@@ -64,7 +64,7 @@ namespace Cockroach
 			UpdateTile(roomPosition.x, roomPosition.y - 1);
 			UpdateTile(roomPosition.x, roomPosition.y + 1);
 
-			Save("assets/scenes/room1.txt");
+			Save(filepath);
 		}
 
 	}
@@ -95,7 +95,7 @@ namespace Cockroach
 				}
 			}
 
-		Save("assets/scenes/room1.txt");
+		Save(filepath);
 	}
 
 	void Room::UpdateTile(int x, int y)
@@ -199,7 +199,7 @@ namespace Cockroach
 			char* data = new char[width*height];
 			stream >> data;
 
-			room = CreateRef<Room>(width, height, posX, posY);
+			room = CreateRef<Room>(filepath, width, height, posX, posY);
 			if (Room::current == nullptr)
 				Room::current = room; // bruh
 

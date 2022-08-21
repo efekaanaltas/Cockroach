@@ -153,7 +153,6 @@ void Game::ImGuiRender()
 	Checkbox("Render Grid", &renderGrid);
 	Checkbox("Render All Rooms", &renderAllRooms);
 	Checkbox("Render Room Boundaries", &renderRoomBoundaries);
-	Checkbox("Player Grounded", &player->grounded);
 	End();
 
 	Application::ImGuiEnd();
