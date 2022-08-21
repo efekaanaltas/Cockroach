@@ -49,6 +49,27 @@ void Game::Update(float dt)
 	player->entity->Update(dt);
 	Room::current->Update(dt);
 
+	static bool currentlyTransitioning = false; // Temporary
+
+	bool roomContainsPlayer = Room::current->Contains(player->WorldHitbox());
+	if (currentlyTransitioning && roomContainsPlayer)
+		currentlyTransitioning = false;
+
+	if (!roomContainsPlayer)
+	{
+		currentlyTransitioning = true;
+		for (int i = 0; i < rooms.size(); i++)
+		{
+			if (rooms[i] == Room::current) continue;
+			if (rooms[i]->OverlapsWith(player->WorldHitbox(), 0, 0))
+			{
+				Room::current = rooms[i];
+				currentlyTransitioning = false;
+				CR_TRACE("New current room: {0}", i);
+			}
+		}
+	}
+
 	if (Input::IsPressed(CR_KEY_Q))
 		player->entity->position = { 10,10 };
 
@@ -90,19 +111,17 @@ void Game::Render()
 
 	for (int i = 0; i < rooms.size(); i++)
 	{
-		bool roomVisible = rooms[i]->CollidesWith(cameraController->Bounds(), 0, 0);
-		if(roomVisible) CR_TRACE("Room visible: {0}", i);
-		if (rooms[i] == Room::current || renderAllRooms || (renderAllVisibleRooms && rooms[i]->CollidesWith(cameraController->Bounds(), 0, 0)))
+		bool roomVisible = rooms[i]->OverlapsWith(cameraController->Bounds(), 0, 0);
+		if (rooms[i] == Room::current || renderAllRooms || (renderAllVisibleRooms && roomVisible))
 		{
 			rooms[i]->Render(Game::baseSpriteSheet);
 
 			if (renderRoomBoundaries)
 			{
-				float worldWidth = rooms[i]->width * 8.0f;
-				float worldHeight = rooms[i]->height * 8.0f;
 				float2 worldPosition = rooms[i]->RoomToWorldPosition({ 0,0 });
+				float2 extents = rooms[i]->RoomToWorldPosition({ rooms[i]->width, rooms[i]->height });
 
-				Renderer::DrawQuadOutline(worldPosition.x, worldPosition.x + worldWidth, worldPosition.y, worldPosition.y + worldHeight, { 0.0f, 1.0f, 0.0f, 1.0f });
+				Renderer::DrawQuadOutline(worldPosition.x, extents.x, worldPosition.y, extents.y, { 0.0f, 1.0f, 0.0f, 1.0f });
 			}
 		}
 	}
@@ -134,6 +153,7 @@ void Game::ImGuiRender()
 	Checkbox("Render Grid", &renderGrid);
 	Checkbox("Render All Rooms", &renderAllRooms);
 	Checkbox("Render Room Boundaries", &renderRoomBoundaries);
+	Checkbox("Player Grounded", &player->grounded);
 	End();
 
 	Application::ImGuiEnd();

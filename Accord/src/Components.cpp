@@ -62,6 +62,8 @@ void Player::Update(float dt)
 
 	int horizontalCollision = MoveX(velocity.x * dt);
 	int verticalCollision = MoveY((velocityLastFrame.y + velocity.y) * 0.5f * dt);
+
+	grounded = verticalCollision == -1;
 }
 
 bool Player::OnCollide(Ref<DynamicObject> other, int horizontal, int vertical)

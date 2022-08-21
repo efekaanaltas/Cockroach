@@ -127,7 +127,7 @@ public:
 	float2 positionHighRes = { 0.0f, 0.0f };
 	
 	float aspectRatio = 16.0f/9.0f;
-	float zoom = 10.0f;
+	float zoom = 100.0f;
 
 	float speed = 1.0f;
 
