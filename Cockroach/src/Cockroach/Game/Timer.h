@@ -12,7 +12,7 @@ namespace Cockroach
 
 		void Tick(float dt);
 
-		inline bool Finished();
+		bool Finished();
 		inline float ElapsedTime();
 		inline float GetProgress01();
 		void Reset();

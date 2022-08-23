@@ -106,9 +106,11 @@ i32 Player::InputDirY() const
 	return inputDir;
 }
 
-bool Player::NextToWall()
+int Player::WallDir()
 {
-	return GetCollision(-1, 0) || GetCollision(1, 0);
+	if (GetCollision(faceDir, 0))	return faceDir;
+	if (GetCollision(-faceDir, 0))	return -faceDir;
+									return 0;
 }
 
 void Player::TrySwitchState(State<Player>* newState)

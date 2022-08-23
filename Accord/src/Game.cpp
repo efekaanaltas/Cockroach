@@ -71,7 +71,7 @@ void Game::Update(float dt)
 	}
 
 	if (Input::IsPressed(CR_KEY_Q))
-		player->entity->position = { 10,10 };
+		player->entity->position = EntityPlacePosition();
 
 	if (Input::IsPressed(CR_MOUSE_BUTTON_LEFT))
 		Room::current->PlaceTile(Input::IsPressed(CR_KEY_LEFT_CONTROL) ? Room::Air : Room::TileBasic, EntityPlacePosition());
@@ -153,6 +153,11 @@ void Game::ImGuiRender()
 	Checkbox("Render Grid", &renderGrid);
 	Checkbox("Render All Rooms", &renderAllRooms);
 	Checkbox("Render Room Boundaries", &renderRoomBoundaries);
+
+	if (Button("Create Room"))
+	{
+		CR_CORE_INFO("Create room");
+	}
 	End();
 
 	Application::ImGuiEnd();
@@ -199,7 +204,7 @@ void Game::RenderCursor()
 	int2 boxPlaceEndPos = EntityPlacePosition();
 	float2 start = { std::min(boxPlaceStartPos.x, boxPlaceEndPos.x), std::min(boxPlaceStartPos.y, boxPlaceEndPos.y) };
 	float2 end = { std::max(boxPlaceStartPos.x, boxPlaceEndPos.x) + 8.0f, std::max(boxPlaceStartPos.y, boxPlaceEndPos.y) + 8.0f };
-	Renderer::DrawQuadOutline(start.x, end.x, start.y, end.y, { 1.0f, Input::IsPressed(CR_KEY_LEFT_CONTROL) ? 0.0f : 1.0f, 0.0f , 1.0f });
+	Renderer::DrawQuadOutline(start.x, end.x, start.y, end.y, Input::IsPressed(CR_KEY_LEFT_CONTROL) ? CR_COLOR_RED : CR_COLOR_YELLOW);
 }
 
 void Game::RenderHitboxes()

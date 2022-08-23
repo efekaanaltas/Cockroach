@@ -102,7 +102,7 @@ public:
 
 	int InputDirX() const;
 	int InputDirY() const;
-	bool NextToWall();
+	int WallDir();
 
 	void TrySwitchState(State<Player>* newState);
 };

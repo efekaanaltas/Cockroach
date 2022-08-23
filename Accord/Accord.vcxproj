@@ -146,6 +146,24 @@
       <Project>{B256E4A5-1EC1-981C-67FF-49C2D3A87671}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="assets\scenes\room1.txt" />
+    <Text Include="assets\scenes\room2.txt" />
+    <Text Include="assets\scenes\room3.txt" />
+    <Text Include="assets\scenes\room4.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\shaders\Line.glsl" />
+    <None Include="assets\shaders\Texture.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\textures\Cockroach.png" />
+    <Image Include="assets\textures\SpriteSheet.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="assets\audio\Dash.wav" />
+    <Media Include="assets\audio\Jump.wav" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

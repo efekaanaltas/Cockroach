@@ -32,6 +32,16 @@
 #define mat3 glm::mat3
 #define mat4 glm::mat4
 
+#define CR_COLOR_WHITE		float4(1.0f, 1.0f, 1.0f, 1.0f)
+#define CR_COLOR_BLACK		float4(0.0f, 0.0f, 0.0f, 1.0f)
+#define CR_COLOR_CLEAR		float4(0.0f, 0.0f, 0.0f, 0.0f)
+#define CR_COLOR_RED		float4(1.0f, 0.0f, 0.0f, 1.0f)
+#define CR_COLOR_GREEN		float4(0.0f, 1.0f, 0.0f, 1.0f)
+#define CR_COLOR_BLUE		float4(0.0f, 0.0f, 1.0f, 1.0f)
+#define CR_COLOR_YELLOW		float4(1.0f, 1.0f, 0.0f, 1.0f)
+#define CR_COLOR_CYAN		float4(0.0f, 1.0f, 1.0f, 1.0f)
+#define CR_COLOR_MAGENTA	float4(1.0f, 0.0f, 1.0f, 1.0f)
+
 #ifdef CR_PLATFORM_WINDOWS
 	#include <Windows.h>
 #endif

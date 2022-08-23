@@ -24,8 +24,11 @@ State<Player>* WalkingState::Update(Player* player, float dt)
 {
 	player->animator->sheet = GetWalkingStateSheet(player);
 
-	if (Input::IsDown(CR_KEY_SPACE) && !player->grounded && player->NextToWall())
-				return player->walljumpingState;
+	if (Input::IsDown(CR_KEY_SPACE) && !player->grounded && player->WallDir())
+	{
+		player->faceDir = player->WallDir();
+		return player->walljumpingState;
+	}
 
 	if (!player->coyoteTimer.Finished() && !player->jumpBufferTimer.Finished())
 		return player->jumpingState;
@@ -60,10 +63,13 @@ void JumpingState::Enter(Player* player)
 	player->velocity.y = maxJumpSpeed;
 
 	player->animator->sheet = player->jumpingSheet;
+	Audio::Play("assets/audio/Jump.wav");
 }
 
 State<Player>* JumpingState::Update(Player* player, float dt)
 {
+	player->coyoteTimer.remainingTime = 0;
+
 	if (Input::IsUp(CR_KEY_SPACE))
 		player->velocity.y = std::min(player->velocity.y, minJumpSpeed);
 	else if (player->velocity.y <= 0)
@@ -81,7 +87,7 @@ void ClingingState::Enter(Player* player)
 
 State<Player>* ClingingState::Update(Player* player, float dt)
 {
-	if (!player->NextToWall())
+	if (!player->WallDir())
 		return player->walkingState;
 
 	if (Input::IsDown(CR_KEY_LEFT_SHIFT) && player->canDash)
@@ -115,6 +121,7 @@ void DashingState::Enter(Player* player)
 	else dashDir = { player->faceDir, 0.0f };
 
 	player->animator->sheet = player->dashingSheet;
+	Audio::Play("assets/audio/Dash.wav");
 
 	Application::Get().freezeTimer = Timer(3.0f);
 }
