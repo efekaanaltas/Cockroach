@@ -8,12 +8,11 @@ namespace Cockroach
 {
 	Ref<Room> Room::current = nullptr;
 
-	Room::Room(std::string filepath, int width, int height, int posX, int posY)
-		: filepath(filepath), width(width), height(height)
+	Room::Room(std::string name, int width, int height, int posX, int posY)
+		: name(name), width(width), height(height)
 	{
 		position = { posX, posY };
 		tiles = new Tile[width * height];
-		memset(tiles, 0, sizeof(char) * width * height);
 
 		entities = new Entity[3000];
 	}
@@ -64,7 +63,7 @@ namespace Cockroach
 			UpdateTile(roomPosition.x, roomPosition.y - 1);
 			UpdateTile(roomPosition.x, roomPosition.y + 1);
 
-			Save(filepath);
+			Save();
 		}
 
 	}
@@ -95,7 +94,31 @@ namespace Cockroach
 				}
 			}
 
-		Save(filepath);
+		Save();
+	}
+
+	void Room::Resize(int newWidth, int newHeight)
+	{
+		Tile* newTiles = new Tile[newWidth * newHeight];
+
+		for (int y = 0; y < height; y++)
+		{
+			for (int x = 0; x < width; x++)
+			{
+				int oldIndex = RoomPositionToIndex(x, y);
+				int newIndex = y * newWidth + x;
+				if(0 <= x && 0 <= y && x < newWidth && x < width && y < newHeight && y < height)
+					newTiles[newIndex] = tiles[oldIndex];
+			}
+		}
+
+		delete[] tiles;
+		tiles = newTiles;
+
+		width = newWidth;
+		height = newHeight;
+
+		Save();
 	}
 
 	void Room::UpdateTile(int x, int y)
@@ -146,7 +169,7 @@ namespace Cockroach
 	bool Room::Contains(int2 roomPosition)
 	{
 		int index = RoomPositionToIndex(roomPosition.x, roomPosition.y);
-		return (0 <= roomPosition.x && roomPosition.x < width && 0 <= roomPosition.y && roomPosition.y < height && 0 <= index && index < width* height);
+		return (0 <= roomPosition.x && roomPosition.x < width && 0 <= roomPosition.y && roomPosition.y < height && 0 <= index && index < width * height);
 	}
 
 	bool Room::Contains(Rect rect)
@@ -154,9 +177,9 @@ namespace Cockroach
 		return Contains(WorldToRoomPosition(rect.min)) && Contains(WorldToRoomPosition(rect.max));
 	}
 
-	void Room::Save(const std::string& filepath)
+	void Room::Save()
 	{
-		std::fstream out(filepath, std::ios::out | std::ios::binary | std::ios::trunc);
+		std::fstream out(Filepath(), std::ios::out | std::ios::binary | std::ios::trunc);
 
 		if (out)
 		{
@@ -175,13 +198,14 @@ namespace Cockroach
 			}
 		}
 		else
-			CR_CORE_ERROR("Could not open file '{0}'", filepath);
+			CR_CORE_ERROR("Could not open file '{0}'", Filepath());
 		out.close();
 	}
 
-	Ref<Room> Room::Load(const std::string& filepath, std::function<Entity*(int2, int)> entityCreateFn)
+	Ref<Room> Room::Load(const std::string& name, std::function<Entity*(int2, int)> entityCreateFn)
 	{
 		Ref<Room> room;
+		std::string filepath = roomDir + name;
 		std::fstream in(filepath, std::ios::in ||std::ios::binary);
 
 		if (in)
@@ -199,7 +223,7 @@ namespace Cockroach
 			char* data = new char[width*height];
 			stream >> data;
 
-			room = CreateRef<Room>(filepath, width, height, posX, posY);
+			room = CreateRef<Room>(name, width, height, posX, posY);
 			if (Room::current == nullptr)
 				Room::current = room; // bruh
 
@@ -229,5 +253,19 @@ namespace Cockroach
 		in.close();
 		
 		return room;
+	}
+
+	void Room::Rename(const std::string& newName)
+	{
+		if (name == newName)
+		{
+			CR_CORE_ERROR("New name is same as old name.");
+			return;
+		}
+
+		if (rename(Filepath().c_str(), (roomDir + newName).c_str()))
+			name = newName;
+		else
+			CR_CORE_ERROR("Room could not be renamed from {0} to {1}.", Filepath(), (roomDir + newName));
 	}
 }

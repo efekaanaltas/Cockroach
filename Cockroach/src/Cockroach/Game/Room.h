@@ -16,17 +16,18 @@ namespace Cockroach
 
 		struct Tile
 		{
-			TileType type;
-			int2 texCoordOffset;
+			TileType type = Air;
+			int2 texCoordOffset = { 0,0 };
 		};
 
 		static Ref<Room> current;
 
 		static const int2 tileTexCoordLUT[4][4];
+		inline static const std::string roomDir = "assets/rooms/";
 
-		Room(std::string filepath, int width, int height, int posX, int posY);
+		Room(std::string name, int width, int height, int posX, int posY);
 
-		std::string filepath;
+		std::string name;
 		int width, height;
 		int2 position = { 0,0 };
 		Tile* tiles;
@@ -41,10 +42,12 @@ namespace Cockroach
 
 		void PlaceTile(TileType tileType, int2 worldPosition);
 		void PlaceTileBox(TileType tileType, int2 worldPositionMin, int2 worldPositionMax);
+		void Resize(int newWidth, int newHeight);
 		void UpdateTile(int x, int y);
 
 		bool IsFilled(int x, int y);
 
+		std::string Filepath() { return roomDir + name; }
 		bool CollidesWith(Rect rect, int xForesense, int yForesense);
 		bool OverlapsWith(Rect rect, int xForesense, int yForesense);
 		bool Contains(int2 roomPosition);
@@ -55,7 +58,8 @@ namespace Cockroach
 		int2 WorldToRoomPosition(int2 worldPos) { return glm::floor((float2)(worldPos - 8*position) / 8.0f); }
 		int2 RoomToWorldPosition(int2 roomPos) { return position * 8 + roomPos * 8; }
 
-		void Save(const std::string& filepath);
-		static Ref<Room> Load(const std::string& filepath, std::function<Entity* (int2, int)> entityCreateFn);
+		void Save();
+		static Ref<Room> Load(const std::string& name, std::function<Entity* (int2, int)> entityCreateFn);
+		void Rename(const std::string& newName);
 	};
 }

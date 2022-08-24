@@ -25,7 +25,7 @@ Player::Player(Entity* entity)
 	idleSheet.Add(		Sprite::CreateFromCoords(texture, { 0, 3 }, { 16, 16 }));
 	idleSheet.Add(		Sprite::CreateFromCoords(texture, { 1, 3 }, { 16, 16 }));
 
-	walkingSheet.framePerSecond = 6;
+	walkingSheet.framePerSecond = 10;
 	walkingSheet.Add(	Sprite::CreateFromCoords(texture, { 2, 3 }, { 16, 16 }));
 	walkingSheet.Add(	Sprite::CreateFromCoords(texture, { 3, 3 }, { 16, 16 }));
 	walkingSheet.Add(	Sprite::CreateFromCoords(texture, { 4, 3 }, { 16, 16 }));

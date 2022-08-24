@@ -22,10 +22,10 @@ Game::Game()
 	Game::baseSpriteSheet = CreateRef<Texture2D>("assets/textures/SpriteSheet.png");
 	//Room::current = Room::Load("assets/scenes/room1.txt", Entities::Create);
 
-	rooms.push_back(Room::Load("assets/scenes/room1.txt", Entities::Create));
-	rooms.push_back(Room::Load("assets/scenes/room2.txt", Entities::Create));
-	rooms.push_back(Room::Load("assets/scenes/room3.txt", Entities::Create));
-	rooms.push_back(Room::Load("assets/scenes/room4.txt", Entities::Create));
+	rooms.push_back(Room::Load("room1.txt", Entities::Create));
+	rooms.push_back(Room::Load("room2.txt", Entities::Create));
+	rooms.push_back(Room::Load("room3.txt", Entities::Create));
+	rooms.push_back(Room::Load("room4.txt", Entities::Create));
 
 	Room::current = rooms[0];
 
@@ -52,16 +52,14 @@ void Game::Update(float dt)
 	static bool currentlyTransitioning = false; // Temporary
 
 	bool roomContainsPlayer = Room::current->Contains(player->WorldHitbox());
-	if (currentlyTransitioning && roomContainsPlayer)
-		currentlyTransitioning = false;
+	currentlyTransitioning = !roomContainsPlayer;
 
-	if (!roomContainsPlayer)
+	if (currentlyTransitioning)
 	{
-		currentlyTransitioning = true;
 		for (int i = 0; i < rooms.size(); i++)
 		{
 			if (rooms[i] == Room::current) continue;
-			if (rooms[i]->OverlapsWith(player->WorldHitbox(), 0, 0))
+			if (rooms[i]->Contains(player->WorldHitbox()))
 			{
 				Room::current = rooms[i];
 				currentlyTransitioning = false;
@@ -70,7 +68,7 @@ void Game::Update(float dt)
 		}
 	}
 
-	if (Input::IsPressed(CR_KEY_Q))
+	if (Input::IsPressed(CR_MOUSE_BUTTON_MIDDLE))
 		player->entity->position = EntityPlacePosition();
 
 	if (Input::IsPressed(CR_MOUSE_BUTTON_LEFT))
