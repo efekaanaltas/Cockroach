@@ -1,7 +1,5 @@
 #pragma once
 
-// For use by Cockroach applications
-
 #include "Cockroach/Core/Application.h"
 #include "Cockroach/Core/Log.h"
 

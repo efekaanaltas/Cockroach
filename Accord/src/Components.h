@@ -124,6 +124,8 @@ public:
 
 	virtual void Update(float dt) override;
 
+	void SetZoom(float zoom);
+
 	float2 positionHighRes = { 0.0f, 0.0f };
 	
 	float aspectRatio = 16.0f/9.0f;

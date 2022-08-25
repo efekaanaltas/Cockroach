@@ -20,7 +20,6 @@ Game::Game()
 	: Application()
 {
 	Game::baseSpriteSheet = CreateRef<Texture2D>("assets/textures/SpriteSheet.png");
-	//Room::current = Room::Load("assets/scenes/room1.txt", Entities::Create);
 
 	rooms.push_back(Room::Load("room1.txt", Entities::Create));
 	rooms.push_back(Room::Load("room2.txt", Entities::Create));
@@ -67,6 +66,10 @@ void Game::Update(float dt)
 			}
 		}
 	}
+
+	for (int i = CR_KEY_KP_1; i <= CR_KEY_KP_3; i++)
+		if(Input::IsDown(i))
+			cameraController->SetZoom(std::powf(10.0f, (float)(i-CR_KEY_KP_1+1)));
 
 	if (Input::IsPressed(CR_MOUSE_BUTTON_MIDDLE))
 		player->entity->position = EntityPlacePosition();
@@ -152,10 +155,26 @@ void Game::ImGuiRender()
 	Checkbox("Render All Rooms", &renderAllRooms);
 	Checkbox("Render Room Boundaries", &renderRoomBoundaries);
 
-	if (Button("Create Room"))
-	{
-		CR_CORE_INFO("Create room");
-	}
+	End();
+
+	Begin(Room::current->name.c_str());
+
+	char buf[255]{};
+	InputText("Name", buf, sizeof(buf));
+
+	int pos[2] = { Room::current->position.x, Room::current->position.y };
+	DragInt2("Pos", pos);
+	if(Room::current->position.x != pos[0] || Room::current->position.y != pos[1])
+		Room::current->position = { pos[0], pos[1] };
+
+	int size[2] = { Room::current->width, Room::current->height };
+	DragInt2("Size", size);
+	if(Room::current->width != size[0] || Room::current->height != size[1])
+		Room::current->Resize(size[0], size[1]);
+
+	if (Button("Save"))
+		Room::current->Save();
+
 	End();
 
 	Application::ImGuiEnd();
@@ -163,15 +182,13 @@ void Game::ImGuiRender()
 
 Entity* Game::GetEntityAtPosition(float2 position)
 {
-	if (Room::current->entityCount == 0)
-		return nullptr;
-	for (int i = 0; i < Room::current->entityCount; i++)
+	for (int i = 0; i < Room::current->entities.size(); i++)
 	{
 		Ref<DynamicObject> dyn = Room::current->entities[i].GetComponent<DynamicObject>();
 		if(dyn && dyn->hitbox.Contains(position))
 			return &Room::current->entities[i];
 	}
-	return false;
+	return nullptr;
 }
 
 float2 Game::EntityPlacePosition()
@@ -210,7 +227,7 @@ void Game::RenderHitboxes()
 	Ref<DynamicObject> dyn = player->entity->GetComponent<DynamicObject>();
 	Renderer::DrawQuadOutline((float)dyn->Left(), (float)dyn->Right(), (float)dyn->Bottom(), (float)dyn->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
 
-	for (int i = 0; i < Room::current->entityCount; i++)
+	for (int i = 0; i < Room::current->entities.size(); i++)
 	{
 		Ref<DynamicObject> dyn = Room::current->entities[i].GetComponent<DynamicObject>();
 		if (dyn)

@@ -180,12 +180,12 @@ int DynamicObject::MoveY(float amount)
 
 Ref<DynamicObject> DynamicObject::GetEntityCollision(int xForesense, int yForesense, CollisionLayer layer)
 {	
-	for (int i = 0; i < Room::current->entityCount; i++)
+	for (int i = 0; i < Room::current->entities.size(); i++)
 	{
 		if (Room::current->entities[i] != *entity)
 		{
 			Ref<DynamicObject> dyn = Room::current->entities[i].GetComponent<DynamicObject>();
-			if (OverlapsWith(dyn, xForesense, yForesense) && (layer == All || layer == dyn->layer))
+			if (OverlapsWith(dyn, xForesense, yForesense) && (layer & All || layer == dyn->layer))
 				return dyn;
 		}
 	}
@@ -234,11 +234,17 @@ void CameraController::Update(float dt)
 	speed = zoom; // Change speed according to zoom level
 
 	zoom -= Input::scroll * 0.1f * zoom;
-	zoom = std::clamp(zoom, 5.0f, 200.0f);
+	zoom = std::clamp(zoom, 5.0f, 1000.0f);
 
 	float newAspect = (float)Application::Get().GetWindow().Width() / (float)Application::Get().GetWindow().Height();
 	if (aspectRatio != newAspect)
 		aspectRatio = newAspect;
 
+	camera.SetZoom(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
+}
+
+void CameraController::SetZoom(float zoom)
+{
+	this->zoom = zoom;
 	camera.SetZoom(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
 }

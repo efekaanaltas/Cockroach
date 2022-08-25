@@ -13,13 +13,11 @@ namespace Cockroach
 	{
 		position = { posX, posY };
 		tiles = new Tile[width * height];
-
-		entities = new Entity[3000];
 	}
 
 	void Room::Update(float dt)
 	{
-		for (int i = 0; i < entityCount; i++)
+		for (int i = 0; i < entities.size(); i++)
 			entities[i].Update(dt);
 	}
 
@@ -32,19 +30,14 @@ namespace Cockroach
 			int2 roomPos = IndexToRoomPosition(i);
 			Renderer::DrawQuad(RoomToWorldPosition(roomPos), {8,8}, sprite);
 		}
-		for (int i = 0; i < entityCount; i++)
-		{
+		for (int i = 0; i < entities.size(); i++)
 			entities[i].Render();
-		}
 	}
 
 	Entity* Room::AddEntity(int2 position)
 	{
-		entityCount += 1;
-		Entity* e = new Entity(position);
-		entities[entityCount] = *e;
-		delete e;
-		return &entities[entityCount-1];
+		entities.push_back(Entity(position));
+		return &entities[entities.size() - 1];
 	}
 
 	void Room::PlaceTile(TileType tileType, int2 worldPosition)
@@ -118,7 +111,7 @@ namespace Cockroach
 		width = newWidth;
 		height = newHeight;
 
-		Save();
+		//Save();
 	}
 
 	void Room::UpdateTile(int x, int y)
@@ -189,7 +182,7 @@ namespace Cockroach
 			out << position.y << ' ';
 			for (int i = 0; i < width * height; i++)
 				out << tiles[i].type;
-			for (int i = 0; i < entityCount; i++)
+			for (int i = 0; i < entities.size(); i++)
 			{
 				out << '\n';
 				out << "E: " << entities[i].type << ", ";
@@ -245,7 +238,7 @@ namespace Cockroach
 				stream.seekg(line.find("Y:") + 2);
 				stream >> pY;
 
-				room->entities[room->entityCount] = *entityCreateFn(int2(pX, pY), type);
+				room->entities.push_back(*entityCreateFn(int2(pX, pY), type));
 			}
 		}
 		else
