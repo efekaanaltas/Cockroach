@@ -11,6 +11,8 @@
 
 #include "Game.h"
 
+#include <filesystem>
+
 Ref<CameraController> Game::cameraController = nullptr;
 Ref<Player> Game::player = nullptr;
 
@@ -21,10 +23,12 @@ Game::Game()
 {
 	Game::baseSpriteSheet = CreateRef<Texture2D>("assets/textures/SpriteSheet.png");
 
-	rooms.push_back(Room::Load("room1.txt", Entities::Create));
-	rooms.push_back(Room::Load("room2.txt", Entities::Create));
-	rooms.push_back(Room::Load("room3.txt", Entities::Create));
-	rooms.push_back(Room::Load("room4.txt", Entities::Create));
+	const std::filesystem::path roomDir{ "assets/rooms" };
+	for (auto& a : std::filesystem::directory_iterator(roomDir))
+	{
+		std::string name = a.path().string().substr(a.path().string().find_last_of("/\\") + 1);
+		rooms.push_back(Room::Load(name, Entities::Create));
+	}
 
 	Room::current = rooms[0];
 
@@ -158,22 +162,36 @@ void Game::ImGuiRender()
 	End();
 
 	Begin(Room::current->name.c_str());
-
+	
 	char buf[255]{};
 	InputText("Name", buf, sizeof(buf));
 
 	int pos[2] = { Room::current->position.x, Room::current->position.y };
 	DragInt2("Pos", pos);
-	if(Room::current->position.x != pos[0] || Room::current->position.y != pos[1])
+	if (Room::current->position.x != pos[0] || Room::current->position.y != pos[1])
 		Room::current->position = { pos[0], pos[1] };
 
 	int size[2] = { Room::current->width, Room::current->height };
 	DragInt2("Size", size);
-	if(Room::current->width != size[0] || Room::current->height != size[1])
+	if (Room::current->width != size[0] || Room::current->height != size[1])
 		Room::current->Resize(size[0], size[1]);
 
 	if (Button("Save"))
 		Room::current->Save();
+	
+	static char bufnew[255]{};
+	InputText("Nam2e", bufnew, sizeof(bufnew));
+
+	static int posnew[2]{};
+	DragInt2("Pos2", posnew);
+	static int sizenew[2]{};
+	DragInt2("Siz2e", sizenew);
+
+	if (Button("Create"))
+	{
+		rooms.push_back(CreateRef<Room>(bufnew, sizenew[0], sizenew[1], posnew[0], posnew[1]));
+		rooms[rooms.size() - 1]->Save();
+	}
 
 	End();
 
