@@ -40,6 +40,13 @@ namespace Cockroach
 		return &entities[entities.size() - 1];
 	}
 
+	void Room::RemoveEntity(Entity* entity)
+	{
+		for (int i = 0; i < entities.size(); i++)
+			if (entities[i].ID == entity->ID)
+				entities.erase(entities.begin() + i);
+	}
+
 	void Room::PlaceTile(TileType tileType, int2 worldPosition)
 	{
 		int2 roomPosition = WorldToRoomPosition(worldPosition);

@@ -8,6 +8,7 @@
 
 #include "Components.h"
 #include "Entities.h"
+#include "EditorCursor.h"
 
 #include "Game.h"
 
@@ -17,6 +18,8 @@ Ref<CameraController> Game::cameraController = nullptr;
 Ref<Player> Game::player = nullptr;
 
 Ref<Texture2D> Game::baseSpriteSheet = nullptr;
+
+std::vector<Ref<Room>> Game::rooms;
 
 Game::Game()
 	: Application()
@@ -38,7 +41,7 @@ Game::Game()
 	cameraController = e->AddComponent<CameraController>();
 
 	Entity* pe = new Entity({ 10,10 });
-	pe->type = Entities::Cockroach;
+	pe->type = Entities::Payga;
 	pe->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 3 }, { 16, 16 });
 	pe->AddComponent<Animator>();
 	player = pe->AddComponent<Player>();
@@ -76,25 +79,9 @@ void Game::Update(float dt)
 			cameraController->SetZoom(std::powf(10.0f, (float)(i-CR_KEY_KP_1+1)));
 
 	if (Input::IsPressed(CR_MOUSE_BUTTON_MIDDLE))
-		player->entity->position = EntityPlacePosition();
+		player->entity->position = EditorCursor::WorldPosition();
 
-	if (Input::IsPressed(CR_MOUSE_BUTTON_LEFT))
-		Room::current->PlaceTile(Input::IsPressed(CR_KEY_LEFT_CONTROL) ? Room::Air : Room::TileBasic, EntityPlacePosition());
-
-	else if (Input::IsDown(CR_MOUSE_BUTTON_RIGHT))
-	{
-		isBoxPlacing = true;
-		boxPlaceStartPos = EntityPlacePosition();
-	}
-
-	else if (Input::IsUp(CR_MOUSE_BUTTON_RIGHT))
-	{
-		isBoxPlacing = false;
-		int2 boxPlaceEndPos = EntityPlacePosition();
-		int2 minPos = { std::min(boxPlaceStartPos.x, boxPlaceEndPos.x), std::min(boxPlaceStartPos.y, boxPlaceEndPos.y) };
-		int2 maxPos = { std::max(boxPlaceStartPos.x, boxPlaceEndPos.x), std::max(boxPlaceStartPos.y, boxPlaceEndPos.y) };
-		Room::current->PlaceTileBox(Input::IsPressed(CR_KEY_LEFT_CONTROL) ? Room::Air : Room::TileBasic, minPos, maxPos);
-	}
+	EditorCursor::Update(dt);
 }
 
 void Game::Render()
@@ -135,7 +122,7 @@ void Game::Render()
 
 	if (renderHitboxes) RenderHitboxes();
 
-	RenderCursor();
+	EditorCursor::Render();
 
 	Cockroach::Renderer::EndScene();
 
@@ -161,8 +148,10 @@ void Game::ImGuiRender()
 
 	End();
 
-	Begin(Room::current->name.c_str());
+	Begin("Current Room");
 	
+	Text(Room::current->name.c_str());
+
 	char buf[255]{};
 	InputText("Name", buf, sizeof(buf));
 
@@ -178,21 +167,13 @@ void Game::ImGuiRender()
 
 	if (Button("Save"))
 		Room::current->Save();
-	
-	static char bufnew[255]{};
-	InputText("Nam2e", bufnew, sizeof(bufnew));
 
-	static int posnew[2]{};
-	DragInt2("Pos2", posnew);
-	static int sizenew[2]{};
-	DragInt2("Siz2e", sizenew);
+	End();
 
-	if (Button("Create"))
-	{
-		rooms.push_back(CreateRef<Room>(bufnew, sizenew[0], sizenew[1], posnew[0], posnew[1]));
-		rooms[rooms.size() - 1]->Save();
-	}
+	Begin("Brush Settings");
 
+	SliderInt("Brush Mode", (int*) & EditorCursor::brushMode, 0, 2);
+		
 	End();
 
 	Application::ImGuiEnd();
@@ -209,12 +190,6 @@ Entity* Game::GetEntityAtPosition(float2 position)
 	return nullptr;
 }
 
-float2 Game::EntityPlacePosition()
-{
-	float2 worldCoord = cameraController->camera.ScreenToWorldPosition(Input::MousePosition());
-	return float2(std::floor(worldCoord.x / 8) * 8, std::floor(worldCoord.y / 8) * 8);
-}
-
 void Game::RenderGrid()
 {
 	for (int i = -80; i < 80; i++)
@@ -228,16 +203,6 @@ void Game::RenderGrid()
 		Cockroach::Renderer::DrawLine({ i + xFloor, -80.0f + yFloor, 0.0f }, { i + xFloor, 79.0f + yFloor, 0.0f }, { xColor, xColor, xColor, 0.5f });
 		Cockroach::Renderer::DrawLine({ -80.0f + xFloor, i + yFloor, 0.0f }, { 79.0f + xFloor, i + yFloor, 0.0f }, { yColor, yColor, yColor, 0.5f });
 	}
-}
-
-void Game::RenderCursor()
-{
-	if (!isBoxPlacing)
-		boxPlaceStartPos = EntityPlacePosition();
-	int2 boxPlaceEndPos = EntityPlacePosition();
-	float2 start = { std::min(boxPlaceStartPos.x, boxPlaceEndPos.x), std::min(boxPlaceStartPos.y, boxPlaceEndPos.y) };
-	float2 end = { std::max(boxPlaceStartPos.x, boxPlaceEndPos.x) + 8.0f, std::max(boxPlaceStartPos.y, boxPlaceEndPos.y) + 8.0f };
-	Renderer::DrawQuadOutline(start.x, end.x, start.y, end.y, Input::IsPressed(CR_KEY_LEFT_CONTROL) ? CR_COLOR_RED : CR_COLOR_YELLOW);
 }
 
 void Game::RenderHitboxes()

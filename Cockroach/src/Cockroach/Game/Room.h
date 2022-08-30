@@ -37,6 +37,7 @@ namespace Cockroach
 		void Render(Ref<Texture2D> tilemapTexture);
 
 		Entity* AddEntity(int2 position);
+		void RemoveEntity(Entity* entity);
 
 		void PlaceTile(TileType tileType, int2 worldPosition);
 		void PlaceTileBox(TileType tileType, int2 worldPositionMin, int2 worldPositionMax);

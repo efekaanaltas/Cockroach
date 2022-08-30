@@ -1,5 +1,6 @@
 #pragma once
 #include <Cockroach.h>
+#include "Entities.h"
 
 class Game : public Cockroach::Application
 {
@@ -9,19 +10,18 @@ public:
 	virtual void Update(float dt) override;
 	virtual void Render() override;
 	void ImGuiRender();
-	Entity* GetEntityAtPosition(float2 position);
-	float2 EntityPlacePosition();
+	static Entity* GetEntityAtPosition(float2 position);
 
-	void RenderGrid();
+	static void RenderGrid();
 	void RenderCursor();
-	void RenderHitboxes();
+	static void RenderHitboxes();
 
 	static Ref<CameraController> cameraController;
 	static Ref<Player> player;
 
 	static Ref<Texture2D> baseSpriteSheet;
 
-	std::vector<Ref<Room>> rooms;;
+	static std::vector<Ref<Room>> rooms;
 private:
 	bool renderGrid = true;
 	bool renderHitboxes = true;

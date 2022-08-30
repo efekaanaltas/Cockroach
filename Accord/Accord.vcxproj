@@ -79,7 +79,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>CR_PLATFORM_WINDOWS;CR_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Cockroach\vendor\spdlog\include;..\Cockroach\src;..\Cockroach\vendor;..\Cockroach\vendor\glm;..\Cockroach\vendor\GLFW\include;..\Cockroach\vendor\miniaudio;..\Cockroach\vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Cockroach\vendor\spdlog\include;..\Cockroach\src;..\Cockroach\vendor;..\Cockroach\vendor\glm;..\Cockroach\vendor\GLFW\include;..\Cockroach\vendor\miniaudio;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -95,7 +95,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>CR_PLATFORM_WINDOWS;CR_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Cockroach\vendor\spdlog\include;..\Cockroach\src;..\Cockroach\vendor;..\Cockroach\vendor\glm;..\Cockroach\vendor\GLFW\include;..\Cockroach\vendor\miniaudio;..\Cockroach\vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Cockroach\vendor\spdlog\include;..\Cockroach\src;..\Cockroach\vendor;..\Cockroach\vendor\glm;..\Cockroach\vendor\GLFW\include;..\Cockroach\vendor\miniaudio;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -115,7 +115,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>CR_PLATFORM_WINDOWS;CR_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Cockroach\vendor\spdlog\include;..\Cockroach\src;..\Cockroach\vendor;..\Cockroach\vendor\glm;..\Cockroach\vendor\GLFW\include;..\Cockroach\vendor\miniaudio;..\Cockroach\vendor\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Cockroach\vendor\spdlog\include;..\Cockroach\src;..\Cockroach\vendor;..\Cockroach\vendor\glm;..\Cockroach\vendor\GLFW\include;..\Cockroach\vendor\miniaudio;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -132,12 +132,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Components.h" />
+    <ClInclude Include="src\EditorCursor.h" />
     <ClInclude Include="src\Entities.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\State.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Components.cpp" />
+    <ClCompile Include="src\EditorCursor.cpp" />
+    <ClCompile Include="src\Entities.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\State.cpp" />
   </ItemGroup>
