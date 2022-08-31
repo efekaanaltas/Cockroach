@@ -10,14 +10,14 @@ public:
 	virtual void Update(float dt) override;
 	virtual void Render() override;
 	void ImGuiRender();
-	static Entity* GetEntityAtPosition(float2 position);
+	static Entity* GetEntityAtPosition(int2 position);
 
 	static void RenderGrid();
 	void RenderCursor();
 	static void RenderHitboxes();
 
-	static Ref<CameraController> cameraController;
-	static Ref<Player> player;
+	static CameraController* cameraController;
+	static Player* player;
 
 	static Ref<Texture2D> baseSpriteSheet;
 

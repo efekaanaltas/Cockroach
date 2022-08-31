@@ -20,34 +20,34 @@ namespace Entities
 		}
 		case EntityType::SpikeLeft:
 		{
-			e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 1 }, { 8, 8 });
-			Ref<DynamicObject> dyn = e->AddComponent<Hazard>();
-			dyn->hitbox = Rect({ 4,0 }, { 8,8 });
-			dyn->layer = Trigger;
+			Dynamic e = Dynamic();
+			e.sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 1 }, { 8, 8 });
+			e.hitbox = Rect({ 4,0 }, { 8,8 });
+			e.layer = Trigger;
 			break;
 		}
 		case EntityType::SpikeRight:
 		{
-			e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 0 }, { 8, 8 });
-			Ref<DynamicObject> dyn = e->AddComponent<Hazard>();
-			dyn->hitbox = Rect({ 0,0 }, { 4,8 });
-			dyn->layer = Trigger;
+			Dynamic e = Dynamic();
+			e.sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 1 }, { 8, 8 });
+			e.hitbox = Rect({ 0,0 }, { 4,8 });
+			e.layer = Trigger;
 			break;
 		}
 		case EntityType::SpikeDown:
 		{
-			e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 8, 1 }, { 8, 8 });
-			Ref<DynamicObject> dyn = e->AddComponent<Hazard>();
-			dyn->hitbox = Rect({ 0,4 }, { 8,8 });
-			dyn->layer = Trigger;
+			Dynamic e = Dynamic();
+			e.sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 1 }, { 8, 8 });
+			e.hitbox = Rect({ 0,4 }, { 8,8 });
+			e.layer = Trigger;
 			break;
 		}
 		case EntityType::SpikeUp:
 		{
-			e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 8, 0 }, { 8, 8 });
-			Ref<DynamicObject> dyn = e->AddComponent<Hazard>();
-			dyn->hitbox = Rect({ 4,8 }, { 8,4 });
-			dyn->layer = Trigger;
+			Dynamic e = Dynamic();
+			e.sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 1 }, { 8, 8 });
+			e.hitbox = Rect({ 4,8 }, { 8,4 });
+			e.layer = Trigger;
 			break;
 		}
 		}

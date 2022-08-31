@@ -14,8 +14,8 @@
 
 #include <filesystem>
 
-Ref<CameraController> Game::cameraController = nullptr;
-Ref<Player> Game::player = nullptr;
+CameraController* Game::cameraController = nullptr;
+Player* Game::player = nullptr;
 
 Ref<Texture2D> Game::baseSpriteSheet = nullptr;
 
@@ -33,26 +33,25 @@ Game::Game()
 		rooms.push_back(Room::Load(name, Entities::Create));
 	}
 
-	Room::current = rooms[0];
+	Game::cameraController = new CameraController();
+	cameraController->type = Entities::Camera;
+	cameraController->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0,0 }, { 1,1 });
 
-	Entity* e = new Entity({ 0,0 });
-	e->type = Entities::Camera;
-	e->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0,0 }, { 1,1 });
-	cameraController = e->AddComponent<CameraController>();
-
-	Entity* pe = new Entity({ 10,10 });
-	pe->type = Entities::Payga;
-	pe->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 3 }, { 16, 16 });
-	pe->AddComponent<Animator>();
-	player = pe->AddComponent<Player>();
+	Game::player = new Player();
+	player->type = Entities::Payga;
+	player->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 3 }, { 16, 16 });
 	player->hitbox = Rect({ 6,0 }, { 10,12 });
 	player->layer = Light;
+
+	for (auto& room : rooms)
+		if (room->Contains(player->WorldHitbox()))
+			Room::current = room;
 }
 
 void Game::Update(float dt)
 {
-	cameraController->entity->Update(dt);
-	player->entity->Update(dt);
+	cameraController->Update(dt);
+	player->Update(dt);
 	Room::current->Update(dt);
 
 	static bool currentlyTransitioning = false; // Temporary
@@ -79,8 +78,8 @@ void Game::Update(float dt)
 			cameraController->SetZoom(std::powf(10.0f, (float)(i-CR_KEY_KP_1+1)));
 
 	if (Input::IsPressed(CR_MOUSE_BUTTON_MIDDLE))
-		player->entity->position = EditorCursor::WorldPosition();
-
+		player->position = EditorCursor::WorldPosition();
+	int2 worldPosCur = EditorCursor::WorldPosition();
 	EditorCursor::Update(dt);
 }
 
@@ -118,7 +117,7 @@ void Game::Render()
 		}
 	}
 
-	player->entity->Render();
+	player->Render();
 
 	if (renderHitboxes) RenderHitboxes();
 
@@ -135,16 +134,17 @@ void Game::ImGuiRender()
 	Application::ImGuiBegin();
 
 	ImGuiIO io = ImGui::GetIO();
+
 	Begin("Info");
 	Text("%.3f ms (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 
-	Text("Pos: %i %i", player->entity->position.x, player->entity->position.y);
+	Text("Pos: %i %i", player->position.x, player->position.y);
 	Text("Vel: %.1f, %.1f", player->velocity.x, player->velocity.y);
 
-	Checkbox("Render Hitboxes", &renderHitboxes);
-	Checkbox("Render Grid", &renderGrid);
-	Checkbox("Render All Rooms", &renderAllRooms);
-	Checkbox("Render Room Boundaries", &renderRoomBoundaries);
+	Checkbox("Hitboxes", &renderHitboxes);
+	Checkbox("Grid", &renderGrid);
+	Checkbox("Rooms", &renderAllRooms);
+	Checkbox("Room Boundaries", &renderRoomBoundaries);
 
 	End();
 
@@ -172,20 +172,23 @@ void Game::ImGuiRender()
 
 	Begin("Brush Settings");
 
-	SliderInt("Brush Mode", (int*) & EditorCursor::brushMode, 0, 2);
+	int* brushModeIntPtr = (int*)&EditorCursor::brushMode;
+	const char* elems_names[3] = { "Tile", "Entity", "Room" };
+	const char* elem_name = elems_names[*brushModeIntPtr];
+	SliderInt("Mode", brushModeIntPtr, 0, 2, elem_name);
 		
 	End();
 
 	Application::ImGuiEnd();
 }
 
-Entity* Game::GetEntityAtPosition(float2 position)
+Entity* Game::GetEntityAtPosition(int2 position)
 {
-	for (int i = 0; i < Room::current->entities.size(); i++)
+	for (auto& ent : Room::current->entities)
 	{
-		Ref<DynamicObject> dyn = Room::current->entities[i].GetComponent<DynamicObject>();
-		if(dyn && dyn->hitbox.Contains(position))
-			return &Room::current->entities[i];
+		Dynamic* dyn = dynamic_cast<Dynamic*>(&ent);
+		if (dyn && dyn->WorldHitbox().Contains(position))
+			return &ent;
 	}
 	return nullptr;
 }
@@ -207,12 +210,11 @@ void Game::RenderGrid()
 
 void Game::RenderHitboxes()
 {
-	Ref<DynamicObject> dyn = player->entity->GetComponent<DynamicObject>();
-	Renderer::DrawQuadOutline((float)dyn->Left(), (float)dyn->Right(), (float)dyn->Bottom(), (float)dyn->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
+	Renderer::DrawQuadOutline((float)player->Left(), (float)player->Right(), (float)player->Bottom(), (float)player->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
 
-	for (int i = 0; i < Room::current->entities.size(); i++)
+	for (auto& ent : Room::current->entities)
 	{
-		Ref<DynamicObject> dyn = Room::current->entities[i].GetComponent<DynamicObject>();
+		Dynamic* dyn = dynamic_cast<Dynamic*>(&ent);
 		if (dyn)
 			Renderer::DrawQuadOutline((float)dyn->Left(), (float)dyn->Right(), (float)dyn->Bottom(), (float)dyn->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
 	}

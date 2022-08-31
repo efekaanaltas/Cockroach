@@ -22,7 +22,7 @@ void WalkingState::Enter(Player* player)
 
 State<Player>* WalkingState::Update(Player* player, float dt)
 {
-	player->animator->sheet = GetWalkingStateSheet(player);
+	player->currentSheet = GetWalkingStateSheet(player);
 
 	if (Input::IsDown(CR_KEY_SPACE) && !player->grounded && player->WallDir())
 	{
@@ -62,7 +62,7 @@ void JumpingState::Enter(Player* player)
 	player->velocity.x += horizontalBoost * player->faceDir;
 	player->velocity.y = maxJumpSpeed;
 
-	player->animator->sheet = player->jumpingSheet;
+	player->currentSheet = player->jumpingSheet;
 	Audio::Play("assets/audio/Jump.wav");
 }
 
@@ -82,7 +82,7 @@ void ClingingState::Enter(Player* player)
 {
 	player->velocity.y = 0;
 
-	player->animator->sheet = player->clingingSheet;
+	player->currentSheet = player->clingingSheet;
 }
 
 State<Player>* ClingingState::Update(Player* player, float dt)
@@ -120,7 +120,7 @@ void DashingState::Enter(Player* player)
 		dashDir = glm::normalize(float2(player->InputDirX(), player->InputDirY()));
 	else dashDir = { player->faceDir, 0.0f };
 
-	player->animator->sheet = player->dashingSheet;
+	player->currentSheet = player->dashingSheet;
 	Audio::Play("assets/audio/Dash.wav");
 
 	Application::Get().freezeTimer = Timer(3.0f);

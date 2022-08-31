@@ -1,16 +1,15 @@
 #include "EditorCursor.h"
 using namespace Cockroach;
-//#include "Entities.h"
 #include "Game.h"
 
 EditorCursor::BrushMode EditorCursor::brushMode = BrushMode::Tile;
-int EditorCursor::entityType = 0;
+int EditorCursor::entityType = 2;
 bool EditorCursor::isBoxPlacing = false;
 int2 EditorCursor::boxPlaceStartPos = { 0.0f, 0.0f };
 
 void EditorCursor::Update(float dt)
 {
-	if (Input::IsPressed(CR_MOUSE_BUTTON_LEFT))
+	if (Input::IsDown(CR_MOUSE_BUTTON_LEFT))
 	{
 		switch (brushMode)
 		{
@@ -21,10 +20,14 @@ void EditorCursor::Update(float dt)
 		}
 		case BrushMode::Entity:
 		{
-			if (!Input::IsPressed(CR_KEY_LEFT_CONTROL))
-				Entities::Create(WorldPosition(), entityType);
-			else
-				Room::current->RemoveEntity(Game::GetEntityAtPosition(WorldPosition()));
+			Cockroach::Entity* entityOverCursor = Game::GetEntityAtPosition(WorldPosition());
+			if(entityOverCursor)
+				CR_CORE_INFO(std::to_string(entityOverCursor->ID));
+			//if (!Input::IsPressed(CR_KEY_LEFT_CONTROL) && !entityOverCursor)
+				//Entities::Create(WorldPosition(), entityType); // Spikes get some random position for whatever reason, investigate.
+			
+			//else if (entityOverCursor)
+				//	Room::current->RemoveEntity(entityOverCursor);
 			break;
 		}
 		}
@@ -60,7 +63,7 @@ void EditorCursor::Update(float dt)
 		}
 		}
 	}
-}
+	}
 
 void EditorCursor::Render()
 {

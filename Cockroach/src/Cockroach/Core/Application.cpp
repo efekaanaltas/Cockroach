@@ -68,7 +68,6 @@ namespace Cockroach
 		if (e.GetEventType() == EventType::MouseScrolled)
 			Input::scroll = dynamic_cast<MouseScrollEvent&>(e).GetYOffset();
 
-
 		//CR_CORE_TRACE("{0}", e);
 	}
 

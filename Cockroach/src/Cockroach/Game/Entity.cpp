@@ -18,16 +18,8 @@ namespace Cockroach
 		ID = lastID++;
 	}
 
-	void Entity::Update(float dt)
-	{
-		for (auto& comp : components)
-		{
-			comp->Update(dt);
-		}
-	}
-
 	void Entity::Render()
 	{
-		Renderer::DrawQuad(position /*glm::ivec2(sprite->XSize() / 2.0f, sprite->YSize() / 2.0f)*/, {sprite.XSize(), sprite.YSize()}, sprite);
+		Renderer::DrawQuad(position, {sprite.XSize(), sprite.YSize()}, sprite);
 	}
 }

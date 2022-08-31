@@ -9,8 +9,7 @@
 
 using namespace Cockroach;
 
-Player::Player(Entity* entity)
-	: DynamicObject(entity)
+Player::Player()
 {
 	walkingState =		new WalkingState;
 	jumpingState =		new JumpingState(100.0f, 160.0f, 0.0f);
@@ -35,8 +34,7 @@ Player::Player(Entity* entity)
 	clingingSheet.Add(	Sprite::CreateFromCoords(texture, { 7, 3 }, { 16, 16 }));
 	fallingSheet.Add(	Sprite::CreateFromCoords(texture, { 8, 3 }, { 16, 16 }));
 
-	animator = entity->GetComponent<Animator>();
-	animator->sheet = idleSheet;
+	currentSheet = idleSheet;
 	
 	currentState = walkingState;
 	currentState->Enter(this);
@@ -54,11 +52,13 @@ void Player::Update(float dt)
 	if (grounded) coyoteTimer.Reset();
 	else		  coyoteTimer.Tick(1.0f);
 
-	TrySwitchState(currentState->Update(this, dt));
+	TrySwitchState(currentState->Update(this, dt));	
+
+	currentSheet.Update(this);
 
 	if (velocity.x != 0.0f) // Use InputDirX() instead?
 		faceDir = velocity.x < 0.0f ? -1 : 1;
-	entity->sprite.flipX = faceDir == -1;
+	sprite.flipX = faceDir == -1;
 
 	int horizontalCollision = MoveX(velocity.x * dt);
 	int verticalCollision = MoveY((velocityLastFrame.y + velocity.y) * 0.5f * dt);
@@ -66,11 +66,8 @@ void Player::Update(float dt)
 	grounded = verticalCollision == -1;
 }
 
-bool Player::OnCollide(Ref<DynamicObject> other, int horizontal, int vertical)
+bool Player::OnCollide(Dynamic* other, int horizontal, int vertical)
 {
-	if (std::dynamic_pointer_cast<Hazard>(other))
-		entity->position = { 0,0 };
-
 	if (horizontal)
 	{
 		velocity.x = 0.0f;
@@ -121,12 +118,7 @@ void Player::TrySwitchState(State<Player>* newState)
 	currentState->Enter(this);
 }
 
-DynamicObject::DynamicObject(Entity* entity)
-	: Component(entity)
-{
-}
-
-int DynamicObject::MoveX(float amount)
+int Dynamic::MoveX(float amount)
 {
 	xRemainder += amount;
 	int move = (int)xRemainder;
@@ -138,11 +130,11 @@ int DynamicObject::MoveX(float amount)
 
 		while (move != 0)
 		{
-			Ref<DynamicObject> collidingHitbox = GetEntityCollision(sign, 0);
+			Dynamic* collidingHitbox = GetEntityCollision(sign, 0);
 			bool tilemapCollision = GetTilemapCollision(sign, 0);
 			if (!collidingHitbox && !tilemapCollision)
 			{
-				entity->position.x += sign;
+				position.x += sign;
 				move -= sign;
 			}
 			else if (OnCollide(collidingHitbox, sign, 0))
@@ -152,7 +144,7 @@ int DynamicObject::MoveX(float amount)
 	return GetCollision(sign, 0) ? sign : 0;
 }
 
-int DynamicObject::MoveY(float amount)
+int Dynamic::MoveY(float amount)
 {
 	yRemainder += amount;
 	int move = (int)yRemainder;
@@ -164,11 +156,11 @@ int DynamicObject::MoveY(float amount)
 
 		while (move != 0)
 		{
-			Ref<DynamicObject> collidingHitbox = GetEntityCollision(0, sign, Heavy);
+			Dynamic* collidingHitbox = GetEntityCollision(0, sign, Heavy);
 			bool tilemapCollision = GetTilemapCollision(0, sign);
 			if (!collidingHitbox && !tilemapCollision)
 			{
-				entity->position.y += sign;
+				position.y += sign;
 				move -= sign;
 			}
 			else if (OnCollide(collidingHitbox, 0, sign))
@@ -178,42 +170,27 @@ int DynamicObject::MoveY(float amount)
 	return GetCollision(0, sign) ? sign : 0;
 }
 
-Ref<DynamicObject> DynamicObject::GetEntityCollision(int xForesense, int yForesense, CollisionLayer layer)
+Dynamic* Dynamic::GetEntityCollision(int xForesense, int yForesense, CollisionLayer layer)
 {	
 	for (int i = 0; i < Room::current->entities.size(); i++)
-	{
-		if (Room::current->entities[i] != *entity)
-		{
-			Ref<DynamicObject> dyn = Room::current->entities[i].GetComponent<DynamicObject>();
-			if (OverlapsWith(dyn, xForesense, yForesense) && (layer & All || layer == dyn->layer))
-				return dyn;
-		}
-	}
+		if (Room::current->entities[i] != *this)
+			if (OverlapsWith(this, xForesense, yForesense) && (layer & All || layer == layer))
+				return this;
+	
 	// Also check for collisions with player
-	if (Game::player->entity != entity && OverlapsWith(Game::player, xForesense, yForesense) && (layer == All || layer == Game::player->layer))
+	if (Game::player != this && OverlapsWith(Game::player, xForesense, yForesense) && (layer & All || layer == Game::player->layer))
 		return Game::player;
 	return nullptr;
 }
 
-bool DynamicObject::GetTilemapCollision(int xForesense, int yForesense)
+bool Dynamic::GetTilemapCollision(int xForesense, int yForesense)
 {
 	return Room::current->CollidesWith(WorldHitbox(), xForesense, yForesense);
 }
 
-bool DynamicObject::GetCollision(int xForesense, int yForesense, CollisionLayer layer)
+bool Dynamic::GetCollision(int xForesense, int yForesense, CollisionLayer layer)
 {
 	return GetTilemapCollision(xForesense, yForesense) || GetEntityCollision(xForesense, yForesense, layer);
-}
-
-void Animator::Update(float dt)
-{
-	int index = (int)std::fmodf(Application::Get().frameCount * sheet.framePerSecond / 60.0f, (float)sheet.Size());
-	entity->sprite = sheet[index];
-}
-
-CameraController::CameraController(Entity* entity)
-	: Component(entity), camera(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom)
-{
 }
 
 void CameraController::Update(float dt)
@@ -227,7 +204,7 @@ void CameraController::Update(float dt)
 	if (Input::IsPressed(CR_KEY_W))
 		positionHighRes.y += speed * dt;
 
-	entity->position = int2(positionHighRes.x, positionHighRes.y);
+	position = int2(positionHighRes.x, positionHighRes.y);
 
 	camera.SetPosition({positionHighRes.x, positionHighRes.y, 0.0f});
 

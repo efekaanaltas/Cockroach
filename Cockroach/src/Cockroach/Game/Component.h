@@ -12,7 +12,8 @@ namespace Cockroach
 		Component(Entity* entity) 
 			: entity(entity)
 		{}
-		Entity* entity = nullptr;
+
+		Entity* entity;
 		virtual void Update(float dt) {}
 	};
 }
