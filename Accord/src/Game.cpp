@@ -37,10 +37,9 @@ Game::Game()
 	cameraController->type = Entities::Camera;
 	cameraController->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0,0 }, { 1,1 });
 
-	Game::player = new Player();
+	Game::player = new Player({10, 20}, {6,0}, {10,12});
 	player->type = Entities::Payga;
 	player->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 3 }, { 16, 16 });
-	player->hitbox = Rect({ 6,0 }, { 10,12 });
 	player->layer = Light;
 
 	for (auto& room : rooms)
@@ -182,17 +181,6 @@ void Game::ImGuiRender()
 	Application::ImGuiEnd();
 }
 
-Entity* Game::GetEntityAtPosition(int2 position)
-{
-	for (auto& ent : Room::current->entities)
-	{
-		Dynamic* dyn = dynamic_cast<Dynamic*>(&ent);
-		if (dyn && dyn->WorldHitbox().Contains(position))
-			return &ent;
-	}
-	return nullptr;
-}
-
 void Game::RenderGrid()
 {
 	for (int i = -80; i < 80; i++)
@@ -214,7 +202,8 @@ void Game::RenderHitboxes()
 
 	for (auto& ent : Room::current->entities)
 	{
-		Dynamic* dyn = dynamic_cast<Dynamic*>(&ent);
+		//Dynamic* dyn = ent.As<Dynamic>();
+		Dynamic* dyn = dynamic_cast<Dynamic*>(ent);
 		if (dyn)
 			Renderer::DrawQuadOutline((float)dyn->Left(), (float)dyn->Right(), (float)dyn->Bottom(), (float)dyn->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
 	}

@@ -31,12 +31,12 @@ namespace Cockroach
 		int width, height;
 		int2 position = { 0,0 };
 		Tile* tiles;
-		std::vector<Entity> entities;
+		std::vector<Entity*> entities;
 
 		void Update(float dt);
 		void Render(Ref<Texture2D> tilemapTexture);
 
-		Entity* AddEntity(int2 position);
+		void AddEntity(Entity* entity);
 		void RemoveEntity(Entity* entity);
 
 		void PlaceTile(TileType tileType, int2 worldPosition);

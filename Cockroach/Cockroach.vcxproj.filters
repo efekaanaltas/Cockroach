@@ -84,9 +84,6 @@
     <ClInclude Include="src\Cockroach\Events\MouseEvent.h">
       <Filter>src\Cockroach\Events</Filter>
     </ClInclude>
-    <ClInclude Include="src\Cockroach\Game\Component.h">
-      <Filter>src\Cockroach\Game</Filter>
-    </ClInclude>
     <ClInclude Include="src\Cockroach\Game\Entity.h">
       <Filter>src\Cockroach\Game</Filter>
     </ClInclude>

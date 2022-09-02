@@ -33,9 +33,15 @@ enum CollisionLayer
 class Dynamic : public Entity
 {
 public:
+	Dynamic(int2 position, int2 hitboxMin, int2 hitboxMax)
+		: Entity(position)
+	{
+		hitbox = Rect(hitboxMin, hitboxMax);
+	}
+
 	CollisionLayer layer = CollisionLayer::Light;
 
-	virtual void Update(float dt) override {}
+	virtual void Update(float dt) override { }
 
 	Rect hitbox;
 	float xRemainder = 0.0f, yRemainder = 0.0f;
@@ -58,44 +64,6 @@ public:
 	Dynamic* GetEntityCollision(int xForesense, int yForesense, CollisionLayer layer = CollisionLayer::All);
 	bool GetTilemapCollision(int xForesense, int yForesense);
 	bool GetCollision(int xForesense, int yForesense, CollisionLayer layer = CollisionLayer::All);
-};
-
-class Player : public Dynamic
-{
-public:
-	Player();
-
-	virtual void Update(float dt) override;
-
-	int faceDir = 1;
-	float gravity = 200.0f;
-	bool grounded = false;
-	bool canDash = false;
-
-	float2 velocity = { 0.0f, 0.0f };
-	float2 velocityLastFrame = { 0.0f, 0.0f };
-
-	State<Player>* currentState = nullptr;
-	WalkingState* walkingState = nullptr;
-	JumpingState* jumpingState = nullptr;
-	JumpingState* superjumpingState = nullptr;
-	JumpingState* walljumpingState = nullptr;
-	ClingingState* clingingState = nullptr;
-	DashingState* dashingState = nullptr;
-
-	Sheet idleSheet, walkingSheet, fallingSheet, jumpingSheet, clingingSheet, dashingSheet;
-	Sheet currentSheet;
-
-	Timer jumpBufferTimer = Timer(10.0f);
-	Timer coyoteTimer = Timer(10.0f);
-
-	virtual bool OnCollide(Dynamic* other, int horizontal, int vertical) override;
-
-	int InputDirX() const;
-	int InputDirY() const;
-	int WallDir();
-
-	void TrySwitchState(State<Player>* state);
 };
 
 class CameraController : public Entity

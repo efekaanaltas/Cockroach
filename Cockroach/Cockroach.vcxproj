@@ -152,7 +152,6 @@
     <ClInclude Include="src\Cockroach\Events\Event.h" />
     <ClInclude Include="src\Cockroach\Events\KeyEvent.h" />
     <ClInclude Include="src\Cockroach\Events\MouseEvent.h" />
-    <ClInclude Include="src\Cockroach\Game\Component.h" />
     <ClInclude Include="src\Cockroach\Game\Entity.h" />
     <ClInclude Include="src\Cockroach\Game\Rect.h" />
     <ClInclude Include="src\Cockroach\Game\Room.h" />

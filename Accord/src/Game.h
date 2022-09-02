@@ -2,6 +2,8 @@
 #include <Cockroach.h>
 #include "Entities.h"
 
+#include "Entities/Player.h"
+
 class Game : public Cockroach::Application
 {
 public:
@@ -10,7 +12,6 @@ public:
 	virtual void Update(float dt) override;
 	virtual void Render() override;
 	void ImGuiRender();
-	static Entity* GetEntityAtPosition(int2 position);
 
 	static void RenderGrid();
 	void RenderCursor();

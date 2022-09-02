@@ -7,10 +7,8 @@ namespace Cockroach
 	int Entity::lastID = 0;
 
 	Entity::Entity()
-	{
-		position = { 0, 0 };
-		ID = lastID++;
-	}
+		: Entity({ 0,0 })
+	{}
 
 	Entity::Entity(const glm::ivec2& position)
 	{

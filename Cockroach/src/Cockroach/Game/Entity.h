@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <glm/glm.hpp>
-#include "Component.h"
 #include "Cockroach/Renderer/Texture.h"
 #include "Cockroach/Renderer/Renderer.h"
 
@@ -26,7 +25,16 @@ namespace Cockroach
 		virtual void Update(float dt) {}
 		void Render();
 
+		template<typename T>
+		T* As();
+
 		bool operator==(const Entity& other) { return ID == other.ID; }
 		bool operator!=(const Entity& other) { return ID != other.ID; }
 	};
+
+	template<typename T>
+	T* Entity::As()
+	{
+		return dynamic_cast<T*>(this);
+	}
 }

@@ -116,6 +116,7 @@ project "Accord"
 
     includedirs
     {
+        "%{prj.name}/src",
         "Cockroach/vendor/spdlog/include",
         "Cockroach/src",
         "Cockroach/vendor",

@@ -2,6 +2,7 @@
 #include "State.h"
 
 #include "Components.h"
+#include "Entities/Player.h"
 
 Sheet GetWalkingStateSheet(Player* player)
 {

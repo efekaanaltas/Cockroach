@@ -9,7 +9,7 @@ int2 EditorCursor::boxPlaceStartPos = { 0.0f, 0.0f };
 
 void EditorCursor::Update(float dt)
 {
-	if (Input::IsDown(CR_MOUSE_BUTTON_LEFT))
+	if (Input::IsPressed(CR_MOUSE_BUTTON_LEFT))
 	{
 		switch (brushMode)
 		{
@@ -20,14 +20,15 @@ void EditorCursor::Update(float dt)
 		}
 		case BrushMode::Entity:
 		{
-			Cockroach::Entity* entityOverCursor = Game::GetEntityAtPosition(WorldPosition());
-			if(entityOverCursor)
-				CR_CORE_INFO(std::to_string(entityOverCursor->ID));
-			//if (!Input::IsPressed(CR_KEY_LEFT_CONTROL) && !entityOverCursor)
-				//Entities::Create(WorldPosition(), entityType); // Spikes get some random position for whatever reason, investigate.
-			
-			//else if (entityOverCursor)
-				//	Room::current->RemoveEntity(entityOverCursor);
+			Cockroach::Entity* entityOverCursor = nullptr;
+			for (auto& ent : Room::current->entities)
+				if (Dynamic* dyn = ent->As<Dynamic>())
+					if (dyn->WorldHitbox().OverlapsWith(Rect(WorldPosition(), WorldPosition() + int2(8, 8)), 0, 0))
+						entityOverCursor = ent;
+			if (!Input::IsPressed(CR_KEY_LEFT_CONTROL) && !entityOverCursor)
+				Entities::Create(WorldPosition(), entityType);
+			else if (Input::IsPressed(CR_KEY_LEFT_CONTROL) && entityOverCursor)
+				Room::current->RemoveEntity(entityOverCursor);
 			break;
 		}
 		}

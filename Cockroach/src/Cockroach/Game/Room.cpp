@@ -18,7 +18,7 @@ namespace Cockroach
 	void Room::Update(float dt)
 	{
 		for (int i = 0; i < entities.size(); i++)
-			entities[i].Update(dt);
+			entities[i]->Update(dt);
 	}
 
 	void Room::Render(Ref<Texture2D> tilemapTexture)
@@ -31,19 +31,18 @@ namespace Cockroach
 			Renderer::DrawQuad(RoomToWorldPosition(roomPos), {8,8}, sprite);
 		}
 		for (int i = 0; i < entities.size(); i++)
-			entities[i].Render();
+			entities[i]->Render();
 	}
 
-	Entity* Room::AddEntity(int2 position)
+	void Room::AddEntity(Entity* entity)
 	{
-		entities.push_back(Entity(position));
-		return &entities[entities.size() - 1];
+		entities.push_back(entity);
 	}
 
 	void Room::RemoveEntity(Entity* entity)
 	{
 		for (int i = 0; i < entities.size(); i++)
-			if (entities[i].ID == entity->ID)
+			if (entities[i]->ID == entity->ID)
 				entities.erase(entities.begin() + i);
 	}
 
@@ -192,9 +191,9 @@ namespace Cockroach
 			for (int i = 0; i < entities.size(); i++)
 			{
 				out << '\n';
-				out << "E: " << entities[i].type << ", ";
-				out << "X: " << entities[i].position.x << ", ";
-				out << "Y: " << entities[i].position.y;
+				out << "E: " << entities[i]->type << ", ";
+				out << "X: " << entities[i]->position.x << ", ";
+				out << "Y: " << entities[i]->position.y;
 			}
 		}
 		else
@@ -245,7 +244,7 @@ namespace Cockroach
 				stream.seekg(line.find("Y:") + 2);
 				stream >> pY;
 
-				room->entities.push_back(*entityCreateFn(int2(pX, pY), type));
+				room->entities.push_back(entityCreateFn(int2(pX, pY), type));
 			}
 		}
 		else
