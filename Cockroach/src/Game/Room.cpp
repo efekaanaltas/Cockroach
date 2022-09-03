@@ -2,7 +2,7 @@
 #include "Room.h"
 
 #include <fstream>
-#include "Cockroach/Renderer/Renderer.h"
+#include "Renderer/Renderer.h"
 
 namespace Cockroach
 {

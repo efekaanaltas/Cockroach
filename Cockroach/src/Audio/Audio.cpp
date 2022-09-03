@@ -1,4 +1,8 @@
 #include "crpch.h"
+
+#define MINIAUDIO_IMPLEMENTATION
+#include <miniaudio.h>
+
 #include "Audio.h"
 
 namespace Cockroach

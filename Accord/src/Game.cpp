@@ -1,12 +1,12 @@
 #include <Cockroach.h>
-#include <Cockroach/Core/EntryPoint.h>
+#include <Core/EntryPoint.h>
 
 #include "imgui/imgui.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Components.h"
+#include "EntityDef.h"
 #include "Entities.h"
 #include "EditorCursor.h"
 
@@ -53,25 +53,6 @@ void Game::Update(float dt)
 	player->Update(dt);
 	Room::current->Update(dt);
 
-	static bool currentlyTransitioning = false; // Temporary
-
-	bool roomContainsPlayer = Room::current->Contains(player->WorldHitbox());
-	currentlyTransitioning = !roomContainsPlayer;
-
-	if (currentlyTransitioning)
-	{
-		for (int i = 0; i < rooms.size(); i++)
-		{
-			if (rooms[i] == Room::current) continue;
-			if (rooms[i]->Contains(player->WorldHitbox()))
-			{
-				Room::current = rooms[i];
-				currentlyTransitioning = false;
-				CR_TRACE("New current room: {0}", i);
-			}
-		}
-	}
-
 	for (int i = CR_KEY_KP_1; i <= CR_KEY_KP_3; i++)
 		if(Input::IsDown(i))
 			cameraController->SetZoom(std::powf(10.0f, (float)(i-CR_KEY_KP_1+1)));
@@ -84,8 +65,6 @@ void Game::Update(float dt)
 
 void Game::Render()
 {
-	Renderer::ResetStats();
-
 	Renderer::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 	Renderer::Clear();
 

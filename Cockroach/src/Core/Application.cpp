@@ -1,21 +1,14 @@
 #include "crpch.h"
 #include "Application.h"
 
-#include "Cockroach/Core/Log.h"
-#include "Cockroach/Core/Input.h"
-
-#include "Cockroach/Renderer/Renderer.h"
-
-#include "Cockroach/Events/Event.h"
-#include "Cockroach/Events/ApplicationEvent.h"
-#include "Cockroach/Events/KeyEvent.h"
-#include "Cockroach/Events/MouseEvent.h"
+#include "Core/Log.h"
+#include "Core/Input.h"
+#include "Renderer/Renderer.h"
+#include "Audio/Audio.h"
 
 #define IMGUI_IMPL_OPENGL_LOADER_GLAD
 #include "backends/imgui_impl_opengl3.cpp"
 #include "backends/imgui_impl_glfw.cpp"
-
-#include "Cockroach/Audio/Audio.h"
 
 namespace Cockroach
 {
@@ -29,8 +22,7 @@ namespace Cockroach
 		CR_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
-		window = Scope<Window>( new Window(WindowProps()) );
-		window->SetEventCallback(BIND_EVENT_FN(OnEvent));
+		window = Scope<Window>( new Window("Cockroach Engine", 1280, 720));
 
 		Renderer::Init();
 		Audio::Init();
@@ -42,33 +34,20 @@ namespace Cockroach
 
 	}
 
-	void Application::OnEvent(Event& e)
+	void Application::OnInputCallback(int code, bool down)
 	{
-		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
-		dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OnWindowResize));
-
 		ImGuiIO io = ImGui::GetIO();
 
 		bool imguiFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow) || ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow);
 
-		if (e.GetEventType() == EventType::KeyPressed || e.GetEventType() == EventType::MouseButtonPressed)
-			if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
-				ImGui::SetWindowFocus(nullptr); // Lose focus if keys are pressed but the mouse is over the game world.
+		if (down && !ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow))
+		{
+			ImGui::SetWindowFocus(nullptr); // Lose focus if keys are pressed but the mouse is over the game world.
+			imguiFocused = false;
+		}
 
-		if (e.GetEventType() == EventType::KeyPressed && !imguiFocused)
-			Input::stateMap[dynamic_cast<KeyPressedEvent&>(e).GetKeyCode()].pressed = true;
-		if (e.GetEventType() == EventType::KeyReleased)
-			Input::stateMap[dynamic_cast<KeyReleasedEvent&>(e).GetKeyCode()].pressed = false;
-
-		if (e.GetEventType() == EventType::MouseButtonPressed && !imguiFocused)
-			Input::stateMap[dynamic_cast<MouseButtonPressedEvent&>(e).GetMouseButton()].pressed = true;
-		if (e.GetEventType() == EventType::MouseButtonReleased)
-			Input::stateMap[dynamic_cast<MouseButtonReleasedEvent&>(e).GetMouseButton()].pressed = false;
-		if (e.GetEventType() == EventType::MouseScrolled)
-			Input::scroll = dynamic_cast<MouseScrollEvent&>(e).GetYOffset();
-
-		//CR_CORE_TRACE("{0}", e);
+		if (!down || !imguiFocused)
+			Input::stateMap[code].pressed = down;
 	}
 
 	void Application::Run()
@@ -95,24 +74,19 @@ namespace Cockroach
 		}
 	}
 
-	bool Application::OnWindowClose(WindowCloseEvent& e)
+	void Application::OnQuit()
 	{
 		running = false;
-		return true;
 	}
 
-	bool Application::OnWindowResize(WindowResizeEvent& e)
+	void Application::OnWindowResize(int width, int height)
 	{
-		if (e.GetWidth() == 0 || e.GetHeight() == 0)
-		{
-			minimized = true;
-			return false;
-		}
+		Application::Get().GetWindow().width = width;
+		Application::Get().GetWindow().height = height;
+		bool minimized = width == 0 || height == 0;
 
-		minimized = false;
-		Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
-
-		return false;
+		if (!minimized)
+			Renderer::OnWindowResize(width, height);
 	}
 
 	void Application::ImGuiInit()
@@ -155,7 +129,7 @@ namespace Cockroach
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		Application& app = Application::Get();
-		io.DisplaySize = ImVec2((float)app.GetWindow().Width(), (float)app.GetWindow().Height());
+		io.DisplaySize = ImVec2((float)app.GetWindow().width, (float)app.GetWindow().height);
 
 		// Rendering
 		ImGui::Render();

@@ -141,28 +141,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Cockroach.h" />
-    <ClInclude Include="src\Cockroach\Audio\Audio.h" />
-    <ClInclude Include="src\Cockroach\Core\Application.h" />
-    <ClInclude Include="src\Cockroach\Core\Core.h" />
-    <ClInclude Include="src\Cockroach\Core\EntryPoint.h" />
-    <ClInclude Include="src\Cockroach\Core\Input.h" />
-    <ClInclude Include="src\Cockroach\Core\Log.h" />
-    <ClInclude Include="src\Cockroach\Core\Window.h" />
-    <ClInclude Include="src\Cockroach\Events\ApplicationEvent.h" />
-    <ClInclude Include="src\Cockroach\Events\Event.h" />
-    <ClInclude Include="src\Cockroach\Events\KeyEvent.h" />
-    <ClInclude Include="src\Cockroach\Events\MouseEvent.h" />
-    <ClInclude Include="src\Cockroach\Game\Entity.h" />
-    <ClInclude Include="src\Cockroach\Game\Rect.h" />
-    <ClInclude Include="src\Cockroach\Game\Room.h" />
-    <ClInclude Include="src\Cockroach\Game\Timer.h" />
-    <ClInclude Include="src\Cockroach\Renderer\Buffer.h" />
-    <ClInclude Include="src\Cockroach\Renderer\Camera.h" />
-    <ClInclude Include="src\Cockroach\Renderer\GraphicsContext.h" />
-    <ClInclude Include="src\Cockroach\Renderer\Renderer.h" />
-    <ClInclude Include="src\Cockroach\Renderer\Shader.h" />
-    <ClInclude Include="src\Cockroach\Renderer\Texture.h" />
-    <ClInclude Include="src\Cockroach\Renderer\VertexArray.h" />
+    <ClInclude Include="src\Audio\Audio.h" />
+    <ClInclude Include="src\Core\Application.h" />
+    <ClInclude Include="src\Core\Core.h" />
+    <ClInclude Include="src\Core\EntryPoint.h" />
+    <ClInclude Include="src\Core\Input.h" />
+    <ClInclude Include="src\Core\Log.h" />
+    <ClInclude Include="src\Core\Window.h" />
+    <ClInclude Include="src\Game\Entity.h" />
+    <ClInclude Include="src\Game\Rect.h" />
+    <ClInclude Include="src\Game\Room.h" />
+    <ClInclude Include="src\Game\Timer.h" />
+    <ClInclude Include="src\Renderer\Buffer.h" />
+    <ClInclude Include="src\Renderer\Camera.h" />
+    <ClInclude Include="src\Renderer\GraphicsContext.h" />
+    <ClInclude Include="src\Renderer\Renderer.h" />
+    <ClInclude Include="src\Renderer\Shader.h" />
+    <ClInclude Include="src\Renderer\Texture.h" />
+    <ClInclude Include="src\Renderer\VertexArray.h" />
     <ClInclude Include="src\crpch.h" />
     <ClInclude Include="vendor\glm\glm\common.hpp" />
     <ClInclude Include="vendor\glm\glm\detail\_features.hpp" />
@@ -582,23 +578,22 @@
     <ClInclude Include="vendor\stb_image\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Cockroach\Audio\Audio.cpp" />
-    <ClCompile Include="src\Cockroach\Core\Application.cpp" />
-    <ClCompile Include="src\Cockroach\Core\Input.cpp" />
-    <ClCompile Include="src\Cockroach\Core\Log.cpp" />
-    <ClCompile Include="src\Cockroach\Core\Window.cpp" />
-    <ClCompile Include="src\Cockroach\Game\Entity.cpp" />
-    <ClCompile Include="src\Cockroach\Game\Rect.cpp" />
-    <ClCompile Include="src\Cockroach\Game\Room.cpp" />
-    <ClCompile Include="src\Cockroach\Game\Timer.cpp" />
-    <ClCompile Include="src\Cockroach\MiniAudioBuild.cpp" />
-    <ClCompile Include="src\Cockroach\Renderer\Buffer.cpp" />
-    <ClCompile Include="src\Cockroach\Renderer\Camera.cpp" />
-    <ClCompile Include="src\Cockroach\Renderer\GraphicsContext.cpp" />
-    <ClCompile Include="src\Cockroach\Renderer\Renderer.cpp" />
-    <ClCompile Include="src\Cockroach\Renderer\Shader.cpp" />
-    <ClCompile Include="src\Cockroach\Renderer\Texture.cpp" />
-    <ClCompile Include="src\Cockroach\Renderer\VertexArray.cpp" />
+    <ClCompile Include="src\Audio\Audio.cpp" />
+    <ClCompile Include="src\Core\Application.cpp" />
+    <ClCompile Include="src\Core\Input.cpp" />
+    <ClCompile Include="src\Core\Log.cpp" />
+    <ClCompile Include="src\Core\Window.cpp" />
+    <ClCompile Include="src\Game\Entity.cpp" />
+    <ClCompile Include="src\Game\Rect.cpp" />
+    <ClCompile Include="src\Game\Room.cpp" />
+    <ClCompile Include="src\Game\Timer.cpp" />
+    <ClCompile Include="src\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\Renderer\Camera.cpp" />
+    <ClCompile Include="src\Renderer\GraphicsContext.cpp" />
+    <ClCompile Include="src\Renderer\Renderer.cpp" />
+    <ClCompile Include="src\Renderer\Shader.cpp" />
+    <ClCompile Include="src\Renderer\Texture.cpp" />
+    <ClCompile Include="src\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\crpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

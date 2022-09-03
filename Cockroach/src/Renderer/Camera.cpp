@@ -2,7 +2,7 @@
 #include "Camera.h"
 
 #include <glm/gtc/matrix_transform.hpp>
-#include "Cockroach/Core/Application.h"
+#include "Core/Application.h"
 
 namespace Cockroach
 {
@@ -21,8 +21,8 @@ namespace Cockroach
 	float2 Camera::ScreenToWorldPosition(const glm::ivec2& screenCoord)
 	{
 		Window& window = Application::Get().GetWindow();
-		float2 screenCoordYFlip = { screenCoord.x, window.Height() - screenCoord.y};
-		float2 screenCoordNormalized = { screenCoordYFlip.x / (float)window.Width(), screenCoordYFlip.y / (float)window.Height() };
+		float2 screenCoordYFlip = { screenCoord.x, window.height - screenCoord.y};
+		float2 screenCoordNormalized = { screenCoordYFlip.x / (float)window.width, screenCoordYFlip.y / (float)window.height };
 		float2 screenCoordCentered = { screenCoordNormalized.x * 2 - 1, screenCoordNormalized.y * 2 - 1 };
 		float2 screenUnits = { 1.0f / projectionMatrix[0][0], 1.0f / projectionMatrix[1][1] };
 		float2 worldCoord = { screenCoordCentered.x * screenUnits.x, screenCoordCentered.y * screenUnits.y };

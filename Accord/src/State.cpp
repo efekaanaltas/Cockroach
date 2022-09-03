@@ -1,7 +1,7 @@
 #include "crpch.h"
 #include "State.h"
 
-#include "Components.h"
+#include "EntityDef.h"
 #include "Entities/Player.h"
 
 Sheet GetWalkingStateSheet(Player* player)

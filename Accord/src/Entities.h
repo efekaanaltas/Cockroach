@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Cockroach.h"
-#include "Components.h"
+#include "EntityDef.h"
 
 #include "Game.h"
 

@@ -6,7 +6,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Components.h" />
+    <ClInclude Include="src\EntityDef.h" />
     <ClInclude Include="src\EditorCursor.h" />
     <ClInclude Include="src\Entities.h" />
     <ClInclude Include="src\Entities\Player.h">
@@ -16,7 +16,7 @@
     <ClInclude Include="src\State.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Components.cpp" />
+    <ClCompile Include="src\EntityDef.cpp" />
     <ClCompile Include="src\EditorCursor.cpp" />
     <ClCompile Include="src\Entities.cpp" />
     <ClCompile Include="src\Entities\Player.cpp">

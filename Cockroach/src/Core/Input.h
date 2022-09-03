@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Cockroach/Core/Core.h"
+#include "Core/Core.h"
 #include <unordered_map>
-#include "Cockroach/Events/KeyEvent.h"
 
 namespace Cockroach
 {

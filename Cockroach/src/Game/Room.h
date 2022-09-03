@@ -1,8 +1,8 @@
 #pragma once
 
 #include <string>
-#include "Cockroach/Game/Entity.h"
-#include "Rect.h"
+#include "Game/Entity.h"
+#include "Game/Rect.h"
 
 namespace Cockroach
 {

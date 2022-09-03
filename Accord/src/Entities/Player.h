@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Components.h"
+#include "../EntityDef.h"
 #include "../State.h"
 
 template<typename T>
@@ -38,6 +38,8 @@ public:
 
 	Timer jumpBufferTimer = Timer(10.0f);
 	Timer coyoteTimer = Timer(10.0f);
+
+	bool transitioning = false;
 
 	virtual bool OnCollide(Dynamic* other, int horizontal, int vertical) override;
 

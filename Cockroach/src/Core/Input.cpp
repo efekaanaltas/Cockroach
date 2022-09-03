@@ -1,7 +1,7 @@
 #include "crpch.h"
 #include "Input.h"
 
-#include "Cockroach/Core/Application.h"
+#include "Core/Application.h"
 #include "GLFW/glfw3.h"
 
 namespace Cockroach

@@ -5,7 +5,7 @@
 using namespace Cockroach;
 
 class Player;
-#include "Components.h"
+#include "EntityDef.h"
 
 template<typename T>
 class State

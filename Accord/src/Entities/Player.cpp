@@ -48,6 +48,21 @@ void Player::Update(float dt)
 
 	TrySwitchState(currentState->Update(this, dt));
 
+	bool roomContainsPlayer = Room::current->Contains(WorldHitbox());
+	transitioning = !roomContainsPlayer;
+
+	if (transitioning)
+	{
+		for (int i = 0; i < Game::rooms.size(); i++)
+		{
+			if (Game::rooms[i] == Room::current) continue;
+			if (Game::rooms[i]->Contains(WorldHitbox()))
+			{
+				Room::current = Game::rooms[i];
+			}
+		}
+	}
+
 	currentSheet.Update(this);
 
 	if (velocity.x != 0.0f) // Use InputDirX() instead?

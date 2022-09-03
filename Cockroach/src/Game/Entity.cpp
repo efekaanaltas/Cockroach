@@ -1,6 +1,8 @@
 #include "crpch.h"
 #include "Entity.h"
 
+#include "Renderer/Renderer.h"
+
 namespace Cockroach
 {
 

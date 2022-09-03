@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Cockroach.h"
-#include "Components.h"
+#include "EntityDef.h"
 
 #include "State.h"
 
@@ -106,7 +106,7 @@ void CameraController::Update(float dt)
 	zoom -= Input::scroll * 0.1f * zoom;
 	zoom = std::clamp(zoom, 5.0f, 1000.0f);
 
-	float newAspect = (float)Application::Get().GetWindow().Width() / (float)Application::Get().GetWindow().Height();
+	float newAspect = (float)Application::Get().GetWindow().width / (float)Application::Get().GetWindow().height;
 	if (aspectRatio != newAspect)
 		aspectRatio = newAspect;
 

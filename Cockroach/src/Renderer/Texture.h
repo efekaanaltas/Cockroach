@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Cockroach/Core/Core.h"
+#include "Core/Core.h"
 #include <string>
 
 #include <glm/glm.hpp>

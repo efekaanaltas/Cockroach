@@ -45,8 +45,6 @@ namespace Cockroach
 
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		uint32_t TextureSlotIndex = 0;
-
-		Renderer::Statistics Stats;
 	};
 
 	static RendererData s_Data;
@@ -173,7 +171,6 @@ namespace Cockroach
 			s_Data.QuadVA->Bind();
 			s_Data.QuadShader->Bind();
 			glDrawElements(GL_TRIANGLES, s_Data.QuadIndexCount, GL_UNSIGNED_INT, nullptr);
-			s_Data.Stats.DrawCalls++;
 		}
 		if (s_Data.LineVertexCount)
 		{
@@ -183,7 +180,6 @@ namespace Cockroach
 			s_Data.LineVA->Bind();
 			s_Data.LineShader->Bind();
 			glDrawArrays(GL_LINES, 0, s_Data.LineVertexCount);
-			s_Data.Stats.DrawCalls++;
 		}
 	}
 
@@ -244,8 +240,6 @@ namespace Cockroach
 		s_Data.QuadVBPtr++;
 
 		s_Data.QuadIndexCount += 6;
-
-		s_Data.Stats.QuadCount++;
 	}
 
 	void Renderer::DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture)
@@ -312,15 +306,5 @@ namespace Cockroach
 
 		vertexArray->Bind();
 		glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->count, GL_UNSIGNED_INT, nullptr);
-	}
-	
-	void Renderer::ResetStats()
-	{
-		memset(&s_Data.Stats, 0, sizeof(Statistics));
-	}
-
-	Renderer::Statistics Renderer::GetStats()
-	{
-		return s_Data.Stats;
 	}
 }

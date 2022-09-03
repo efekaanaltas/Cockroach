@@ -2,8 +2,7 @@
 
 #include <vector>
 #include <glm/glm.hpp>
-#include "Cockroach/Renderer/Texture.h"
-#include "Cockroach/Renderer/Renderer.h"
+#include "Renderer/Texture.h"
 
 namespace Cockroach
 {

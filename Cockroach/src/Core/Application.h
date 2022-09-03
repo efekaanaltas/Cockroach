@@ -4,9 +4,7 @@
 
 #include "Window.h"
 
-#include "Cockroach/Events/Event.h"
-#include "Cockroach/Events/ApplicationEvent.h"
-#include "Cockroach/Game/Timer.h"
+#include "Game/Timer.h"
 
 namespace Cockroach
 {
@@ -21,6 +19,10 @@ namespace Cockroach
 		virtual void Update(float dt) = 0;
 		virtual void Render() = 0;
 
+		void OnQuit();
+		void OnWindowResize(int width, int height);
+		void OnInputCallback(int code, bool down);
+
 		void ImGuiInit();
 		void ImGuiBegin();
 		void ImGuiEnd();
@@ -32,10 +34,6 @@ namespace Cockroach
 		int frameCount = 0;
 		Timer freezeTimer = Timer(0.0f);
 	private:
-		void OnEvent(Event& e);
-		bool OnWindowClose(WindowCloseEvent& e);
-		bool OnWindowResize(WindowResizeEvent& e);
-
 		Scope<Window> window;
 		bool running = true;
 		bool minimized = false;

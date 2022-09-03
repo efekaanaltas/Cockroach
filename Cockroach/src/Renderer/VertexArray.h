@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "Cockroach/Renderer/Buffer.h"
+#include "Renderer/Buffer.h"
 
 namespace Cockroach
 {
