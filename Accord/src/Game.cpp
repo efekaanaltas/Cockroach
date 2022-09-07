@@ -181,8 +181,7 @@ void Game::RenderHitboxes()
 
 	for (auto& ent : Room::current->entities)
 	{
-		//Dynamic* dyn = ent.As<Dynamic>();
-		Dynamic* dyn = dynamic_cast<Dynamic*>(ent);
+		Dynamic* dyn = ent->As<Dynamic>();
 		if (dyn)
 			Renderer::DrawQuadOutline((float)dyn->Left(), (float)dyn->Right(), (float)dyn->Bottom(), (float)dyn->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
 	}

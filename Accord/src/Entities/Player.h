@@ -38,6 +38,7 @@ public:
 
 	Timer jumpBufferTimer = Timer(10.0f);
 	Timer coyoteTimer = Timer(10.0f);
+	Timer flashTimer = Timer(5.0f);
 
 	bool transitioning = false;
 

@@ -24,7 +24,7 @@ namespace Cockroach
 		static void SetClearColor(const float4& color);
 		static void Clear();
 
-		static void DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture, const float2& min, const float2& max);
+		static void DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture, const float2& min, const float2& max, const float4& overlayColor);
 		static void DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture);
 		static void DrawQuad(const float3& position, const float2& size, const Sprite& subTexture);
 		static void DrawQuad(const float2& position, const float2& size, const Sprite& subTexture);

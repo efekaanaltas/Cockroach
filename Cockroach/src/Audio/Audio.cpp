@@ -24,7 +24,6 @@ namespace Cockroach
 
 	void Audio::Play(std::string filepath)
 	{
-		//ma_sound_init_from_file()
 		ma_engine_play_sound(&engine, filepath.c_str(), NULL);
 	}
 }

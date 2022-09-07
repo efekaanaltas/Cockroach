@@ -110,6 +110,7 @@ void DashingState::Enter(Player* player)
 {
 	player->canDash = false;
 	dashTimer.Reset();
+	player->flashTimer.Reset();
 
 	player->velocity.y = 0;
 

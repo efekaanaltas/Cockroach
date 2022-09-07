@@ -46,28 +46,23 @@ void Player::Update(float dt)
 	if (grounded) coyoteTimer.Reset();
 	else		  coyoteTimer.Tick(1.0f);
 
+	flashTimer.Tick(1.0f);
+
 	TrySwitchState(currentState->Update(this, dt));
 
-	bool roomContainsPlayer = Room::current->Contains(WorldHitbox());
-	transitioning = !roomContainsPlayer;
-
-	if (transitioning)
-	{
+	if (!Room::current->Contains(WorldHitbox()))
 		for (int i = 0; i < Game::rooms.size(); i++)
-		{
-			if (Game::rooms[i] == Room::current) continue;
-			if (Game::rooms[i]->Contains(WorldHitbox()))
-			{
+			if (Game::rooms[i] != Room::current && Game::rooms[i]->Contains(WorldHitbox()))
 				Room::current = Game::rooms[i];
-			}
-		}
-	}
 
 	currentSheet.Update(this);
 
-	if (velocity.x != 0.0f) // Use InputDirX() instead?
+	if (velocity.x != 0.0f)
 		faceDir = velocity.x < 0.0f ? -1 : 1;
 	sprite.flipX = faceDir == -1;
+	sprite.overlayColor = CR_COLOR_RED;
+	float flashProgress = flashTimer.Progress01();
+	sprite.overlayWeight = std::clamp(-flashProgress*flashProgress + 1, 0.0f, 1.0f);
 
 	int horizontalCollision = MoveX(velocity.x * dt);
 	int verticalCollision = MoveY((velocityLastFrame.y + velocity.y) * 0.5f * dt);

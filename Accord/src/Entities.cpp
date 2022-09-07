@@ -8,12 +8,12 @@ namespace Entities
 		{
 		case EntityType::Payga:
 		{
-			CR_CORE_WARN("Do not create an instance of Payga");
+			CR_WARN("Do not create an instance of Payga");
 			return nullptr;
 		}
 		case EntityType::Camera:
 		{
-			CR_CORE_WARN("Do not create an instance of Camera");
+			CR_WARN("Do not create an instance of Camera");
 			return nullptr;
 		}
 		case EntityType::SpikeLeft:

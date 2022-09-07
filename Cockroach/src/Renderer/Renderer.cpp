@@ -12,6 +12,7 @@ namespace Cockroach
 		float3 Position;
 		float2 TexCoord;
 		float TexIndex;
+		float4 OverlayColor;
 	};
 
 	struct LineVertex
@@ -25,7 +26,7 @@ namespace Cockroach
 		static const uint32_t BatchQuadCount = 10000;
 		static const uint32_t BatchVertexCount = BatchQuadCount * 4;
 		static const uint32_t BatchIndexCount = BatchQuadCount * 6;
-		static const uint32_t MaxTextureSlots = 32; // TODO: RenderCapabilities
+		static const uint32_t MaxTextureSlots = 32;
 
 		Ref<VertexArray> QuadVA;
 		Ref<VertexBuffer> QuadVB;
@@ -73,7 +74,8 @@ namespace Cockroach
 		{
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float2, "a_TexCoord" },
-			{ ShaderDataType::Float,  "a_TexIndex" }
+			{ ShaderDataType::Float,  "a_TexIndex" },
+			{ ShaderDataType::Float4, "a_OverlayColor"	   }
 		};
 		s_Data.QuadVA->AddVertexBuffer(s_Data.QuadVB);
 
@@ -145,7 +147,6 @@ namespace Cockroach
 		s_Data.ViewProjectionMatrix = camera.GetViewProjectionMatrix();
 		s_Data.QuadShader->Bind();
 		s_Data.QuadShader->UploadUniformMat4("u_ViewProjection", s_Data.ViewProjectionMatrix);
-		s_Data.QuadShader->UploadUniformMat4("u_Transform", mat4(1.0f));
 
 		s_Data.QuadIndexCount = 0;
 		s_Data.QuadVBPtr = s_Data.QuadVBBase;
@@ -196,7 +197,7 @@ namespace Cockroach
 		s_Data.TextureSlotIndex = 0;
 	}
 
-	void Renderer::DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture, const float2& min, const float2& max)
+	void Renderer::DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture, const float2& min, const float2& max, const float4& overlayColor)
 	{
 		if (s_Data.QuadIndexCount >= RendererData::BatchIndexCount)
 			FlushAndReset();
@@ -221,22 +222,25 @@ namespace Cockroach
 		s_Data.QuadVBPtr->Position = position;
 		s_Data.QuadVBPtr->TexCoord = { min.x, min.y };
 		s_Data.QuadVBPtr->TexIndex = textureIndex;
+		s_Data.QuadVBPtr->OverlayColor = overlayColor;
 		s_Data.QuadVBPtr++;
 
 		s_Data.QuadVBPtr->Position = { position.x + size.x, position.y, 0.0f };
 		s_Data.QuadVBPtr->TexCoord = { max.x, min.y };
 		s_Data.QuadVBPtr->TexIndex = textureIndex;
-
+		s_Data.QuadVBPtr->OverlayColor = overlayColor;
 		s_Data.QuadVBPtr++;
 
 		s_Data.QuadVBPtr->Position = { position.x, position.y + size.y, 0.0f };
 		s_Data.QuadVBPtr->TexCoord = { min.x, max.y };
 		s_Data.QuadVBPtr->TexIndex = textureIndex;
+		s_Data.QuadVBPtr->OverlayColor = overlayColor;
 		s_Data.QuadVBPtr++;
 
 		s_Data.QuadVBPtr->Position = { position.x + size.x, position.y + size.y, 0.0f };
 		s_Data.QuadVBPtr->TexCoord = { max.x, max.y };
 		s_Data.QuadVBPtr->TexIndex = textureIndex;
+		s_Data.QuadVBPtr->OverlayColor = overlayColor;
 		s_Data.QuadVBPtr++;
 
 		s_Data.QuadIndexCount += 6;
@@ -244,7 +248,7 @@ namespace Cockroach
 
 	void Renderer::DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, texture, { 0.0f, 0.0f }, { 1.0f, 1.0f });
+		DrawQuad({ position.x, position.y, 0.0f }, size, texture, { 0.0f, 0.0f }, { 1.0f, 1.0f }, CR_COLOR_WHITE);
 	}
 	
 	void Renderer::DrawQuad(const float3& position, const float2& size, const Sprite& subTexture)
@@ -264,7 +268,7 @@ namespace Cockroach
 			max.y = subTexture.min.y;
 		}
 
-		DrawQuad({ position.x, position.y, 0.0f }, size, subTexture.texture, min, max);
+		DrawQuad({ position.x, position.y, 0.0f }, size, subTexture.texture, min, max, { subTexture.overlayColor, subTexture.overlayWeight });
 	}
 
 	void Renderer::DrawQuad(const float2& position, const float2& size, const Sprite& subTexture)
@@ -274,7 +278,7 @@ namespace Cockroach
 	
 	void Renderer::DrawQuad(const float2& position, const float2& size, const Ref<Texture2D>& texture, const float2& min, const float2& max)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, texture, min, max);
+		DrawQuad({ position.x, position.y, 0.0f }, size, texture, min, max, CR_COLOR_WHITE);
 	}
 
 	void Renderer::DrawQuadOutline(float x0, float x1, float y0, float y1, float4 color)
@@ -302,7 +306,6 @@ namespace Cockroach
 	{
 		shader->Bind();
 		shader->UploadUniformMat4("u_ViewProjection", s_Data.ViewProjectionMatrix);
-		shader->UploadUniformMat4("u_Transform", transform);
 
 		vertexArray->Bind();
 		glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->count, GL_UNSIGNED_INT, nullptr);
