@@ -58,7 +58,7 @@ namespace Cockroach
 		int2 RoomToWorldPosition(int2 roomPos) { return position * 8 + roomPos * 8; }
 
 		void Save();
-		static Ref<Room> Load(const std::string& name, std::function<Entity* (int2, int)> entityCreateFn);
+		static Ref<Room> Load(const std::string& name);
 		void Rename(const std::string& newName);
 	};
 }

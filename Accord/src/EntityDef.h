@@ -69,7 +69,7 @@ public:
 class CameraController : public Entity
 {
 public:
-	Camera camera;
+	Cockroach::Camera camera;
 
 	CameraController()
 		: camera(-aspectRatio * zoom, aspectRatio* zoom, -zoom, zoom)

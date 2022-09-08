@@ -201,7 +201,7 @@ namespace Cockroach
 		out.close();
 	}
 
-	Ref<Room> Room::Load(const std::string& name, std::function<Entity*(int2, int)> entityCreateFn)
+	Ref<Room> Room::Load(const std::string& name)
 	{
 		Ref<Room> room;
 		std::string filepath = roomDir + name;
@@ -223,8 +223,7 @@ namespace Cockroach
 			stream >> data;
 
 			room = CreateRef<Room>(name, width, height, posX, posY);
-			if (Room::current == nullptr)
-				Room::current = room; // bruh
+			Room::current = room; // TEMPORARY, Cockroach::CreateEntity() adds the entity to current room
 
 			for (int i = 0; i < room->width * room->height; i++)
 				room->tiles[i].type = (TileType)data[i];
@@ -244,7 +243,7 @@ namespace Cockroach
 				stream.seekg(line.find("Y:") + 2);
 				stream >> pY;
 
-				room->entities.push_back(entityCreateFn(int2(pX, pY), type));
+				room->AddEntity(CreateEntity(int2(pX, pY), type));
 			}
 		}
 		else

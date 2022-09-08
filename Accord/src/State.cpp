@@ -146,7 +146,7 @@ State<Player>* DashingState::Update(Player* player, float dt)
 			while (++height < 5)
 				if (!player->GetCollision(player->faceDir, height))
 				{
-					player->MoveY(height);
+					player->MoveY((float)height);
 					break;
 				}
 		}
@@ -157,7 +157,7 @@ State<Player>* DashingState::Update(Player* player, float dt)
 			while (--height > -4)
 				if (player->GetCollision(0, height) && height < -1)
 				{
-					player->MoveY(height+1);
+					player->MoveY((float)height+1);
 					break;
 				}
 		}

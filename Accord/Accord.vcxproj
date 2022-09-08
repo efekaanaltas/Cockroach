@@ -133,7 +133,6 @@
   <ItemGroup>
     <ClInclude Include="src\EntityDef.h" />
     <ClInclude Include="src\EditorCursor.h" />
-    <ClInclude Include="src\Entities.h" />
     <ClInclude Include="src\Entities\Player.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\State.h" />

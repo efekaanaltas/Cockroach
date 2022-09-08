@@ -7,7 +7,6 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "EntityDef.h"
-#include "Entities.h"
 #include "EditorCursor.h"
 
 #include "Game.h"
@@ -30,15 +29,15 @@ Game::Game()
 	for (auto& a : std::filesystem::directory_iterator(roomDir))
 	{
 		std::string name = a.path().string().substr(a.path().string().find_last_of("/\\") + 1);
-		rooms.push_back(Room::Load(name, Entities::Create));
+		rooms.push_back(Room::Load(name));
 	}
 
 	Game::cameraController = new CameraController();
-	cameraController->type = Entities::Camera;
+	cameraController->type = EntityType::Camera;
 	cameraController->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0,0 }, { 1,1 });
 
 	Game::player = new Player({10, 20}, {6,0}, {10,12});
-	player->type = Entities::Payga;
+	player->type = EntityType::Payga;
 	player->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 3 }, { 16, 16 });
 	player->layer = Light;
 

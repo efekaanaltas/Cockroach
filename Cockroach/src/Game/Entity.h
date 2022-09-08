@@ -36,4 +36,6 @@ namespace Cockroach
 	{
 		return dynamic_cast<T*>(this);
 	}
+
+	Entity* CreateEntity(int2 position, int type);
 }

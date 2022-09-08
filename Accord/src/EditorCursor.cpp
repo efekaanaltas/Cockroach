@@ -26,7 +26,7 @@ void EditorCursor::Update(float dt)
 					if (dyn->WorldHitbox().OverlapsWith(Rect(WorldPosition(), WorldPosition() + int2(8, 8)), 0, 0))
 						entityOverCursor = ent;
 			if (!Input::IsPressed(CR_KEY_LEFT_CONTROL) && !entityOverCursor)
-				Entities::Create(WorldPosition(), entityType);
+				CreateEntity(WorldPosition(), entityType);
 			else if (Input::IsPressed(CR_KEY_LEFT_CONTROL) && entityOverCursor)
 				Room::current->RemoveEntity(entityOverCursor);
 			break;

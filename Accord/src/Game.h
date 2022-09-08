@@ -1,8 +1,12 @@
 #pragma once
 #include <Cockroach.h>
-#include "Entities.h"
 
 #include "Entities/Player.h"
+
+enum EntityType
+{
+	Payga, Camera, SpikeLeft, SpikeRight, SpikeDown, SpikeUp
+};
 
 class Game : public Cockroach::Application
 {
