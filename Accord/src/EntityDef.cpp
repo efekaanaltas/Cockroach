@@ -9,6 +9,12 @@
 
 using namespace Cockroach;
 
+void Trigger::Update(float dt)
+{
+	if (OverlapsWith(Game::player, 0, 0))
+		Game::player->OnTrigger(this);
+}
+
 int Dynamic::MoveX(float amount)
 {
 	xRemainder += amount;
@@ -30,6 +36,11 @@ int Dynamic::MoveX(float amount)
 			}
 			else if (OnCollide(collidingHitbox, sign, 0))
 					return sign;
+			else
+			{
+				position.x += sign;
+				move -= sign;
+			}
 		}
 	}
 	return GetCollision(sign, 0) ? sign : 0;
@@ -47,7 +58,7 @@ int Dynamic::MoveY(float amount)
 
 		while (move != 0)
 		{
-			Dynamic* collidingHitbox = GetEntityCollision(0, sign, Heavy);
+			Dynamic* collidingHitbox = GetEntityCollision(0, sign);
 			bool tilemapCollision = GetTilemapCollision(0, sign);
 			if (!collidingHitbox && !tilemapCollision)
 			{
@@ -56,22 +67,27 @@ int Dynamic::MoveY(float amount)
 			}
 			else if (OnCollide(collidingHitbox, 0, sign))
 				return sign;
+			else
+			{
+				position.y += sign;
+				move -= sign;
+			}
 		}
 	}
 	return GetCollision(0, sign) ? sign : 0;
 }
 
-Dynamic* Dynamic::GetEntityCollision(int xForesense, int yForesense, CollisionLayer layer)
+Dynamic* Dynamic::GetEntityCollision(int xForesense, int yForesense)
 {	
 	for (auto& ent : Room::current->entities)
 	{
 		if (Dynamic* dyn = ent->As<Dynamic>())
-			if (dyn != this && OverlapsWith(dyn, xForesense, yForesense) && (layer & All || layer == layer))
+			if (dyn != this && OverlapsWith(dyn, xForesense, yForesense))
 				return dyn;
 	}
 
 	// Also check for collisions with player
-	if (Game::player != this && OverlapsWith(Game::player, xForesense, yForesense) && (layer & All || layer == Game::player->layer))
+	if (Game::player != this && OverlapsWith(Game::player, xForesense, yForesense))
 		return Game::player;
 	return nullptr;
 }
@@ -81,9 +97,9 @@ bool Dynamic::GetTilemapCollision(int xForesense, int yForesense)
 	return Room::current->CollidesWith(WorldHitbox(), xForesense, yForesense);
 }
 
-bool Dynamic::GetCollision(int xForesense, int yForesense, CollisionLayer layer)
+bool Dynamic::GetCollision(int xForesense, int yForesense)
 {
-	return GetTilemapCollision(xForesense, yForesense) || GetEntityCollision(xForesense, yForesense, layer);
+	return GetTilemapCollision(xForesense, yForesense) || GetEntityCollision(xForesense, yForesense);
 }
 
 void CameraController::Update(float dt)
@@ -135,37 +151,41 @@ Cockroach::Entity* Cockroach::CreateEntity(int2 position, int entityType)
 	}
 	case EntityType::SpikeLeft:
 	{
-		Dynamic* e = new Dynamic(position, { 4,0 }, { 8,8 });
+		Trigger* e = new Trigger(position, { 4,0 }, { 8,8 });
 		e->type = entityType;
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 1 }, { 8, 8 });
-		e->layer = Trigger;
 		Room::current->AddEntity(e);
 		return e;
 	}
 	case EntityType::SpikeRight:
 	{
-		Dynamic* e = new Dynamic(position, { 0,0 }, { 4,8 });
+		Trigger* e = new Trigger(position, { 0,0 }, { 4,8 });
 		e->type = entityType;
-		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 1 }, { 8, 8 });
-		e->layer = Trigger;
+		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 0 }, { 8, 8 });
 		Room::current->AddEntity(e);
 		return e;
 	}
 	case EntityType::SpikeDown:
 	{
-		Dynamic* e = new Dynamic(position, { 0,4 }, { 8,8 });
+		Trigger* e = new Trigger(position, { 0,4 }, { 8,8 });
 		e->type = entityType;
-		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 1 }, { 8, 8 });
-		e->layer = Trigger;
+		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 8, 1 }, { 8, 8 });
 		Room::current->AddEntity(e);
 		return e;
 	}
 	case EntityType::SpikeUp:
 	{
-		Dynamic* e = new Dynamic(position, { 4,8 }, { 8,4 });
+		Trigger* e = new Trigger(position, { 0,0 }, { 8,4 });
 		e->type = entityType;
-		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 1 }, { 8, 8 });
-		e->layer = Trigger;
+		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 8, 0 }, { 8, 8 });
+		Room::current->AddEntity(e);
+		return e;
+	}
+	case EntityType::Oscillator:
+	{
+		OscillatorA* e = new OscillatorA(position, { 0, 0 }, { 8, 8 });
+		e->type = entityType;
+		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
 		Room::current->AddEntity(e);
 		return e;
 	}

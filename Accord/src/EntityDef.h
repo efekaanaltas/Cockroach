@@ -18,16 +18,11 @@ struct Sheet
 
 	void Add(const Sprite& sprite) { sheet.push_back(sprite); }
 
-	void Update(Entity* e)
+	Sprite CurrentSprite()
 	{
 		int index = (int)std::fmodf(Application::Get().frameCount * framePerSecond / 60.0f, (float)sheet.size());
-		e->sprite = sheet[index];
+		return sheet[index];
 	}
-};
-
-enum CollisionLayer
-{
-	Trigger = 0b001, Light = 0b010, Heavy = 0b100, All = 0b111
 };
 
 class Dynamic : public Entity
@@ -39,9 +34,7 @@ public:
 		hitbox = Rect(hitboxMin, hitboxMax);
 	}
 
-	CollisionLayer layer = CollisionLayer::Light;
-
-	virtual void Update(float dt) override { }
+	virtual void Update(float dt) override {}
 
 	Rect hitbox;
 	float xRemainder = 0.0f, yRemainder = 0.0f;
@@ -61,9 +54,46 @@ public:
 	int MoveY(float amount);
 	virtual bool OnCollide(Dynamic* other, int horizontal, int vertical) { return false; }
 
-	Dynamic* GetEntityCollision(int xForesense, int yForesense, CollisionLayer layer = CollisionLayer::All);
+	Dynamic* GetEntityCollision(int xForesense, int yForesense);
 	bool GetTilemapCollision(int xForesense, int yForesense);
-	bool GetCollision(int xForesense, int yForesense, CollisionLayer layer = CollisionLayer::All);
+	bool GetCollision(int xForesense, int yForesense);
+};
+
+class Trigger : public Dynamic
+{
+public:
+	Trigger(int2 position, int2 hitboxMin, int2 hitboxMax)
+		: Dynamic(position, hitboxMin, hitboxMax)
+	{
+	}
+
+	virtual void Update(float dt) override;
+
+	virtual bool OnCollide(Dynamic* other, int horizontal, int vertical) { return false; }
+};
+
+class OscillatorA : public Dynamic
+{
+public:
+	OscillatorA(int2 position, int2 hitboxMin, int2 hitboxMax)
+		: Dynamic(position, hitboxMin, hitboxMax), startPos(position)
+	{}
+
+	int2 startPos;
+	int moveDir = 1;
+
+	virtual void Update(float dt) override
+	{
+		if (std::abs(startPos.x - position.x) > 10)
+		{
+			position.x = std::clamp(position.x, startPos.x-10, startPos.x+10);
+			moveDir *= -1;
+		}
+
+		MoveX(moveDir * dt * 50);
+	}
+
+	virtual bool OnCollide(Dynamic* other, int hotizontal, int vertical) override { return false; }
 };
 
 class CameraController : public Entity

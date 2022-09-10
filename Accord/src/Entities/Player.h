@@ -43,6 +43,7 @@ public:
 	bool transitioning = false;
 
 	virtual bool OnCollide(Dynamic* other, int horizontal, int vertical) override;
+	void OnTrigger(Trigger* trigger);
 
 	int InputDirX() const;
 	int InputDirY() const;

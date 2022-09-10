@@ -5,7 +5,7 @@
 
 enum EntityType
 {
-	Payga, Camera, SpikeLeft, SpikeRight, SpikeDown, SpikeUp
+	Payga, Camera, SpikeLeft, SpikeRight, SpikeDown, SpikeUp, Oscillator, END
 };
 
 class Game : public Cockroach::Application

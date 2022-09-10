@@ -55,19 +55,17 @@ void Player::Update(float dt)
 			if (Game::rooms[i] != Room::current && Game::rooms[i]->Contains(WorldHitbox()))
 				Room::current = Game::rooms[i];
 
-	currentSheet.Update(this);
-
 	if (velocity.x != 0.0f)
 		faceDir = velocity.x < 0.0f ? -1 : 1;
-	sprite.flipX = faceDir == -1;
-	sprite.overlayColor = CR_COLOR_RED;
-	float flashProgress = flashTimer.Progress01();
-	sprite.overlayWeight = std::clamp(-flashProgress*flashProgress + 1, 0.0f, 1.0f);
 
 	int horizontalCollision = MoveX(velocity.x * dt);
 	int verticalCollision = MoveY((velocityLastFrame.y + velocity.y) * 0.5f * dt);
 
-	grounded = verticalCollision == -1;
+	sprite = currentSheet.CurrentSprite();
+	sprite.flipX = faceDir == -1;
+	sprite.overlayColor = CR_COLOR_RED;
+	float flashProgress = flashTimer.Progress01();
+	sprite.overlayWeight = std::clamp(-flashProgress * flashProgress + 1, 0.0f, 1.0f);
 }
 
 bool Player::OnCollide(Dynamic* other, int horizontal, int vertical)
@@ -87,7 +85,22 @@ bool Player::OnCollide(Dynamic* other, int horizontal, int vertical)
 	grounded = vertical == -1;
 	if (grounded) canDash = true;
 
-	return true;
+	return !other->As<Trigger>();
+}
+
+void Player::OnTrigger(Trigger* trigger)
+{
+	switch (trigger->type)
+	{
+	case EntityType::SpikeLeft:
+	case EntityType::SpikeRight:
+	case EntityType::SpikeDown:
+	case EntityType::SpikeUp:
+	{
+		position = { 0,20 };
+		break;
+	}
+	}
 }
 
 i32 Player::InputDirX() const

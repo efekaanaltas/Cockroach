@@ -39,7 +39,6 @@ Game::Game()
 	Game::player = new Player({10, 20}, {6,0}, {10,12});
 	player->type = EntityType::Payga;
 	player->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 3 }, { 16, 16 });
-	player->layer = Light;
 
 	for (auto& room : rooms)
 		if (room->Contains(player->WorldHitbox()))
@@ -153,6 +152,9 @@ void Game::ImGuiRender()
 	const char* elems_names[3] = { "Tile", "Entity", "Room" };
 	const char* elem_name = elems_names[*brushModeIntPtr];
 	SliderInt("Mode", brushModeIntPtr, 0, 2, elem_name);
+
+	if (EditorCursor::brushMode == EditorCursor::Entity)
+		SliderInt("Entity Type", &EditorCursor::entityType, EntityType::Camera+1, EntityType::END-1);
 		
 	End();
 

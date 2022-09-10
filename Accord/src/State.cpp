@@ -140,6 +140,8 @@ State<Player>* DashingState::Update(Player* player, float dt)
 		dashTimer.Tick(dt);
 		player->velocity = dashSpeed * dashDir;
 
+		if (dashDir.y != 0.0f) return nullptr; // Height correct only when horizontally dashing
+
 		if (player->GetCollision(player->faceDir, 0))
 		{
 			int height = 0;

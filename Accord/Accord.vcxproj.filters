@@ -17,7 +17,6 @@
   <ItemGroup>
     <ClCompile Include="src\EntityDef.cpp" />
     <ClCompile Include="src\EditorCursor.cpp" />
-    <ClCompile Include="src\Entities.cpp" />
     <ClCompile Include="src\Entities\Player.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
