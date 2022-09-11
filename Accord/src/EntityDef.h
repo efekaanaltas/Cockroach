@@ -82,16 +82,7 @@ public:
 	int2 startPos;
 	int moveDir = 1;
 
-	virtual void Update(float dt) override
-	{
-		if (std::abs(startPos.x - position.x) > 10)
-		{
-			position.x = std::clamp(position.x, startPos.x-10, startPos.x+10);
-			moveDir *= -1;
-		}
-
-		MoveX(moveDir * dt * 50);
-	}
+	virtual void Update(float dt) override;
 
 	virtual bool OnCollide(Dynamic* other, int hotizontal, int vertical) override { return false; }
 };

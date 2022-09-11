@@ -102,6 +102,22 @@ bool Dynamic::GetCollision(int xForesense, int yForesense)
 	return GetTilemapCollision(xForesense, yForesense) || GetEntityCollision(xForesense, yForesense);
 }
 
+void OscillatorA::Update(float dt)
+{
+	if (std::abs(startPos.x - position.x) > 10)
+	{
+		position.x = std::clamp(position.x, startPos.x - 10, startPos.x + 10);
+		moveDir *= -1;
+	}
+
+	bool carryingPlayer = OverlapsWith(Game::player, -1, 0) || OverlapsWith(Game::player, 1, 0) || OverlapsWith(Game::player, 0, 1);
+
+	if (carryingPlayer)
+		Game::player->MoveX(moveDir * dt * 10);
+	MoveX(moveDir * dt * 10);
+
+}
+
 void CameraController::Update(float dt)
 {
 	if (Input::IsPressed(CR_KEY_A))

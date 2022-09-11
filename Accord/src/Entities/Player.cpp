@@ -50,10 +50,18 @@ void Player::Update(float dt)
 
 	TrySwitchState(currentState->Update(this, dt));
 
-	if (!Room::current->Contains(WorldHitbox()))
-		for (int i = 0; i < Game::rooms.size(); i++)
-			if (Game::rooms[i] != Room::current && Game::rooms[i]->Contains(WorldHitbox()))
-				Room::current = Game::rooms[i];
+	if(!Room::current->Contains(WorldHitbox()))
+		for(auto& room : Game::rooms)
+			if (room != Room::current && room->OverlapsWith(WorldHitbox(), 0, 0))
+			{
+				Rect roomRect = Rect(room->RoomToWorldPosition({ 0,0 }), room->RoomToWorldPosition({ room->width, room->height }));
+				if (Left() < roomRect.min.x || roomRect.max.x < Right())
+					velocity.y = 0.0f;
+				if (Bottom() < roomRect.min.y || roomRect.max.y < Top())
+					velocity.x = 0.0f;
+				if (room->Contains(WorldHitbox()))
+					Room::current = room;
+			}
 
 	if (velocity.x != 0.0f)
 		faceDir = velocity.x < 0.0f ? -1 : 1;
@@ -80,9 +88,9 @@ bool Player::OnCollide(Dynamic* other, int horizontal, int vertical)
 	if (vertical)
 	{
 		velocity.y = 0.0f;
+		grounded = vertical == -1;
 	}
 
-	grounded = vertical == -1;
 	if (grounded) canDash = true;
 
 	return !other->As<Trigger>();
