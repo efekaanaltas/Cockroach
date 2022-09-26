@@ -153,6 +153,12 @@ void Game::ImGuiRender()
 	const char* elem_name = elems_names[*brushModeIntPtr];
 	SliderInt("Mode", brushModeIntPtr, 0, 2, elem_name);
 
+	if (EditorCursor::brushMode == EditorCursor::Tile)
+	{
+		bool backgroundTile = EditorCursor::tileType == Room::BackgroundBasic;
+		Checkbox("Background Tile", &backgroundTile);
+		EditorCursor::tileType = backgroundTile ? Room::BackgroundBasic : Room::TileBasic;
+	}
 	if (EditorCursor::brushMode == EditorCursor::Entity)
 		SliderInt("Entity Type", &EditorCursor::entityType, EntityType::Camera+1, EntityType::END-1);
 		
@@ -189,7 +195,7 @@ void Game::RenderHitboxes()
 
 	for (int i = 0; i < Room::current->width * Room::current->height; i++)
 	{
-		if (Room::current->tiles[i].type != Room::Air)
+		if (Room::current->tiles[i].type == Room::TileBasic)
 		{
 			float2 worldPos = Room::current->RoomToWorldPosition(Room::current->IndexToRoomPosition(i));
 			Renderer::DrawQuadOutline(worldPos.x, worldPos.x + 8.0f, worldPos.y, worldPos.y + 8.0f, { 1.0f, 0.0f, 0.0f, 1.0f });

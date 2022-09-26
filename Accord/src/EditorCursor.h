@@ -13,6 +13,7 @@ public:
 	static int2 WorldPosition();
 
 	static BrushMode brushMode;
+	static Cockroach::Room::TileType tileType;
 	static int entityType;
 	static bool isBoxPlacing;
 	static int2 boxPlaceStartPos;

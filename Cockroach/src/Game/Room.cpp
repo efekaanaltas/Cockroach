@@ -26,7 +26,7 @@ namespace Cockroach
 		for (int i = 0; i < width * height; i++)
 		{
 			if (tiles[i].type == Air) continue;
-			Sprite sprite = Sprite::CreateFromCoords(tilemapTexture, { 11+tiles[i].texCoordOffset.x,2+tiles[i].texCoordOffset.y}, {8,8});
+			Sprite sprite = Sprite::CreateFromCoords(tilemapTexture, tiles[i].texCoordOffset, {8,8});
 			int2 roomPos = IndexToRoomPosition(i);
 			Renderer::DrawQuad(RoomToWorldPosition(roomPos), {8,8}, sprite);
 		}
@@ -122,24 +122,28 @@ namespace Cockroach
 
 	void Room::UpdateTile(int x, int y)
 	{
-		if (!IsFilled(x, y)) return;
+		TileType type = tiles[RoomPositionToIndex(x, y)].type;
 
-		int rightLeft = (IsFilled(x + 1, y) << 1) | (int)IsFilled(x - 1, y);
-		int downUp =	(IsFilled(x, y - 1) << 1) | (int)IsFilled(x, y + 1);
+		if (!IsFilled(x, y, type)) return;
+
+		int rightLeft = (IsFilled(x + 1, y, type) << 1) | (int)IsFilled(x - 1, y, type);
+		int downUp =	(IsFilled(x, y - 1, type) << 1) | (int)IsFilled(x, y + 1, type);
 
 		if (rightLeft == 3) rightLeft = 2;
 		else if (rightLeft == 2) rightLeft = 3;
 		if (downUp == 3) downUp = 2;
 		else if (downUp == 2) downUp = 3;
 
-		tiles[RoomPositionToIndex(x, y)].texCoordOffset = { -rightLeft, downUp };
+		int xStart = type == TileBasic ? 11 : 19;
+
+		tiles[RoomPositionToIndex(x, y)].texCoordOffset = { xStart-rightLeft, 2+downUp };
 	}
 
-	bool Room::IsFilled(int x, int y)
+	bool Room::IsFilled(int x, int y, TileType type)
 	{
 		int index = RoomPositionToIndex(x, y);
 		if (!Contains({x, y})) return true; // Little hack to make autotiling on borders easier
-		return tiles[index].type != Air;
+		return tiles[index].type == type;
 	}
 
 	bool Room::CollidesWith(Rect rect, int xForesense, int yForesense)
@@ -152,7 +156,7 @@ namespace Cockroach
 			for (int x = minRoomPos.x; x <= maxRoomPos.x; x++)
 			{
 				int index = RoomPositionToIndex(x, y);
-				if (Contains({x, y}) && tiles[index].type != Air) // Do not use IsFilled() as it is intended for autotiling and not collisions
+				if (Contains({x, y}) && tiles[index].type == TileBasic) // Do not use IsFilled() as it is intended for autotiling and not collisions
 					return true;
 			}
 		}
@@ -223,7 +227,6 @@ namespace Cockroach
 			stream >> data;
 
 			room = CreateRef<Room>(name, width, height, posX, posY);
-			Room::current = room; // TEMPORARY, Cockroach::CreateEntity() adds the entity to current room
 
 			for (int i = 0; i < room->width * room->height; i++)
 				room->tiles[i].type = (TileType)data[i];

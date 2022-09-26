@@ -3,6 +3,7 @@ using namespace Cockroach;
 #include "Game.h"
 
 EditorCursor::BrushMode EditorCursor::brushMode = BrushMode::Tile;
+Room::TileType EditorCursor::tileType = Room::TileBasic;
 int EditorCursor::entityType = 2;
 bool EditorCursor::isBoxPlacing = false;
 int2 EditorCursor::boxPlaceStartPos = { 0.0f, 0.0f };
@@ -15,7 +16,7 @@ void EditorCursor::Update(float dt)
 		{
 		case BrushMode::Tile:
 		{
-			Room::current->PlaceTile(Input::IsPressed(CR_KEY_LEFT_CONTROL) ? Room::Air : Room::TileBasic, WorldPosition());
+			Room::current->PlaceTile(Input::IsPressed(CR_KEY_LEFT_CONTROL) ? Room::Air : tileType, WorldPosition());
 			break;
 		}
 		case BrushMode::Entity:
@@ -53,7 +54,7 @@ void EditorCursor::Update(float dt)
 		{
 		case BrushMode::Tile:
 		{
-			Room::current->PlaceTileBox(Input::IsPressed(CR_KEY_LEFT_CONTROL) ? Room::Air : Room::TileBasic, minPos, maxPos);
+			Room::current->PlaceTileBox(Input::IsPressed(CR_KEY_LEFT_CONTROL) ? Room::Air : tileType, minPos, maxPos);
 			break;
 		}
 		case BrushMode::Room:

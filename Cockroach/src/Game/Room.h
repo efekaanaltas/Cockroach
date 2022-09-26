@@ -11,7 +11,7 @@ namespace Cockroach
 	public:
 		enum TileType : char
 		{
-			Air = '0', TileBasic = 'B'
+			Air = '0', BackgroundBasic = 'G', TileBasic = 'B'
 		};
 
 		struct Tile
@@ -44,7 +44,7 @@ namespace Cockroach
 		void Resize(int newWidth, int newHeight);
 		void UpdateTile(int x, int y);
 
-		bool IsFilled(int x, int y);
+		bool IsFilled(int x, int y, TileType type);
 
 		std::string Filepath() { return roomDir + name; }
 		bool CollidesWith(Rect rect, int xForesense, int yForesense);

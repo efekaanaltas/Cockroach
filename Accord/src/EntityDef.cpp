@@ -170,7 +170,6 @@ Cockroach::Entity* Cockroach::CreateEntity(int2 position, int entityType)
 		Trigger* e = new Trigger(position, { 4,0 }, { 8,8 });
 		e->type = entityType;
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 1 }, { 8, 8 });
-		Room::current->AddEntity(e);
 		return e;
 	}
 	case EntityType::SpikeRight:
@@ -178,7 +177,6 @@ Cockroach::Entity* Cockroach::CreateEntity(int2 position, int entityType)
 		Trigger* e = new Trigger(position, { 0,0 }, { 4,8 });
 		e->type = entityType;
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 0 }, { 8, 8 });
-		Room::current->AddEntity(e);
 		return e;
 	}
 	case EntityType::SpikeDown:
@@ -186,7 +184,6 @@ Cockroach::Entity* Cockroach::CreateEntity(int2 position, int entityType)
 		Trigger* e = new Trigger(position, { 0,4 }, { 8,8 });
 		e->type = entityType;
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 8, 1 }, { 8, 8 });
-		Room::current->AddEntity(e);
 		return e;
 	}
 	case EntityType::SpikeUp:
@@ -194,7 +191,6 @@ Cockroach::Entity* Cockroach::CreateEntity(int2 position, int entityType)
 		Trigger* e = new Trigger(position, { 0,0 }, { 8,4 });
 		e->type = entityType;
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 8, 0 }, { 8, 8 });
-		Room::current->AddEntity(e);
 		return e;
 	}
 	case EntityType::Oscillator:
@@ -202,7 +198,6 @@ Cockroach::Entity* Cockroach::CreateEntity(int2 position, int entityType)
 		OscillatorA* e = new OscillatorA(position, { 0, 0 }, { 8, 8 });
 		e->type = entityType;
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
-		Room::current->AddEntity(e);
 		return e;
 	}
 	}
