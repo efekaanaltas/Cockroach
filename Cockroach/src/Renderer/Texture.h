@@ -36,9 +36,8 @@ namespace Cockroach
 		}
 
 		std::string path;
-	private:
-		uint32_t width, height;
 		uint32_t rendererID;
+		uint32_t width, height;
 	};
 
 	class Sprite

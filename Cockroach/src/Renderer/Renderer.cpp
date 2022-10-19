@@ -61,14 +61,6 @@ namespace Cockroach
 		// Quads
 		s_Data.QuadVA = CreateRef<VertexArray>();
 
-		float quadVertices[5 * 4] =
-		{
-			-0.5f, -0.5f, 0.0f, 0.0f, 0.0f,
-			+0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-			-0.5f, +0.5f, 0.0f, 0.0f, 1.0f,
-			+0.5f, +0.5f, 0.0f, 1.0f, 1.0f
-		};
-
 		s_Data.QuadVB = CreateRef<VertexBuffer>(s_Data.BatchVertexCount * sizeof(QuadVertex));
 		s_Data.QuadVB->layout =
 		{

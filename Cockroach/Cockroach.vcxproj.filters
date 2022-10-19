@@ -4,23 +4,17 @@
     <Filter Include="src">
       <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Cockroach">
-      <UniqueIdentifier>{89B89EE5-F578-1A1C-BEB3-63992A335FF8}</UniqueIdentifier>
+    <Filter Include="src\Audio">
+      <UniqueIdentifier>{EE2696B2-5A91-4A29-A3CF-FBCE0F79287E}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Cockroach\Audio">
-      <UniqueIdentifier>{4AC92FA4-B62A-0DB2-3F98-5364ABF84371}</UniqueIdentifier>
+    <Filter Include="src\Core">
+      <UniqueIdentifier>{A5D31CCF-91A0-77DA-BAB9-6582A6E5AC68}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Cockroach\Core">
-      <UniqueIdentifier>{819A9D90-6D7E-5EE6-D6DE-5839C2E14868}</UniqueIdentifier>
+    <Filter Include="src\Game">
+      <UniqueIdentifier>{F6C81ECF-E295-79DA-0BAF-6782F7DAAE68}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Cockroach\Events">
-      <UniqueIdentifier>{4D509033-39DF-19FD-E2FD-2DF8CE6B2AA3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Cockroach\Game">
-      <UniqueIdentifier>{D28F9F90-BE73-60E6-27D4-5A3913D74A68}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Cockroach\Renderer">
-      <UniqueIdentifier>{4FA6E04F-3BA0-09A2-240D-A0B210A66F0E}</UniqueIdentifier>
+    <Filter Include="src\Renderer">
+      <UniqueIdentifier>{73D1DFBF-5F34-6F64-08BA-A71AF4FB3AE7}</UniqueIdentifier>
     </Filter>
     <Filter Include="vendor">
       <UniqueIdentifier>{B3738122-9F15-ACF8-88D0-BF4C74113349}</UniqueIdentifier>
@@ -48,62 +42,62 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Audio\Audio.h">
+      <Filter>src\Audio</Filter>
+    </ClInclude>
     <ClInclude Include="src\Cockroach.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="src\Audio\Audio.h">
-      <Filter>src\Cockroach\Audio</Filter>
-    </ClInclude>
     <ClInclude Include="src\Core\Application.h">
-      <Filter>src\Cockroach\Core</Filter>
+      <Filter>src\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Core.h">
-      <Filter>src\Cockroach\Core</Filter>
+      <Filter>src\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\EntryPoint.h">
-      <Filter>src\Cockroach\Core</Filter>
+      <Filter>src\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Input.h">
-      <Filter>src\Cockroach\Core</Filter>
+      <Filter>src\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Log.h">
-      <Filter>src\Cockroach\Core</Filter>
+      <Filter>src\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Core\Window.h">
-      <Filter>src\Cockroach\Core</Filter>
+      <Filter>src\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Game\Entity.h">
-      <Filter>src\Cockroach\Game</Filter>
+      <Filter>src\Game</Filter>
     </ClInclude>
     <ClInclude Include="src\Game\Rect.h">
-      <Filter>src\Cockroach\Game</Filter>
+      <Filter>src\Game</Filter>
     </ClInclude>
     <ClInclude Include="src\Game\Room.h">
-      <Filter>src\Cockroach\Game</Filter>
+      <Filter>src\Game</Filter>
     </ClInclude>
     <ClInclude Include="src\Game\Timer.h">
-      <Filter>src\Cockroach\Game</Filter>
+      <Filter>src\Game</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\Buffer.h">
-      <Filter>src\Cockroach\Renderer</Filter>
+      <Filter>src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\Camera.h">
-      <Filter>src\Cockroach\Renderer</Filter>
+      <Filter>src\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="src\Renderer\GraphicsContext.h">
-      <Filter>src\Cockroach\Renderer</Filter>
+    <ClInclude Include="src\Renderer\Framebuffer.h">
+      <Filter>src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\Renderer.h">
-      <Filter>src\Cockroach\Renderer</Filter>
+      <Filter>src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\Shader.h">
-      <Filter>src\Cockroach\Renderer</Filter>
+      <Filter>src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\Texture.h">
-      <Filter>src\Cockroach\Renderer</Filter>
+      <Filter>src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Renderer\VertexArray.h">
-      <Filter>src\Cockroach\Renderer</Filter>
+      <Filter>src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\crpch.h">
       <Filter>src</Filter>
@@ -1359,52 +1353,52 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Audio\Audio.cpp">
-      <Filter>src\Cockroach\Audio</Filter>
+      <Filter>src\Audio</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Application.cpp">
-      <Filter>src\Cockroach\Core</Filter>
+      <Filter>src\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Input.cpp">
-      <Filter>src\Cockroach\Core</Filter>
+      <Filter>src\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Log.cpp">
-      <Filter>src\Cockroach\Core</Filter>
+      <Filter>src\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Window.cpp">
-      <Filter>src\Cockroach\Core</Filter>
+      <Filter>src\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\Entity.cpp">
-      <Filter>src\Cockroach\Game</Filter>
+      <Filter>src\Game</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\Rect.cpp">
-      <Filter>src\Cockroach\Game</Filter>
+      <Filter>src\Game</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\Room.cpp">
-      <Filter>src\Cockroach\Game</Filter>
+      <Filter>src\Game</Filter>
     </ClCompile>
     <ClCompile Include="src\Game\Timer.cpp">
-      <Filter>src\Cockroach\Game</Filter>
+      <Filter>src\Game</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Buffer.cpp">
-      <Filter>src\Cockroach\Renderer</Filter>
+      <Filter>src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Camera.cpp">
-      <Filter>src\Cockroach\Renderer</Filter>
+      <Filter>src\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="src\Renderer\GraphicsContext.cpp">
-      <Filter>src\Cockroach\Renderer</Filter>
+    <ClCompile Include="src\Renderer\Framebuffer.cpp">
+      <Filter>src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Renderer.cpp">
-      <Filter>src\Cockroach\Renderer</Filter>
+      <Filter>src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Shader.cpp">
-      <Filter>src\Cockroach\Renderer</Filter>
+      <Filter>src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\Texture.cpp">
-      <Filter>src\Cockroach\Renderer</Filter>
+      <Filter>src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Renderer\VertexArray.cpp">
-      <Filter>src\Cockroach\Renderer</Filter>
+      <Filter>src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\crpch.cpp">
       <Filter>src</Filter>
