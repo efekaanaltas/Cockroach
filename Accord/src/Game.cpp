@@ -51,10 +51,6 @@ void Game::Update(float dt)
 	player->Update(dt);
 	Room::current->Update(dt);
 
-	for (int i = CR_KEY_KP_1; i <= CR_KEY_KP_3; i++)
-		if(Input::IsDown(i))
-			cameraController->SetZoom(std::powf(10.0f, (float)(i-CR_KEY_KP_1+1)));
-
 	if (Input::IsPressed(CR_MOUSE_BUTTON_MIDDLE))
 		player->position = EditorCursor::WorldPosition();
 	int2 worldPosCur = EditorCursor::WorldPosition();
@@ -63,7 +59,7 @@ void Game::Update(float dt)
 
 void Game::Render()
 {
-	Renderer::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
+	Renderer::SetClearColor({ 0.02f, 0.02f, 0.1f, 1 });
 	Renderer::Clear();
 
 	Renderer::BeginScene(cameraController->camera);
@@ -85,10 +81,8 @@ void Game::Render()
 
 			if (renderRoomBoundaries)
 			{
-				float2 worldPosition = rooms[i]->RoomToWorldPosition({ 0,0 });
-				float2 extents = rooms[i]->RoomToWorldPosition({ rooms[i]->width, rooms[i]->height });
-
-				Renderer::DrawQuadOutline(worldPosition.x, extents.x, worldPosition.y, extents.y, { 0.0f, 1.0f, 0.0f, 1.0f });
+				Rect bounds = rooms[i]->Bounds();
+				Renderer::DrawQuadOutline(bounds.min.x, bounds.max.x, bounds.min.y, bounds.max.y, CR_COLOR_GREEN);
 			}
 		}
 	}
@@ -101,7 +95,8 @@ void Game::Render()
 
 	Cockroach::Renderer::EndScene();
 
-	ImGuiRender();
+	if(cameraController->editMode)
+		ImGuiRender();
 }
 
 void Game::ImGuiRender()

@@ -54,13 +54,10 @@ void Player::Update(float dt)
 		for(auto& room : Game::rooms)
 			if (room != Room::current && room->OverlapsWith(WorldHitbox(), 0, 0))
 			{
-				Rect roomRect = Rect(room->RoomToWorldPosition({ 0,0 }), room->RoomToWorldPosition({ room->width, room->height }));
-				if (Left() < roomRect.min.x || roomRect.max.x < Right())
-					velocity.y = 0.0f;
-				if (Bottom() < roomRect.min.y || roomRect.max.y < Top())
-					velocity.x = 0.0f;
-				if (room->Contains(WorldHitbox()))
-					Room::current = room;
+				Room::current = room;
+				Rect bounds = room->Bounds();
+				position = glm::clamp(position, Room::current->Bounds().min - hitbox.min, Room::current->Bounds().max - hitbox.max);
+				break;
 			}
 
 	if (velocity.x != 0.0f)

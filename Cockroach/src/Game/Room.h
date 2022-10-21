@@ -51,6 +51,8 @@ namespace Cockroach
 		bool OverlapsWith(Rect rect, int xForesense, int yForesense);
 		bool Contains(int2 roomPosition);
 		bool Contains(Rect rect);
+
+		Rect Bounds() { return Rect(RoomToWorldPosition({ 0,0 }), RoomToWorldPosition({ width, height })); }
 		int RoomPositionToIndex(int x, int y) { return y * width + x; }
 		int2 IndexToRoomPosition(int index) { return { index % width, index / width }; }
 		int2 CenterPoint() { return position + int2(width*4 - 4, height*4 - 4); }

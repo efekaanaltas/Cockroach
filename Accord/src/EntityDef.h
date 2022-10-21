@@ -107,5 +107,7 @@ public:
 
 	float speed = 1.0f;
 
+	bool editMode = true;
+
 	Rect Bounds() { return Rect((float2)camera.GetPosition() - float2(aspectRatio * zoom, zoom), { (float2)camera.GetPosition() + float2(aspectRatio * zoom, zoom) }); }
 };

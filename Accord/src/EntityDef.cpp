@@ -104,6 +104,7 @@ bool Dynamic::GetCollision(int xForesense, int yForesense)
 
 void OscillatorA::Update(float dt)
 {
+	int oldPos = position.x;
 	if (std::abs(startPos.x - position.x) > 10)
 	{
 		position.x = std::clamp(position.x, startPos.x - 10, startPos.x + 10);
@@ -112,37 +113,57 @@ void OscillatorA::Update(float dt)
 
 	bool carryingPlayer = OverlapsWith(Game::player, -1, 0) || OverlapsWith(Game::player, 1, 0) || OverlapsWith(Game::player, 0, 1);
 
-	if (carryingPlayer)
-		Game::player->MoveX(moveDir * dt * 10);
 	MoveX(moveDir * dt * 10);
-
+	if (carryingPlayer)
+			Game::player->position.x += (position.x - oldPos);
 }
 
 void CameraController::Update(float dt)
 {
-	if (Input::IsPressed(CR_KEY_A))
-		positionHighRes.x -= speed * dt;
-	if (Input::IsPressed(CR_KEY_D))
-		positionHighRes.x += speed * dt;
-	if (Input::IsPressed(CR_KEY_S))
-		positionHighRes.y -= speed * dt;
-	if (Input::IsPressed(CR_KEY_W))
-		positionHighRes.y += speed * dt;
+	for (int i = CR_KEY_KP_1; i <= CR_KEY_KP_3; i++)
+		if (Input::IsDown(i))
+			SetZoom(std::powf(10.0f, (float)(i - CR_KEY_KP_1 + 1)));
+	if (Input::IsDown(CR_KEY_KP_0))
+	{
+		SetZoom(90.0f);
+		editMode = !editMode;
+	}
 
-	position = int2(positionHighRes.x, positionHighRes.y);
+	if (editMode)
+	{
+		if (Input::IsPressed(CR_KEY_A))
+			positionHighRes.x -= speed * dt;
+		if (Input::IsPressed(CR_KEY_D))
+			positionHighRes.x += speed * dt;
+		if (Input::IsPressed(CR_KEY_S))
+			positionHighRes.y -= speed * dt;
+		if (Input::IsPressed(CR_KEY_W))
+			positionHighRes.y += speed * dt;
 
-	camera.SetPosition({positionHighRes.x, positionHighRes.y, 0.0f});
+		position = int2(positionHighRes.x, positionHighRes.y);
 
-	speed = zoom; // Change speed according to zoom level
+		camera.SetPosition({positionHighRes.x, positionHighRes.y, 0.0f});
 
-	zoom -= Input::scroll * 0.1f * zoom;
-	zoom = std::clamp(zoom, 5.0f, 1000.0f);
+		speed = zoom; // Change speed according to zoom level
 
-	float newAspect = (float)Application::Get().GetWindow().width / (float)Application::Get().GetWindow().height;
-	if (aspectRatio != newAspect)
-		aspectRatio = newAspect;
+		zoom -= Input::scroll * 0.1f * zoom;
+		zoom = std::clamp(zoom, 5.0f, 1000.0f);
 
-	camera.SetZoom(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
+		float newAspect = (float)Application::Get().GetWindow().width / (float)Application::Get().GetWindow().height;
+		if (aspectRatio != newAspect)
+			aspectRatio = newAspect;
+
+		camera.SetZoom(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
+	}
+	else
+	{
+		position = Game::player->position;
+
+		Rect bounds = Room::current->Bounds();
+		position = glm::clamp(position, bounds.min + int2(aspectRatio * zoom, zoom), bounds.max - int2(aspectRatio * zoom, zoom));
+
+		camera.SetPosition(float3(position.x, position.y, 0.0f));
+	}
 }
 
 void CameraController::SetZoom(float zoom)

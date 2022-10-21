@@ -165,8 +165,7 @@ namespace Cockroach
 
 	bool Room::OverlapsWith(Rect rect, int xForesense, int yForesense)
 	{
-		Rect roomRect = Rect(RoomToWorldPosition({0,0}), RoomToWorldPosition({width, height}));
-		return roomRect.OverlapsWith(rect, xForesense, yForesense);
+		return Bounds().OverlapsWith(rect, xForesense, yForesense);
 	}
 
 	bool Room::Contains(int2 roomPosition)
