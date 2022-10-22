@@ -39,8 +39,7 @@ public:
 	Timer jumpBufferTimer = Timer(10.0f);
 	Timer coyoteTimer = Timer(10.0f);
 	Timer flashTimer = Timer(5.0f);
-
-	bool transitioning = false;
+	Timer gravityHaltTimer = Timer(10.0f);
 
 	virtual bool OnCollide(Dynamic* other, int horizontal, int vertical) override;
 	void OnTrigger(Trigger* trigger);

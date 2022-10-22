@@ -34,6 +34,7 @@ Player::Player(int2 position, int2 hitboxMin, int2 hitboxMax)
 	currentState->Enter(this);
 
 	jumpBufferTimer.remainingTime = 0.0f;
+	gravityHaltTimer.remainingTime = 0.0f;
 }
 
 void Player::Update(float dt)
@@ -45,6 +46,8 @@ void Player::Update(float dt)
 
 	if (grounded) coyoteTimer.Reset();
 	else		  coyoteTimer.Tick(1.0f);
+
+	gravityHaltTimer.Tick(1.0f);
 
 	flashTimer.Tick(1.0f);
 

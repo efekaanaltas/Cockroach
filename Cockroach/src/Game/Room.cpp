@@ -134,7 +134,7 @@ namespace Cockroach
 		if (downUp == 3) downUp = 2;
 		else if (downUp == 2) downUp = 3;
 
-		int xStart = type == TileBasic ? 11 : 19;
+		int xStart = type == TileBasic ? 7 : 19;
 
 		tiles[RoomPositionToIndex(x, y)].texCoordOffset = { xStart-rightLeft, 2+downUp };
 	}

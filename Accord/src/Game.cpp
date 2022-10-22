@@ -59,7 +59,7 @@ void Game::Update(float dt)
 
 void Game::Render()
 {
-	Renderer::SetClearColor({ 0.02f, 0.02f, 0.1f, 1 });
+	Renderer::SetClearColor({ 0.1f, 0.0f, 0.0f, 1 });
 	Renderer::Clear();
 
 	Renderer::BeginScene(cameraController->camera);
