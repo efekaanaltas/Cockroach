@@ -17,12 +17,14 @@ CameraController* Game::cameraController = nullptr;
 Player* Game::player = nullptr;
 
 Ref<Texture2D> Game::baseSpriteSheet = nullptr;
+Ref<Texture2D> Game::background = nullptr;
 
 std::vector<Ref<Room>> Game::rooms;
 
 Game::Game()
 	: Application()
 {
+	Game::background = CreateRef<Texture2D>("assets/textures/BG_RED.png");
 	Game::baseSpriteSheet = CreateRef<Texture2D>("assets/textures/SpriteSheet.png");
 
 	const std::filesystem::path roomDir{ "assets/rooms" };
@@ -67,6 +69,11 @@ void Game::Render()
 	if (Input::IsDown(CR_KEY_G)) renderGrid = !renderGrid;
 	if (Input::IsDown(CR_KEY_H)) renderHitboxes = !renderHitboxes;
 	if (Input::IsDown(CR_KEY_R)) renderAllRooms = !renderAllRooms;
+
+	float zoom = cameraController->zoom;
+	float aspect = cameraController->aspectRatio;
+
+	Renderer::DrawQuad(cameraController->positionHighRes - float2(aspect * zoom, zoom), 2.0f * float2(aspect * zoom, zoom), background, {0,0}, {1,1});
 
 	if (renderGrid) RenderGrid();
 

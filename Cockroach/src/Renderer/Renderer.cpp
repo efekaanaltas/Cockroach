@@ -240,7 +240,7 @@ namespace Cockroach
 
 	void Renderer::DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, texture, { 0.0f, 0.0f }, { 1.0f, 1.0f }, CR_COLOR_WHITE);
+		DrawQuad({ position.x, position.y, 0.0f }, size, texture, { 0.0f, 0.0f }, { 1.0f, 1.0f }, float4(1.0f,1.0f,1.0f,0.0f));
 	}
 	
 	void Renderer::DrawQuad(const float3& position, const float2& size, const Sprite& subTexture)
@@ -248,17 +248,8 @@ namespace Cockroach
 		float2 min = subTexture.min;
 		float2 max = subTexture.max;
 
-		if (subTexture.flipX)
-		{
-			min.x = subTexture.max.x;
-			max.x = subTexture.min.x;
-		}
-
-		if (subTexture.flipY)
-		{
-			min.y = subTexture.max.y;
-			max.y = subTexture.min.y;
-		}
+		if (subTexture.flipX) { min.x = subTexture.max.x; max.x = subTexture.min.x; }
+		if (subTexture.flipY) { min.y = subTexture.max.y; max.y = subTexture.min.y; }
 
 		DrawQuad({ position.x, position.y, 0.0f }, size, subTexture.texture, min, max, { subTexture.overlayColor, subTexture.overlayWeight });
 	}
@@ -270,7 +261,7 @@ namespace Cockroach
 	
 	void Renderer::DrawQuad(const float2& position, const float2& size, const Ref<Texture2D>& texture, const float2& min, const float2& max)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, texture, min, max, CR_COLOR_WHITE);
+		DrawQuad({ position.x, position.y, 0.0f }, size, texture, min, max, float4(1.0f, 1.0f, 1.0f, 0.0f));
 	}
 
 	void Renderer::DrawQuadOutline(float x0, float x1, float y0, float y1, float4 color)

@@ -37,8 +37,10 @@ State<Player>* WalkingState::Update(Player* player, float dt)
 	if (Input::IsDown(CR_KEY_LEFT_SHIFT) && player->canDash)
 		return player->dashingState;
 
-	if(player->gravityHaltTimer.Finished())
+	if (player->gravityHaltTimer.Finished())
 		player->velocity.y -= gravity * dt;
+	else
+		player->velocity.y -= gravity * 0.2f * dt;
 	
 	player->velocity.y = std::max(player->velocity.y, -maxFallSpeed);
 
@@ -172,7 +174,7 @@ State<Player>* DashingState::Update(Player* player, float dt)
 
 void DashingState::Exit(Player* player)
 {
-	if(dashDir.y != 0.0f)
+	if(dashDir.y > 0.0f)
 		player->gravityHaltTimer.Reset();
 	player->velocity = { 0.0f, 0.0f };
 }

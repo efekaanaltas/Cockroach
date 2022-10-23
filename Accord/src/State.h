@@ -19,7 +19,7 @@ public:
 class WalkingState : public State<Player>
 {
 public:
-	float gravity = 500.0f, maxFallSpeed = 200.0f;
+	float gravity = 300.0f, maxFallSpeed = 200.0f;
 	float maxWalkSpeed = 60.0f, acceleration = 400.0f, deceleration = 800.0f;
 
 	virtual void Enter(Player* player) override;

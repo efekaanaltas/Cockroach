@@ -6,9 +6,9 @@ Player::Player(int2 position, int2 hitboxMin, int2 hitboxMax)
 	: Dynamic(position, hitboxMin, hitboxMax)
 {
 	walkingState = new WalkingState;
-	jumpingState = new JumpingState(100.0f, 160.0f, 0.0f);
-	superjumpingState = new JumpingState(100.0f, 150.0f, 250.0f);
-	walljumpingState = new JumpingState(100.0f, 130.0f, -140.0);
+	jumpingState = new JumpingState(50.0f, 130.0f, 0.0f);
+	superjumpingState = new JumpingState(50.0f, 110.0f, 250.0f);
+	walljumpingState = new JumpingState(50.0f, 80.0f, -140.0);
 	clingingState = new ClingingState;
 	dashingState = new DashingState;
 

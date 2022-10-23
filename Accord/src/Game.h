@@ -25,6 +25,7 @@ public:
 	static Player* player;
 
 	static Ref<Texture2D> baseSpriteSheet;
+	static Ref<Texture2D> background;
 
 	static std::vector<Ref<Room>> rooms;
 private:

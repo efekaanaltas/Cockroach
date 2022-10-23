@@ -21,7 +21,7 @@ void main()
 }
 
 #type fragment
-#version 330 core
+#version 450 core
 
 layout(location = 0) out vec4 color;
 
@@ -29,7 +29,7 @@ in vec2 v_TexCoord;
 in float v_TexIndex;
 in vec4 v_OverlayColor;
 
-uniform sampler2D u_Textures[32];
+layout (binding = 0) uniform sampler2D u_Textures[32];
 
 vec4 lerp(vec4 a, vec4 b, float t)
 {
@@ -39,5 +39,6 @@ vec4 lerp(vec4 a, vec4 b, float t)
 void main()
 {
 	color = texture(u_Textures[int(v_TexIndex)], v_TexCoord);
+
 	color = lerp(color, vec4(v_OverlayColor.xyz, color.w), v_OverlayColor.w);
 }
