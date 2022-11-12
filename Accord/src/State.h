@@ -20,7 +20,7 @@ class WalkingState : public State<Player>
 {
 public:
 	float gravity = 300.0f, maxFallSpeed = 200.0f;
-	float maxWalkSpeed = 60.0f, acceleration = 400.0f, deceleration = 800.0f;
+	float maxWalkSpeed = 60.0f, acceleration = 400.0f, deceleration = 1000.0f;
 
 	virtual void Enter(Player* player) override;
 	virtual State<Player>* Update(Player* player, float dt) override;
@@ -56,7 +56,7 @@ public:
 class DashingState : public State<Player>
 {
 public:
-	float dashSpeed = 200.0f;
+	float dashSpeed = 150.0f;
 	Timer dashTimer = Timer(0.2f);
 	float2 dashDir = { 1.0f, 0.0f };
 

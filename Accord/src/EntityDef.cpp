@@ -161,6 +161,8 @@ void CameraController::Update(float dt)
 
 		Rect bounds = Room::current->Bounds();
 		position = glm::clamp(position, bounds.min + int2(aspectRatio * zoom, zoom), bounds.max - int2(aspectRatio * zoom, zoom));
+		
+		positionHighRes = position;
 
 		camera.SetPosition(float3(position.x, position.y, 0.0f));
 	}

@@ -174,7 +174,9 @@ State<Player>* DashingState::Update(Player* player, float dt)
 
 void DashingState::Exit(Player* player)
 {
-	if(dashDir.y > 0.0f)
+	if (dashDir.y > 0.0f)
+	{
 		player->gravityHaltTimer.Reset();
-	player->velocity = { 0.0f, 0.0f };
+		player->velocity.y = 0.0f;
+	}
 }

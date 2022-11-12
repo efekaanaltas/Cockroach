@@ -23,9 +23,4 @@
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\State.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="assets\shaders\PostProcess.glsl" />
-    <None Include="assets\shaders\Line.glsl" />
-    <None Include="assets\shaders\Texture.glsl" />
-  </ItemGroup>
 </Project>
