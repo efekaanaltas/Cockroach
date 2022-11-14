@@ -19,6 +19,7 @@ namespace Cockroach
 		int type = -1;
 
 		glm::ivec2 position;
+		glm::vec2 size = { 1, 1 };
 		Sprite sprite;
 
 		virtual void Update(float dt) {}

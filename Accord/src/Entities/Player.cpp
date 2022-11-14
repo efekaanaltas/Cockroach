@@ -6,8 +6,8 @@ Player::Player(int2 position, int2 hitboxMin, int2 hitboxMax)
 	: Dynamic(position, hitboxMin, hitboxMax)
 {
 	walkingState = new WalkingState;
-	jumpingState = new JumpingState(50.0f, 100.0f, 0.0f);
-	superjumpingState = new JumpingState(50.0f, 110.0f, 150.0f);
+	jumpingState = new JumpingState(50.0f, 140.0f, 0.0f);
+	superjumpingState = new JumpingState(50.0f, 120.0f, 150.0f);
 	walljumpingState = new JumpingState(50.0f, 80.0f, -160.0);
 	clingingState = new ClingingState;
 	dashingState = new DashingState;
@@ -39,6 +39,8 @@ Player::Player(int2 position, int2 hitboxMin, int2 hitboxMax)
 
 void Player::Update(float dt)
 {
+	bool groundedAtStartOfFrame = grounded;
+	bool canDashAtStartOfFrame = canDash;
 	velocityLastFrame = velocity;
 
 	if (Input::IsDown(CR_KEY_SPACE)) jumpBufferTimer.Reset();
@@ -70,9 +72,16 @@ void Player::Update(float dt)
 	int verticalCollision = MoveY((velocityLastFrame.y + velocity.y) * 0.5f * dt);
 	grounded = verticalCollision == -1;
 
+	if (grounded && !groundedAtStartOfFrame)
+		size.y = 0.6f;
+	if (canDash && !canDashAtStartOfFrame)
+		flashTimer.Reset();
+
+	size.x = std::clamp(size.x + 2 * dt, 0.0f, 1.0f);
+	size.y = std::clamp(size.y + 2 * dt, 0.0f, 1.0f);
+
 	sprite = currentSheet.CurrentSprite();
 	sprite.flipX = faceDir == -1;
-	sprite.overlayColor = CR_COLOR_RED;
 	float flashProgress = flashTimer.Progress01();
 	sprite.overlayWeight = std::clamp(-flashProgress * flashProgress + 1, 0.0f, 1.0f);
 }

@@ -51,7 +51,7 @@ State<Player>* WalkingState::Update(Player* player, float dt)
 	}
 	else
 	{
-		player->velocity.x -= player->faceDir * deceleration * dt;
+		player->velocity.x -= player->faceDir * (player->grounded ? deceleration : airDeceleration) * dt;
 		if (player->faceDir * player->velocity.x < 0.0f) player->velocity.x = 0.0f;
 	}
 
@@ -68,6 +68,7 @@ void JumpingState::Enter(Player* player)
 	player->velocity.y = maxJumpSpeed;
 
 	player->currentSheet = player->jumpingSheet;
+	player->size.x = 0.6f;
 	Audio::Play("assets/audio/Jump.wav");
 }
 
@@ -114,7 +115,6 @@ void DashingState::Enter(Player* player)
 {
 	player->canDash = false;
 	dashTimer.Reset();
-	player->flashTimer.Reset();
 
 	player->velocity.y = 0;
 
