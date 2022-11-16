@@ -98,6 +98,14 @@ void Game::Render()
 
 	if (renderHitboxes) RenderHitboxes();
 
+	for (auto& ent : Room::current->entities)
+	{
+		if (renderHitboxes && ent->type >= EntityType::TurbineLeft)
+		{
+			Renderer::DrawQuadOutline(ent->As<Turbine>()->turbineRect.min.x, ent->As<Turbine>()->turbineRect.max.x, ent->As<Turbine>()->turbineRect.min.y, ent->As<Turbine>()->turbineRect.max.y, CR_COLOR_GREEN);
+		}
+	}
+
 	EditorCursor::Render();
 
 	Cockroach::Renderer::EndScene();

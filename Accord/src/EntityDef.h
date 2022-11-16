@@ -87,6 +87,19 @@ public:
 	virtual bool OnCollide(Dynamic* other, int hotizontal, int vertical) override { return false; }
 };
 
+class Turbine : public Dynamic
+{
+public:
+	Turbine(int2 position, int2 hitboxMin, int2 hitboxMax, int horizontal, int vertical);
+
+	float turbineAcceleration = 200.0f;
+	int horizontal = 1, vertical = 0;
+	int span = 1;
+	Rect turbineRect;
+
+	virtual void Update(float dt) override;
+};
+
 class CameraController : public Entity
 {
 public:

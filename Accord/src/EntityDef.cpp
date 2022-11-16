@@ -176,52 +176,96 @@ void CameraController::SetZoom(float zoom)
 
 Cockroach::Entity* Cockroach::CreateEntity(int2 position, int entityType)
 {
+	Entity* e = nullptr;
 	switch (entityType)
 	{
 	case EntityType::Payga:
 	{
 		CR_WARN("Do not create an instance of Payga");
-		return nullptr;
+		break;
 	}
 	case EntityType::Camera:
 	{
 		CR_WARN("Do not create an instance of Camera");
-		return nullptr;
+		break;
 	}
 	case EntityType::SpikeLeft:
 	{
-		Trigger* e = new Trigger(position, { 4,0 }, { 8,8 });
-		e->type = entityType;
+		e = new Trigger(position, { 4,0 }, { 8,8 });
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 1 }, { 8, 8 });
-		return e;
+		break;
 	}
 	case EntityType::SpikeRight:
 	{
-		Trigger* e = new Trigger(position, { 0,0 }, { 4,8 });
-		e->type = entityType;
+		e = new Trigger(position, { 0,0 }, { 4,8 });
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 0 }, { 8, 8 });
-		return e;
+		break;
 	}
 	case EntityType::SpikeDown:
 	{
-		Trigger* e = new Trigger(position, { 0,4 }, { 8,8 });
-		e->type = entityType;
+		e = new Trigger(position, { 0,4 }, { 8,8 });
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 8, 1 }, { 8, 8 });
-		return e;
+		break;
 	}
 	case EntityType::SpikeUp:
 	{
-		Trigger* e = new Trigger(position, { 0,0 }, { 8,4 });
-		e->type = entityType;
+		e = new Trigger(position, { 0,0 }, { 8,4 });
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 8, 0 }, { 8, 8 });
-		return e;
+		break;
 	}
 	case EntityType::Oscillator:
 	{
-		OscillatorA* e = new OscillatorA(position, { 0, 0 }, { 8, 8 });
-		e->type = entityType;
+		e = new OscillatorA(position, { 0, 0 }, { 8, 8 });
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
-		return e;
+		break;
+	}
+	case EntityType::TurbineLeft:
+	{
+		e = new Turbine(position, { 0, 0 }, { 8, 8 }, -1, 0);
+		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
+		break;
+	}
+	case EntityType::TurbineRight:
+	{
+		e = new Turbine(position, { 0,0 }, { 8,8 }, 1, 0);
+		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
+		break;
+	}
+	case EntityType::TurbineDown:
+	{
+		e = new Turbine(position, { 0,0 }, { 8,8 }, 0, -1);
+		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
+		break;
+	}
+	case EntityType::TurbineUp:
+	{
+		e = new Turbine(position, { 0,0 }, { 8,8 }, 0, 1);
+		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
+		break;
 	}
 	}
+	if(e != nullptr)
+		e->type = entityType;
+	return e;
+}
+
+Turbine::Turbine(int2 position, int2 hitboxMin, int2 hitboxMax, int horizontal, int vertical)
+: Dynamic(position, hitboxMin, hitboxMax), horizontal(horizontal), vertical(vertical)
+{
+	int iter = 0;
+	//while (!Room::current->CollidesWith(WorldHitbox(), span * horizontal, span * vertical) && iter++ < 100000)
+		span+=56;
+	int xStart = std::min(position.x, position.x + horizontal * span);
+	int xEnd = std::max(position.x, position.x + horizontal * span) + 8;
+	int yStart = std::min(position.y, position.y + vertical * span);
+	int yEnd = std::max(position.y, position.y + vertical * span) + 8;
+	turbineRect = Rect({ xStart, yStart }, { xEnd, yEnd });
+}
+
+void Turbine::Update(float dt)
+{
+	if (horizontal && turbineRect.OverlapsWith(Game::player->WorldHitbox(), 0, 0))
+		Game::player->velocity.x += horizontal * turbineAcceleration * dt;
+	if (vertical && turbineRect.OverlapsWith(Game::player->WorldHitbox(), 0, 0))
+		Game::player->velocity.y += vertical * turbineAcceleration * dt;
 }

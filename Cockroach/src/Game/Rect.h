@@ -15,7 +15,7 @@ namespace Cockroach
 
 		bool OverlapsWith(Rect other, int xForesense = 0, int yForesense = 0) const;
 
-		bool Contains(Rect oher, int xForesense = 0, int yForesense = 0) const;
+		bool Contains(Rect other, int xForesense = 0, int yForesense = 0) const;
 		bool Contains(glm::ivec2 coord) const;
 	};
 }
