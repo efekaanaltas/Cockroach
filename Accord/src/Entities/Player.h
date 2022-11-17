@@ -3,6 +3,8 @@
 #include "../EntityDef.h"
 #include "../State.h"
 
+using namespace Entities;
+
 template<typename T>
 class State;
 class WalkingState;
@@ -42,11 +44,12 @@ public:
 	Timer gravityHaltTimer = Timer(10.0f);
 
 	virtual bool OnCollide(Dynamic* other, int horizontal, int vertical) override;
-	void OnTrigger(Trigger* trigger);
 
 	int InputDirX() const;
 	int InputDirY() const;
 	int WallDir();
 
 	void TrySwitchState(State<Player>* state);
+
+	void Die();
 };

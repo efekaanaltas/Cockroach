@@ -3,9 +3,11 @@
 
 #include "Entities/Player.h"
 
+using namespace Entities;
+
 enum EntityType
 {
-	Payga, Camera, SpikeLeft, SpikeRight, SpikeDown, SpikeUp, Oscillator, TurbineLeft, TurbineRight, TurbineDown, TurbineUp, END
+	Payga, Camera, SpikeLeft, SpikeRight, SpikeDown, SpikeUp, Oscillator, TurbineLeft, TurbineRight, TurbineDown, TurbineUp, EssenceRed, END
 };
 
 class Game : public Cockroach::Application

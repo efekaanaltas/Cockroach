@@ -88,37 +88,27 @@ void Player::Update(float dt)
 
 bool Player::OnCollide(Dynamic* other, int horizontal, int vertical)
 {
-	if (horizontal)
-	{
-		velocity.x = 0.0f;
-		if (!grounded && velocity.y < 0.0f && InputDirX() == horizontal)
-			TrySwitchState(clingingState);
-	}
+	bool blockCollisions = other ? other->blockOnCollision : true;
 
-	if (vertical)
+	if (blockCollisions)
 	{
-		velocity.y = 0.0f;
-		grounded = vertical == -1;
+		if (horizontal)
+		{
+			velocity.x = 0.0f;
+			if (!grounded && velocity.y < 0.0f && InputDirX() == horizontal)
+				TrySwitchState(clingingState);
+		}
+
+		if (vertical)
+		{
+			velocity.y = 0.0f;
+			grounded = vertical == -1;
+		}
 	}
 
 	if (grounded) canDash = true;
 
-	return !other->As<Trigger>();
-}
-
-void Player::OnTrigger(Trigger* trigger)
-{
-	switch (trigger->type)
-	{
-	case EntityType::SpikeLeft:
-	case EntityType::SpikeRight:
-	case EntityType::SpikeDown:
-	case EntityType::SpikeUp:
-	{
-		position = { 0,20 };
-		break;
-	}
-	}
+	return blockCollisions;
 }
 
 i32 Player::InputDirX() const
@@ -151,4 +141,9 @@ void Player::TrySwitchState(State<Player>* newState)
 	currentState->Exit(this);
 	currentState = newState;
 	currentState->Enter(this);
+}
+
+void Player::Die()
+{
+	position = { 0,20 };
 }
