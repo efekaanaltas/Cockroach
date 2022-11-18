@@ -27,6 +27,8 @@ struct Sheet
 
 namespace Entities
 {
+	class Carrier;
+
 	class Dynamic : public Entity
 	{
 	public:
@@ -53,13 +55,27 @@ namespace Entities
 		bool Contains(Dynamic* other, int xForesense, int yForesense) const { return WorldHitbox().Contains(other->WorldHitbox(), xForesense, yForesense); }
 		bool Contains(int2 coord) const { return WorldHitbox().Contains(coord); }
 
-		int MoveX(float amount);
-		int MoveY(float amount);
+		virtual int MoveX(float amount);
+		virtual int MoveY(float amount);
 		virtual bool OnCollide(Dynamic* other, int horizontal, int vertical) { return blockOnCollision; }
 
 		Dynamic* GetEntityCollision(int xForesense, int yForesense);
 		bool GetTilemapCollision(int xForesense, int yForesense);
 		bool GetCollision(int xForesense, int yForesense);
+		bool IsRiding(Carrier* carrier);
+	};
+
+	class Carrier : public Dynamic
+	{
+	public:
+		Carrier(int2 position, int2 hitboxMin, int2 hitboxMax)
+			: Dynamic(position, hitboxMin, hitboxMax)
+		{}
+
+		virtual int MoveX(float amount) override;
+		virtual int MoveY(float amount) override;
+
+		std::vector<Dynamic*> GetRiders();
 	};
 
 	class Spike : public Dynamic
@@ -74,11 +90,11 @@ namespace Entities
 		virtual void Update(float dt) override;
 	};
 
-	class OscillatorA : public Dynamic
+	class OscillatorA : public Carrier
 	{
 	public:
 		OscillatorA(int2 position, int2 hitboxMin, int2 hitboxMax)
-			: Dynamic(position, hitboxMin, hitboxMax), startPos(position)
+			: Carrier(position, hitboxMin, hitboxMax), startPos(position)
 		{}
 
 		int2 startPos;

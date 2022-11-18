@@ -98,20 +98,19 @@ namespace Entities
 		return GetTilemapCollision(xForesense, yForesense) || GetEntityCollision(xForesense, yForesense);
 	}
 
+	bool Dynamic::IsRiding(Carrier* carrier)
+	{
+		return OverlapsWith(carrier, 1, 0) || OverlapsWith(carrier, -1, 0) || OverlapsWith(carrier, 0, -1);
+	}
+
 	void OscillatorA::Update(float dt)
 	{
-		int oldPos = position.x;
-		if (std::abs(startPos.x - position.x) > 10)
-		{
-			position.x = std::clamp(position.x, startPos.x - 10, startPos.x + 10);
-			moveDir *= -1;
-		}
-
-		bool carryingPlayer = OverlapsWith(Game::player, -1, 0) || OverlapsWith(Game::player, 1, 0) || OverlapsWith(Game::player, 0, 1);
-
-		MoveX(moveDir * dt * 10);
-		if (carryingPlayer)
-				Game::player->position.x += (position.x - oldPos);
+		static float time = 0.0f; // Lazy
+		time += dt;
+		int2 desiredPos = startPos + int2(10*std::cos(4*time), 10*std::sin(4*time));
+		int2 move = desiredPos - position;
+		MoveX(move.x);
+		MoveY(move.y);
 
 		sprite.overlayWeight = 0.5f;
 		sprite.overlayColor = CR_COLOR_GREEN;
@@ -229,6 +228,80 @@ namespace Entities
 	{
 		if(OverlapsWith(Game::player, 0, 0))
 			Game::player->Die();
+	}
+
+	int Carrier::MoveX(float amount)
+	{
+		xRemainder += amount;
+
+		int moveX = (int)xRemainder;
+		
+		if (moveX != 0)
+		{
+			std::vector<Dynamic*> riders = GetRiders();
+
+			xRemainder -= moveX;
+			position.x += moveX;
+
+			Game::player->xRemainder = 0;
+
+			if (OverlapsWith(Game::player, 0, 0))
+			{
+				if (moveX > 0)
+					Game::player->MoveX(Right() - Game::player->Left());
+				else
+					Game::player->MoveX(Left() - Game::player->Right());
+			}
+			else if (std::find(riders.begin(), riders.end(), Game::player) != riders.end()) // If riders contains this dynamic
+				Game::player->MoveX(moveX);
+		}
+
+		return moveX > 0 ? 1 : -1;
+	}
+
+	int Carrier::MoveY(float amount)
+	{
+		yRemainder += amount;
+
+		int moveY = (int)yRemainder;
+
+		if (moveY != 0)
+		{
+			std::vector<Dynamic*> riders = GetRiders();
+
+			yRemainder -= moveY;
+			position.y += moveY;
+
+			Game::player->yRemainder = 0;
+
+			if (OverlapsWith(Game::player, 0, 0))
+			{
+				if (moveY > 0)
+					Game::player->MoveY(Top() - Game::player->Bottom());
+				else
+					Game::player->MoveY(Bottom() - Game::player->Top());
+			}
+			else if (std::find(riders.begin(), riders.end(), Game::player) != riders.end()) // If riders contains this dynamic
+				Game::player->MoveY(moveY);
+		}
+
+		return moveY > 0 ? 1 : -1;
+	}
+
+	std::vector<Dynamic*> Carrier::GetRiders()
+	{
+		std::vector<Dynamic*> riders;
+		for (auto& ent : Room::current->entities)
+		{
+			Dynamic* dyn = ent->As<Dynamic>();
+			if (dyn && dyn != this && dyn->IsRiding(this))
+				riders.push_back(this);
+		}
+
+		if (Game::player->IsRiding(this))
+			riders.push_back(Game::player);
+
+		return riders;
 	}
 }
 
