@@ -113,19 +113,21 @@ bool Player::OnCollide(Dynamic* other, int horizontal, int vertical)
 
 i32 Player::InputDirX() const
 {
-	// Perhaps some kind of overwrite system where if both inputs are pressed, the latest pressed one takes precedence?
-	i8 inputDir = 0;
-	if (Input::IsPressed(CR_KEY_LEFT))  inputDir = -1;
-	if (Input::IsPressed(CR_KEY_RIGHT)) inputDir = +1;
-	return inputDir;
+	static int lastDir = 0;
+
+	bool left = Input::IsPressed(CR_KEY_A);
+	bool right = Input::IsPressed(CR_KEY_D);
+
+	if (left && right)
+		return -lastDir;
+	else return lastDir = (left ? -1 : (right ? 1 : 0));
 }
 
 i32 Player::InputDirY() const
 {
-	i8 inputDir = 0;
-	if (Input::IsPressed(CR_KEY_DOWN))  inputDir = -1;
-	if (Input::IsPressed(CR_KEY_UP))	inputDir = +1;
-	return inputDir;
+	bool down = Input::IsPressed(CR_KEY_S);
+	bool up = Input::IsPressed(CR_KEY_W);
+	return down ? -1 : (up ? 1 : 0);
 }
 
 int Player::WallDir()

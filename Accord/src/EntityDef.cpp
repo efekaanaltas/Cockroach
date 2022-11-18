@@ -78,12 +78,12 @@ namespace Entities
 		for (auto& ent : Room::current->entities)
 		{
 			if (Dynamic* dyn = ent->As<Dynamic>())
-				if (dyn != this && OverlapsWith(dyn, xForesense, yForesense))
+				if (dyn != this && OverlapsWith(dyn, xForesense, yForesense) && dyn->blockOnCollision)
 					return dyn;
 		}
 
 		// Also check for collisions with player
-		if (Game::player != this && OverlapsWith(Game::player, xForesense, yForesense))
+		if (Game::player != this && OverlapsWith(Game::player, xForesense, yForesense) && Game::player->blockOnCollision)
 			return Game::player;
 		return nullptr;
 	}
@@ -129,13 +129,13 @@ namespace Entities
 
 		if (editMode)
 		{
-			if (Input::IsPressed(CR_KEY_A))
+			if (Input::IsPressed(CR_KEY_LEFT))
 				positionHighRes.x -= speed * dt;
-			if (Input::IsPressed(CR_KEY_D))
+			if (Input::IsPressed(CR_KEY_RIGHT))
 				positionHighRes.x += speed * dt;
-			if (Input::IsPressed(CR_KEY_S))
+			if (Input::IsPressed(CR_KEY_DOWN))
 				positionHighRes.y -= speed * dt;
-			if (Input::IsPressed(CR_KEY_W))
+			if (Input::IsPressed(CR_KEY_UP))
 				positionHighRes.y += speed * dt;
 
 			position = int2(positionHighRes.x, positionHighRes.y);
