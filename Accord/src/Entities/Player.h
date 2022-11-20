@@ -18,6 +18,7 @@ public:
 	Player(int2 position, int2 hitboxMin, int2 hitboxMax);
 
 	virtual void Update(float dt) override;
+	virtual void Render() override;
 
 	int faceDir = 1;
 	float gravity = 200.0f;

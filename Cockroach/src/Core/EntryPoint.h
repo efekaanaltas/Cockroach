@@ -3,7 +3,7 @@
 #ifdef CR_PLATFORM_WINDOWS
 
 extern Cockroach::Application* Cockroach::CreateApplication();
-extern Cockroach::Entity* Cockroach::CreateEntity(int2 position, int type);
+extern Cockroach::Entity* Cockroach::CreateEntity(int2 position, int2 size, int type);
 
 int main(int argc, char** argv)
 {

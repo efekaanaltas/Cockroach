@@ -62,8 +62,8 @@ namespace Cockroach
 
 	Sprite Sprite::CreateFromCoords(const Ref<Texture2D>& texture, const float2& coords, const float2& spriteSize)
 	{
-		float2 min = { coords.x * spriteSize.x / texture->GetWidth(), coords.y * spriteSize.y / texture->GetHeight() };
-		float2 max = { (coords.x + 1) * spriteSize.x / texture->GetWidth(), (coords.y + 1) * spriteSize.y / texture->GetHeight() };
+		float2 min = { coords.x * spriteSize.x / texture->width, coords.y * spriteSize.y / texture->height };
+		float2 max = { (coords.x + 1) * spriteSize.x / texture->width, (coords.y + 1) * spriteSize.y / texture->height };
 		return Sprite(texture, min, max);
 	}
 }

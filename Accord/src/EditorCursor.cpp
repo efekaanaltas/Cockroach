@@ -27,7 +27,7 @@ void EditorCursor::Update(float dt)
 					if (dyn->WorldHitbox().OverlapsWith(Rect(WorldPosition(), WorldPosition() + int2(8, 8)), 0, 0))
 						entityOverCursor = ent;
 			if (!Input::IsPressed(CR_KEY_LEFT_CONTROL) && !entityOverCursor)
-				Room::current->AddEntity(CreateEntity(WorldPosition(), entityType));
+				Room::current->AddEntity(CreateEntity(WorldPosition(), {1,1}, entityType));
 			else if (Input::IsPressed(CR_KEY_LEFT_CONTROL) && entityOverCursor)
 				Room::current->RemoveEntity(entityOverCursor);
 			break;
@@ -36,9 +36,7 @@ void EditorCursor::Update(float dt)
 
 	}
 
-	if (brushMode == BrushMode::Entity) return;
-
-	else if (Input::IsDown(CR_MOUSE_BUTTON_RIGHT))
+	if (Input::IsDown(CR_MOUSE_BUTTON_RIGHT))
 	{
 		isBoxPlacing = true;
 		boxPlaceStartPos = WorldPosition();
@@ -55,6 +53,19 @@ void EditorCursor::Update(float dt)
 		case BrushMode::Tile:
 		{
 			Room::current->PlaceTileBox(Input::IsPressed(CR_KEY_LEFT_CONTROL) ? Room::Air : tileType, minPos, maxPos);
+			break;
+		}
+		case BrushMode::Entity:
+		{
+			Cockroach::Entity* entityOverCursor = nullptr;
+			for (auto& ent : Room::current->entities)
+				if (Dynamic* dyn = ent->As<Dynamic>())
+					if (dyn->WorldHitbox().OverlapsWith(Rect(WorldPosition(), WorldPosition() + int2(8, 8)), 0, 0))
+						entityOverCursor = ent;
+			if (!Input::IsPressed(CR_KEY_LEFT_CONTROL) && !entityOverCursor)
+				Room::current->AddEntity(CreateEntity(minPos, { maxPos.x-minPos.x+8,maxPos.y-minPos.y+8 }, entityType));
+			else if (Input::IsPressed(CR_KEY_LEFT_CONTROL) && entityOverCursor)
+				Room::current->RemoveEntity(entityOverCursor);
 			break;
 		}
 		case BrushMode::Room:

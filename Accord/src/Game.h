@@ -7,7 +7,7 @@ using namespace Entities;
 
 enum EntityType
 {
-	Payga, Camera, SpikeLeft, SpikeRight, SpikeDown, SpikeUp, Oscillator, TurbineLeft, TurbineRight, TurbineDown, TurbineUp, EssenceRed, END
+	Payga, Camera, SpikeLeft, SpikeRight, SpikeDown, SpikeUp, Oscillator, TurbineLeft, TurbineRight, TurbineDown, TurbineUp, EssenceRed, Igniter, END
 };
 
 class Game : public Cockroach::Application

@@ -196,7 +196,9 @@ namespace Cockroach
 				out << '\n';
 				out << "E: " << entities[i]->type << ", ";
 				out << "X: " << entities[i]->position.x << ", ";
-				out << "Y: " << entities[i]->position.y;
+				out << "Y: " << entities[i]->position.y << ", ";
+				out << "W: " << (int)entities[i]->size.x << ", ";
+				out << "H: " << (int)entities[i]->size.y;
 			}
 		}
 		else
@@ -237,15 +239,19 @@ namespace Cockroach
 			{
 				std::stringstream stream(line);
 
-				int type = 0, pX = 0, pY = 0;
+				int type = 0, pX = 0, pY = 0, w = 1, h = 1;
 				stream.seekg(line.find("E:") + 2);
 				stream >> type;
 				stream.seekg(line.find("X:") + 2);
 				stream >> pX;
 				stream.seekg(line.find("Y:") + 2);
 				stream >> pY;
+				stream.seekg(line.find("W:") + 2);
+				stream >> w;
+				stream.seekg(line.find("H:") + 2);
+				stream >> h;
 
-				room->AddEntity(CreateEntity(int2(pX, pY), type));
+				room->AddEntity(CreateEntity(int2(pX, pY), int2(w,h), type));
 			}
 		}
 		else

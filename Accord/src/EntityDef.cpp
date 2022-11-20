@@ -98,15 +98,14 @@ namespace Entities
 		return GetTilemapCollision(xForesense, yForesense) || GetEntityCollision(xForesense, yForesense);
 	}
 
-	bool Dynamic::IsRiding(Carrier* carrier)
+	bool Dynamic::IsRiding(Dynamic* carrier)
 	{
 		return OverlapsWith(carrier, 1, 0) || OverlapsWith(carrier, -1, 0) || OverlapsWith(carrier, 0, -1);
 	}
 
 	void OscillatorA::Update(float dt)
 	{
-		static float time = 0.0f; // Lazy
-		time += dt;
+		float time = glfwGetTime();
 		int2 desiredPos = startPos + int2(10*std::cos(4*time), 10*std::sin(4*time));
 		int2 move = desiredPos - position;
 		MoveX(move.x);
@@ -230,6 +229,8 @@ namespace Entities
 			Game::player->Die();
 	}
 
+#pragma warning (disable: 4244) // Lots of int->float conversions, no need for warnings.
+
 	int Carrier::MoveX(float amount)
 	{
 		xRemainder += amount;
@@ -303,9 +304,40 @@ namespace Entities
 
 		return riders;
 	}
+
+	void Igniter::Update(float dt)
+	{
+		if (Game::player->IsRiding(this))
+			igniteTimer.Tick(dt);
+		else
+			igniteTimer.Tick(-dt);
+		igniteTimer.remainingTime = std::min(igniteTimer.remainingTime, igniteTimer.duration);
+
+		if (igniteTimer.Finished())
+		{
+			igniteTimer.Reset();
+			flashTimer.Reset();
+			Game::player->Die();
+		}
+
+		sprite.overlayColor = CR_COLOR_RED;
+		sprite.overlayWeight = lerp(0.0f, 1.0f, igniteTimer.Progress01());
+		
+		if (igniteTimer.Progress01() > 0.7f)
+		{
+			sprite.overlayWeight = fmod(glfwGetTime(), 0.2f) < 0.15f ? 1.0f : 0.0f;
+		}
+
+		if (!flashTimer.Finished())
+		{
+			flashTimer.Tick(dt);
+			sprite.overlayColor = CR_COLOR_WHITE;
+			sprite.overlayWeight = lerp(1.0f, 0.0f, flashTimer.Progress01());
+		}
+	}
 }
 
-Cockroach::Entity* Cockroach::CreateEntity(int2 position, int entityType)
+Cockroach::Entity* Cockroach::CreateEntity(int2 position, int2 size, int entityType)
 {
 	Entity* e = nullptr;
 	switch (entityType)
@@ -376,8 +408,15 @@ Cockroach::Entity* Cockroach::CreateEntity(int2 position, int entityType)
 	}
 	case EntityType::EssenceRed:
 	{
-		e = new Entities::EssenceRed(position, { 0,0 }, { 8,8 });
+		e = new Entities::EssenceRed(position, { 1,1 }, { 7,7 });
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 1,0 }, { 8,8 });
+		break;
+	}
+	case EntityType::Igniter:
+	{
+		e = new Entities::Igniter(position, size);
+		e->size = size;
+		e->sprite = Sprite(Game::baseSpriteSheet, { 8.0f*8/ Game::baseSpriteSheet->width, 2.0f*8/ Game::baseSpriteSheet->height }, { (8.0f*8 + size.x) / Game::baseSpriteSheet->width, (2.0f*8 + size.y) / Game::baseSpriteSheet->height });
 		break;
 	}
 	}

@@ -23,7 +23,7 @@ namespace Cockroach
 		Sprite sprite;
 
 		virtual void Update(float dt) {}
-		void Render();
+		virtual void Render();
 
 		template<typename T>
 		T* As();
@@ -38,5 +38,5 @@ namespace Cockroach
 		return dynamic_cast<T*>(this);
 	}
 
-	Entity* CreateEntity(int2 position, int type);
+	Entity* CreateEntity(int2 position, int2 size, int type);
 }

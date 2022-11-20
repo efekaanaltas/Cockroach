@@ -11,9 +11,6 @@ namespace Cockroach
 	{
 	public:
 		virtual ~Texture() = default;
-
-		virtual uint32_t GetWidth() const = 0;
-		virtual uint32_t GetHeight() const = 0;
 		
 		virtual void Bind(uint32_t slot = 0) const = 0;
 		virtual bool operator ==(const Texture& other) const = 0;
@@ -24,9 +21,6 @@ namespace Cockroach
 	public:
 		Texture2D(const std::string& path);
 		virtual ~Texture2D() override;
-
-		virtual uint32_t GetWidth() const override { return width; }
-		virtual uint32_t GetHeight() const override { return height; }
 
 		virtual void Bind(uint32_t slot = 0) const override;
 
@@ -48,8 +42,8 @@ namespace Cockroach
 
 		static Sprite CreateFromCoords(const Ref<Texture2D>& texture, const float2& coords, const float2& spriteSize);
 
-		inline float XSize() { return (max.x - min.x) * texture->GetWidth(); }
-		inline float YSize() { return (max.y - min.y) * texture->GetHeight(); }
+		inline float XSize() { return (max.x - min.x) * texture->width; }
+		inline float YSize() { return (max.y - min.y) * texture->height; }
 
 		Ref<Texture2D> texture;
 		float2 min = {0.0f, 0.0f}, max = {1.0f, 1.0f};

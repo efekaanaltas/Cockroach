@@ -37,6 +37,11 @@ Player::Player(int2 position, int2 hitboxMin, int2 hitboxMax)
 	gravityHaltTimer.remainingTime = 0.0f;
 }
 
+void Player::Render()
+{
+	Renderer::DrawQuad((float2)position + (float2(1, 1) - size) * float2(sprite.XSize() / 2, 0), { sprite.XSize() * size.x, sprite.YSize() * size.y }, sprite);
+}
+
 void Player::Update(float dt)
 {
 	bool groundedAtStartOfFrame = grounded;
@@ -147,5 +152,5 @@ void Player::TrySwitchState(State<Player>* newState)
 
 void Player::Die()
 {
-	position = { 0,20 };
+	position = { -8,24 };
 }

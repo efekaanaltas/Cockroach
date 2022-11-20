@@ -27,8 +27,6 @@ struct Sheet
 
 namespace Entities
 {
-	class Carrier;
-
 	class Dynamic : public Entity
 	{
 	public:
@@ -62,7 +60,7 @@ namespace Entities
 		Dynamic* GetEntityCollision(int xForesense, int yForesense);
 		bool GetTilemapCollision(int xForesense, int yForesense);
 		bool GetCollision(int xForesense, int yForesense);
-		bool IsRiding(Carrier* carrier);
+		bool IsRiding(Dynamic* carrier);
 	};
 
 	class Carrier : public Dynamic
@@ -128,6 +126,19 @@ namespace Entities
 
 		void Absorb();
 		void Refresh();
+	};
+
+	class Igniter : public Dynamic
+	{
+	public:
+		Igniter(int2 position, int2 size)
+			: Dynamic(position, int2(0, 0), size)
+		{}
+
+		Timer igniteTimer = Timer(2.0f);
+		Timer flashTimer = Timer(0.3f);
+
+		virtual void Update(float dt) override;
 	};
 
 	class CameraController : public Entity
