@@ -85,7 +85,7 @@ void EditorCursor::Render()
 	int2 boxPlaceEndPos = WorldPosition();
 	float2 start = { std::min(boxPlaceStartPos.x, boxPlaceEndPos.x), std::min(boxPlaceStartPos.y, boxPlaceEndPos.y) };
 	float2 end = { std::max(boxPlaceStartPos.x, boxPlaceEndPos.x) + 8.0f, std::max(boxPlaceStartPos.y, boxPlaceEndPos.y) + 8.0f };
-	Renderer::DrawQuadOutline(start.x, end.x, start.y, end.y, Input::IsPressed(CR_KEY_LEFT_CONTROL) ? CR_COLOR_RED : CR_COLOR_YELLOW);
+	Renderer::DrawQuadOutline(start.x, end.x, start.y, end.y, Input::IsPressed(CR_KEY_LEFT_CONTROL) ? RED : YELLOW);
 }
 
 int2 EditorCursor::WorldPosition()

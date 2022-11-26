@@ -2,12 +2,13 @@
 #include <Cockroach.h>
 
 #include "Entities/Player.h"
+#include "Entities/Particles.h"
 
 using namespace Entities;
 
 enum EntityType
 {
-	Payga, Camera, SpikeLeft, SpikeRight, SpikeDown, SpikeUp, Oscillator, TurbineLeft, TurbineRight, TurbineDown, TurbineUp, EssenceRed, Igniter, END
+	Payga, Camera, Particles, SpikeLeft, SpikeRight, SpikeDown, SpikeUp, Oscillator, TurbineLeft, TurbineRight, TurbineDown, TurbineUp, EssenceRed, Igniter, END
 };
 
 class Game : public Cockroach::Application
@@ -24,7 +25,8 @@ public:
 	static void RenderHitboxes();
 
 	static CameraController* cameraController;
-	static Player* player;
+	static Entities::Player* player;
+	static Entities::Particles* particles;
 
 	static Ref<Texture2D> baseSpriteSheet;
 	static Ref<Texture2D> background;

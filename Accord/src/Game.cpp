@@ -15,6 +15,7 @@
 
 CameraController* Game::cameraController = nullptr;
 Player* Game::player = nullptr;
+Entities::Particles* Game::particles = nullptr;
 
 Ref<Texture2D> Game::baseSpriteSheet = nullptr;
 Ref<Texture2D> Game::background = nullptr;
@@ -38,9 +39,12 @@ Game::Game()
 	cameraController->type = EntityType::Camera;
 	cameraController->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0,0 }, { 1,1 });
 
-	Game::player = new Player({10, 20}, {6,0}, {10,12});
+	Game::player = new Entities::Player({10, 20}, {6,0}, {10,12});
 	player->type = EntityType::Payga;
 	player->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 3 }, { 16, 16 });
+
+	Game::particles = new Entities::Particles();
+	particles->type = EntityType::Particles;
 
 	for (auto& room : rooms)
 		if (room->Contains(player->WorldHitbox()))
@@ -51,6 +55,7 @@ void Game::Update(float dt)
 {
 	cameraController->Update(dt);
 	player->Update(dt);
+	particles->Update(dt);
 	Room::current->Update(dt);
 
 	if (Input::IsPressed(CR_MOUSE_BUTTON_MIDDLE))
@@ -58,6 +63,8 @@ void Game::Update(float dt)
 	int2 worldPosCur = EditorCursor::WorldPosition();
 	EditorCursor::Update(dt);
 }
+
+#pragma warning (disable: 4244) // No need for DrawQuad... warnings
 
 void Game::Render()
 {
@@ -89,12 +96,13 @@ void Game::Render()
 			if (renderRoomBoundaries)
 			{
 				Rect bounds = rooms[i]->Bounds();
-				Renderer::DrawQuadOutline(bounds.min.x, bounds.max.x, bounds.min.y, bounds.max.y, CR_COLOR_GREEN);
+				Renderer::DrawQuadOutline(bounds.min.x, bounds.max.x, bounds.min.y, bounds.max.y, GREEN);
 			}
 		}
 	}
 
 	player->Render();
+	particles->Render();
 
 	if (renderHitboxes) RenderHitboxes();
 
@@ -102,7 +110,7 @@ void Game::Render()
 	{
 		if (renderHitboxes && ent->type >= EntityType::TurbineLeft && ent->type <= EntityType::TurbineUp)
 		{
-			Renderer::DrawQuadOutline(ent->As<Turbine>()->turbineRect.min.x, ent->As<Turbine>()->turbineRect.max.x, ent->As<Turbine>()->turbineRect.min.y, ent->As<Turbine>()->turbineRect.max.y, CR_COLOR_GREEN);
+			Renderer::DrawQuadOutline(ent->As<Turbine>()->turbineRect.min.x, ent->As<Turbine>()->turbineRect.max.x, ent->As<Turbine>()->turbineRect.min.y, ent->As<Turbine>()->turbineRect.max.y, GREEN);
 		}
 	}
 
@@ -153,6 +161,9 @@ void Game::ImGuiRender()
 
 	if (Button("Save"))
 		Room::current->Save();
+	if (Button("Save All"))
+		for (auto& room : rooms)
+			room->Save();
 
 	End();
 

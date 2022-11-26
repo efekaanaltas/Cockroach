@@ -105,14 +105,14 @@ namespace Entities
 
 	void OscillatorA::Update(float dt)
 	{
-		float time = glfwGetTime();
-		int2 desiredPos = startPos + int2(10*std::cos(4*time), 10*std::sin(4*time));
-		int2 move = desiredPos - position;
+		float time = (float)glfwGetTime();
+		int2 desiredPos = startPos + int2(10*std::cos(time), 10*std::sin(time));
+		float2 move = desiredPos - position;
 		MoveX(move.x);
 		MoveY(move.y);
 
 		sprite.overlayWeight = 0.5f;
-		sprite.overlayColor = CR_COLOR_GREEN;
+		sprite.overlayColor = GREEN;
 	}
 
 	void CameraController::Update(float dt)
@@ -244,7 +244,7 @@ namespace Entities
 			xRemainder -= moveX;
 			position.x += moveX;
 
-			Game::player->xRemainder = 0;
+			//Game::player->xRemainder = 0;
 
 			if (OverlapsWith(Game::player, 0, 0))
 			{
@@ -320,7 +320,7 @@ namespace Entities
 			Game::player->Die();
 		}
 
-		sprite.overlayColor = CR_COLOR_RED;
+		sprite.overlayColor = RED;
 		sprite.overlayWeight = lerp(0.0f, 1.0f, igniteTimer.Progress01());
 		
 		if (igniteTimer.Progress01() > 0.7f)
@@ -331,7 +331,7 @@ namespace Entities
 		if (!flashTimer.Finished())
 		{
 			flashTimer.Tick(dt);
-			sprite.overlayColor = CR_COLOR_WHITE;
+			sprite.overlayColor = WHITE;
 			sprite.overlayWeight = lerp(1.0f, 0.0f, flashTimer.Progress01());
 		}
 	}
@@ -350,6 +350,11 @@ Cockroach::Entity* Cockroach::CreateEntity(int2 position, int2 size, int entityT
 	case EntityType::Camera:
 	{
 		CR_WARN("Do not create an instance of Camera");
+		break;
+	}
+	case EntityType::Particles:
+	{
+		CR_WARN("Do not create an instance of Particles");
 		break;
 	}
 	case EntityType::SpikeLeft:

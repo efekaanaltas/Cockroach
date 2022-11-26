@@ -47,7 +47,7 @@ namespace Cockroach
 
 		Ref<Texture2D> texture;
 		float2 min = {0.0f, 0.0f}, max = {1.0f, 1.0f};
-		float3 overlayColor = CR_COLOR_WHITE;
+		float3 overlayColor = WHITE;
 		float overlayWeight = 0.0f;
 		bool flipX = false, flipY = false;
 	};

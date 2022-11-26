@@ -7,6 +7,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\EditorCursor.h" />
+    <ClInclude Include="src\Entities\Particles.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
     <ClInclude Include="src\Entities\Player.h">
       <Filter>Entities</Filter>
     </ClInclude>
@@ -16,6 +19,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EditorCursor.cpp" />
+    <ClCompile Include="src\Entities\Particles.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
     <ClCompile Include="src\Entities\Player.cpp">
       <Filter>Entities</Filter>
     </ClCompile>

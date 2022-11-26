@@ -264,6 +264,21 @@ namespace Cockroach
 		DrawQuad({ position.x, position.y, 0.0f }, size, texture, min, max, float4(1.0f, 1.0f, 1.0f, 0.0f));
 	}
 
+	void Renderer::DrawQuadWithOutline(const float2& position, const float2& size, const Sprite& subTexture, float4 outlineColor)
+	{
+		float2 min = subTexture.min;
+		float2 max = subTexture.max;
+
+		if (subTexture.flipX) { min.x = subTexture.max.x; max.x = subTexture.min.x; }
+		if (subTexture.flipY) { min.y = subTexture.max.y; max.y = subTexture.min.y; }
+
+		DrawQuad({ position.x + 1, position.y, 0.0f }, size, subTexture.texture, min, max, outlineColor);
+		DrawQuad({ position.x - 1, position.y, 0.0f }, size, subTexture.texture, min, max, outlineColor);
+		DrawQuad({ position.x, position.y + 1, 0.0f }, size, subTexture.texture, min, max, outlineColor);
+		DrawQuad({ position.x, position.y - 1, 0.0f }, size, subTexture.texture, min, max, outlineColor);
+		DrawQuad({ position.x, position.y, 0.0f }, size, subTexture);
+	}
+
 	void Renderer::DrawQuadOutline(float x0, float x1, float y0, float y1, float4 color)
 	{
 		DrawLine({ x0, y0, 0.0f }, { x0, y1, 0.0f }, color);

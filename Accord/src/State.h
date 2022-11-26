@@ -4,63 +4,67 @@
 
 using namespace Cockroach;
 
-class Player;
 #include "EntityDef.h"
 
-template<typename T>
-class State
+namespace Entities
 {
-public:
-	virtual void Enter(T* obj) {};
-	virtual State<T>* Update(T* obj, float dt) { return nullptr; }
-	virtual void Exit(T* obj) {};
-};
+	class Player;
 
-class WalkingState : public State<Player>
-{
-public:
-	float gravity = 300.0f, maxFallSpeed = 150.0f;
-	float maxWalkSpeed = 60.0f, acceleration = 400.0f, deceleration = 1000.0f, airDeceleration = 700.0f;
+	template<typename T>
+	class State
+	{
+	public:
+		virtual void Enter(T* obj) {};
+		virtual State<T>* Update(T* obj, float dt) { return nullptr; }
+		virtual void Exit(T* obj) {};
+	};
 
-	virtual void Enter(Player* player) override;
-	virtual State<Player>* Update(Player* player, float dt) override;
-};
+	class WalkingState : public State<Player>
+	{
+	public:
+		float gravity = 300.0f, maxFallSpeed = 150.0f;
+		float maxWalkSpeed = 60.0f, acceleration = 400.0f, deceleration = 1000.0f, airDeceleration = 700.0f;
 
-class JumpingState : public WalkingState
-{
-public:
-	float minJumpSpeed = 100.0f, maxJumpSpeed = 160.0f;
-	float horizontalBoost = 0.0f;
+		virtual void Enter(Player* player) override;
+		virtual State<Player>* Update(Player* player, float dt) override;
+	};
 
-	Sheet jumpingSheet;
+	class JumpingState : public WalkingState
+	{
+	public:
+		float minJumpSpeed = 100.0f, maxJumpSpeed = 160.0f;
+		float horizontalBoost = 0.0f;
 
-	JumpingState(float minJumpSpeed, float maxJumpSpeed, float horizontalBoost)
-		: WalkingState(), minJumpSpeed(minJumpSpeed), maxJumpSpeed(maxJumpSpeed), horizontalBoost(horizontalBoost)
-	{}
+		Sheet jumpingSheet;
 
-	virtual void Enter(Player* player) override;
-	virtual State<Player>* Update(Player* player, float dt) override;
-};
+		JumpingState(float minJumpSpeed, float maxJumpSpeed, float horizontalBoost)
+			: WalkingState(), minJumpSpeed(minJumpSpeed), maxJumpSpeed(maxJumpSpeed), horizontalBoost(horizontalBoost)
+		{}
 
-class ClingingState : public State<Player>
-{
-public:
-	float reducedGravity = 100.0f;
-	float fallSpeed = 50.0f;
-	float jumpExhaustionTime = 0.1f;
+		virtual void Enter(Player* player) override;
+		virtual State<Player>* Update(Player* player, float dt) override;
+	};
 
-	virtual void Enter(Player* player) override;
-	virtual State<Player>* Update(Player* player, float dt) override;
-};
+	class ClingingState : public State<Player>
+	{
+	public:
+		float reducedGravity = 100.0f;
+		float fallSpeed = 50.0f;
+		float jumpExhaustionTime = 0.1f;
 
-class DashingState : public State<Player>
-{
-public:
-	float dashSpeed = 150.0f;
-	Timer dashTimer = Timer(0.2f);
-	float2 dashDir = { 1.0f, 0.0f };
+		virtual void Enter(Player* player) override;
+		virtual State<Player>* Update(Player* player, float dt) override;
+	};
 
-	virtual void Enter(Player* player) override;
-	virtual State<Player>* Update(Player* player, float dt) override;
-	virtual void Exit(Player* player) override;
-};
+	class DashingState : public State<Player>
+	{
+	public:
+		float dashSpeed = 150.0f;
+		Timer dashTimer = Timer(0.2f);
+		float2 dashDir = { 1.0f, 0.0f };
+
+		virtual void Enter(Player* player) override;
+		virtual State<Player>* Update(Player* player, float dt) override;
+		virtual void Exit(Player* player) override;
+	};
+}
