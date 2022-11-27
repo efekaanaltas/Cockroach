@@ -61,7 +61,7 @@ namespace Entities
 	public:
 		float dashSpeed = 150.0f;
 		Timer dashTimer = Timer(0.2f);
-		float2 dashDir = { 1.0f, 0.0f };
+		float2 dashDir = RIGHT;
 
 		virtual void Enter(Player* player) override;
 		virtual State<Player>* Update(Player* player, float dt) override;

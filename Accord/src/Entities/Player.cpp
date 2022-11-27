@@ -11,6 +11,7 @@ namespace Entities
 		jumpingState = new JumpingState(50.0f, 140.0f, 0.0f);
 		superjumpingState = new JumpingState(50.0f, 120.0f, 150.0f);
 		walljumpingState = new JumpingState(50.0f, 80.0f, -160.0);
+		ledgeJumpingState = new JumpingState(80.0f, 80.0f, 0.0f);
 		clingingState = new ClingingState;
 		dashingState = new DashingState;
 
@@ -43,7 +44,7 @@ namespace Entities
 	{
 		float2 adjustedPosition = (float2)position + (float2(1, 1) - size) * float2(sprite.XSize() / 2, 0);
 		float2 adjustedSize = { sprite.XSize() * size.x, sprite.YSize() * size.y };
-		Renderer::DrawQuadWithOutline(adjustedPosition, adjustedSize, sprite, BLACK);
+		Renderer::DrawQuadWithOutline(adjustedPosition, adjustedSize, sprite, { overlayColor ,overlayWeight }, BLACK);
 	}
 
 	void Player::Update(float dt)
@@ -92,7 +93,8 @@ namespace Entities
 		sprite = currentSheet.CurrentSprite();
 		sprite.flipX = faceDir == -1;
 		float flashProgress = flashTimer.Progress01();
-		sprite.overlayWeight = std::clamp(-flashProgress * flashProgress + 1, 0.0f, 1.0f);
+		overlayColor = WHITE;
+		overlayWeight = std::clamp(-flashProgress * flashProgress + 1, 0.0f, 1.0f);
 	}
 
 	bool Player::OnCollide(Dynamic* other, int horizontal, int vertical)

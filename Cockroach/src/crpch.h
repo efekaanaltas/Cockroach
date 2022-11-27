@@ -32,12 +32,12 @@
 #define mat3 glm::mat3
 #define mat4 glm::mat4
 
-#define ONE			float4(1.0f, 1.0f, 1.0f, 1.0f)
-#define ZERO		float4(0.0f, 0.0f, 0.0f, 0.0f)
-#define LEFT		float4(-1.0f, 0.0f, 0.0f, 0.0f)
-#define RIGHT		float4(+1.0f, 0.0f, 0.0f, 0.0f)
-#define DOWN		float4(0.0f, -1.0f, 0.0f, 0.0f)
-#define UP			float4(0.0f, +1.0f, 0.0f, 0.0f)
+#define ONE			float2(1.0f, 1.0f)
+#define ZERO		float2(0.0f, 0.0f)
+#define LEFT		float2(-1.0f, 0.0f)
+#define RIGHT		float2(+1.0f, 0.0f)
+#define DOWN		float2(0.0f, -1.0f)
+#define UP			float2(0.0f, +1.0f)
 
 #define WHITE		float4(1.0f, 1.0f, 1.0f, 1.0f)
 #define BLACK		float4(0.0f, 0.0f, 0.0f, 1.0f)

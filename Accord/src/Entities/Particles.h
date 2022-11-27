@@ -9,11 +9,12 @@ namespace Entities
 	{
 	public:
 		Particle(float2 position, float2 velocity, float duration, float4 color);
+		Particle(float2 basePosition, float2 positionDev, float2 baseVelocity, float2 velocityDev, float baseDuration, float durationDev, float4 baseColor, float4 colorDev);
 
-		float2 position;
-		float2 velocity;
+		float2 position = ZERO;
+		float2 velocity = ZERO;
 
-		Timer life;
+		Timer life = Timer(1.0f);
 
 		float4 color = WHITE;
 	};

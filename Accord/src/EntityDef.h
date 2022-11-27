@@ -93,7 +93,10 @@ namespace Entities
 	public:
 		OscillatorA(int2 position, int2 hitboxMin, int2 hitboxMax)
 			: Carrier(position, hitboxMin, hitboxMax), startPos(position)
-		{}
+		{
+			overlayWeight = 0.5f;
+			overlayColor = GREEN;
+		}
 
 		int2 startPos;
 		int moveDir = 1;

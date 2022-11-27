@@ -28,7 +28,7 @@ namespace Cockroach
 			if (tiles[i].type == Air) continue;
 			Sprite sprite = Sprite::CreateFromCoords(tilemapTexture, tiles[i].texCoordOffset, {8,8});
 			int2 roomPos = IndexToRoomPosition(i);
-			Renderer::DrawQuad(RoomToWorldPosition(roomPos), {8,8}, sprite);
+			Renderer::DrawQuad(RoomToWorldPosition(roomPos), {8,8}, sprite, {0,0,0,0});
 		}
 		for (int i = 0; i < entities.size(); i++)
 			entities[i]->Render();

@@ -110,9 +110,6 @@ namespace Entities
 		float2 move = desiredPos - position;
 		MoveX(move.x);
 		MoveY(move.y);
-
-		sprite.overlayWeight = 0.5f;
-		sprite.overlayColor = GREEN;
 	}
 
 	void CameraController::Update(float dt)
@@ -195,18 +192,24 @@ namespace Entities
 	{
 		blockOnCollision = false;
 		respawnTimer.remainingTime = 0;
+		overlayColor = WHITE;
 	}
 
 	void EssenceRed::Update(float dt)
 	{
-		if (respawnTimer.Finished())
+		if (!active && respawnTimer.Finished())
 			Refresh();
 		else respawnTimer.Tick(dt);
 
-		if (active && OverlapsWith(Game::player, 0, 0) && !Game::player->canDash)
+		if (active)
 		{
-			Game::player->canDash = true;
-			Absorb();
+			overlayWeight = std::clamp(overlayWeight - 4 * dt, 0.0f, 1.0f);
+
+			if (OverlapsWith(Game::player, 0, 0) && !Game::player->canDash)
+			{
+				Game::player->canDash = true;
+				Absorb();
+			}
 		}
 	}
 
@@ -220,6 +223,7 @@ namespace Entities
 	void EssenceRed::Refresh()
 	{
 		sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 1,0 }, { 8,8 });
+		overlayWeight = 1.0f;
 		active = true;
 	}
 
@@ -244,7 +248,7 @@ namespace Entities
 			xRemainder -= moveX;
 			position.x += moveX;
 
-			//Game::player->xRemainder = 0;
+			Game::player->xRemainder = 0;
 
 			if (OverlapsWith(Game::player, 0, 0))
 			{
@@ -320,19 +324,19 @@ namespace Entities
 			Game::player->Die();
 		}
 
-		sprite.overlayColor = RED;
-		sprite.overlayWeight = lerp(0.0f, 1.0f, igniteTimer.Progress01());
+		overlayColor = RED;
+		overlayWeight = lerp(0.0f, 1.0f, igniteTimer.Progress01());
 		
 		if (igniteTimer.Progress01() > 0.7f)
 		{
-			sprite.overlayWeight = fmod(glfwGetTime(), 0.2f) < 0.15f ? 1.0f : 0.0f;
+			overlayWeight = fmod(glfwGetTime(), 0.2f) < 0.15f ? 1.0f : 0.0f;
 		}
 
 		if (!flashTimer.Finished())
 		{
 			flashTimer.Tick(dt);
-			sprite.overlayColor = WHITE;
-			sprite.overlayWeight = lerp(1.0f, 0.0f, flashTimer.Progress01());
+			overlayColor = WHITE;
+			overlayWeight = lerp(1.0f, 0.0f, flashTimer.Progress01());
 		}
 	}
 }

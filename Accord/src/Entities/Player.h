@@ -33,6 +33,7 @@ namespace Entities
 		JumpingState* jumpingState = nullptr;
 		JumpingState* superjumpingState = nullptr;
 		JumpingState* walljumpingState = nullptr;
+		JumpingState* ledgeJumpingState = nullptr;
 		ClingingState* clingingState = nullptr;
 		DashingState* dashingState = nullptr;
 

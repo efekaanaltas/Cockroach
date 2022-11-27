@@ -12,14 +12,17 @@ namespace Cockroach
 	{
 	public:
 		Entity();
-		Entity(const glm::ivec2& position);
+		Entity(const int2& position);
 
 		static int lastID;
 		int ID = 0;
 		int type = -1;
 
-		glm::ivec2 position;
-		glm::vec2 size = { 1, 1 };
+		int2 position;
+		float2 size = { 1, 1 };
+		
+		float3 overlayColor = CLEAR;
+		float overlayWeight = 0.0f;
 		Sprite sprite;
 
 		virtual void Update(float dt) {}

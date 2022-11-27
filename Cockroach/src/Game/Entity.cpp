@@ -20,6 +20,6 @@ namespace Cockroach
 
 	void Entity::Render()
 	{
-		Renderer::DrawQuad((float2)position, {sprite.XSize(), sprite.YSize()}, sprite);
+		Renderer::DrawQuad((float2)position, { sprite.XSize(), sprite.YSize() }, sprite, { overlayColor, overlayWeight });
 	}
 }

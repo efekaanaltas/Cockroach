@@ -243,7 +243,7 @@ namespace Cockroach
 		DrawQuad({ position.x, position.y, 0.0f }, size, texture, { 0.0f, 0.0f }, { 1.0f, 1.0f }, float4(1.0f,1.0f,1.0f,0.0f));
 	}
 	
-	void Renderer::DrawQuad(const float3& position, const float2& size, const Sprite& subTexture)
+	void Renderer::DrawQuad(const float3& position, const float2& size, const Sprite& subTexture, const float4& overlayColor)
 	{
 		float2 min = subTexture.min;
 		float2 max = subTexture.max;
@@ -251,12 +251,12 @@ namespace Cockroach
 		if (subTexture.flipX) { min.x = subTexture.max.x; max.x = subTexture.min.x; }
 		if (subTexture.flipY) { min.y = subTexture.max.y; max.y = subTexture.min.y; }
 
-		DrawQuad({ position.x, position.y, 0.0f }, size, subTexture.texture, min, max, { subTexture.overlayColor, subTexture.overlayWeight });
+		DrawQuad({ position.x, position.y, 0.0f }, size, subTexture.texture, min, max, overlayColor);
 	}
 
-	void Renderer::DrawQuad(const float2& position, const float2& size, const Sprite& subTexture)
+	void Renderer::DrawQuad(const float2& position, const float2& size, const Sprite& subTexture, const float4& overlayColor)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, subTexture);
+		DrawQuad({ position.x, position.y, 0.0f }, size, subTexture, overlayColor);
 	}
 	
 	void Renderer::DrawQuad(const float2& position, const float2& size, const Ref<Texture2D>& texture, const float2& min, const float2& max)
@@ -264,7 +264,7 @@ namespace Cockroach
 		DrawQuad({ position.x, position.y, 0.0f }, size, texture, min, max, float4(1.0f, 1.0f, 1.0f, 0.0f));
 	}
 
-	void Renderer::DrawQuadWithOutline(const float2& position, const float2& size, const Sprite& subTexture, float4 outlineColor)
+	void Renderer::DrawQuadWithOutline(const float2& position, const float2& size, const Sprite& subTexture, float4 overlayColor, float4 outlineColor)
 	{
 		float2 min = subTexture.min;
 		float2 max = subTexture.max;
@@ -272,11 +272,11 @@ namespace Cockroach
 		if (subTexture.flipX) { min.x = subTexture.max.x; max.x = subTexture.min.x; }
 		if (subTexture.flipY) { min.y = subTexture.max.y; max.y = subTexture.min.y; }
 
-		DrawQuad({ position.x + 1, position.y, 0.0f }, size, subTexture.texture, min, max, outlineColor);
-		DrawQuad({ position.x - 1, position.y, 0.0f }, size, subTexture.texture, min, max, outlineColor);
-		DrawQuad({ position.x, position.y + 1, 0.0f }, size, subTexture.texture, min, max, outlineColor);
-		DrawQuad({ position.x, position.y - 1, 0.0f }, size, subTexture.texture, min, max, outlineColor);
-		DrawQuad({ position.x, position.y, 0.0f }, size, subTexture);
+		DrawQuad({ position.x + 1, position.y, 0.0f }, size, subTexture, outlineColor);
+		DrawQuad({ position.x - 1, position.y, 0.0f }, size, subTexture, outlineColor);
+		DrawQuad({ position.x, position.y + 1, 0.0f }, size, subTexture, outlineColor);
+		DrawQuad({ position.x, position.y - 1, 0.0f }, size, subTexture, outlineColor);
+		DrawQuad({ position.x, position.y, 0.0f }, size, subTexture, overlayColor);
 	}
 
 	void Renderer::DrawQuadOutline(float x0, float x1, float y0, float y1, float4 color)

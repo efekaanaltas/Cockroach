@@ -34,6 +34,14 @@ namespace Entities
 		if (Input::IsDown(CR_KEY_SPACE) && !player->grounded && player->WallDir())
 		{
 			player->faceDir = player->WallDir();
+
+			int height = 0;
+			while (++height < 8)
+				if (!player->GetCollision(player->faceDir, height))
+				{
+					return player->ledgeJumpingState;
+				}
+
 			return player->walljumpingState;
 		}
 
@@ -86,12 +94,13 @@ namespace Entities
 
 		for (int i = 0; i < 30; i++)
 		{
-			float t = (float)glfwGetTime();
-			float randomX = Game::player->position.x + 12.0f + 10*(2*random({ i + t, i + t + 3.0f })-1);
-			float randomVelX = 5 * (2 * random({ i + t + 10, i + t + 5 }) - 1) - Game::player->velocity.x/10.0f;
-			float randomVelY = 10*random({ i + t + 10, i + t + 5 })+5.0f;
-			float randomLife = 1.2f * random({ i + t, i + t + 9 })+0.5f;
-			Game::particles->particles.push_back(Particle({ randomX,Game::player->position.y }, { randomVelX, randomVelY }, randomLife, WHITE));
+			Game::particles->particles.push_back(Particle
+			(
+				Game::player->position + int2(8, 0), { 3,0 },
+				{ -Game::player->velocity.x / 10.0f, 12.0f }, { 4.0f, 3.0f },
+				0.7f, 0.3f, 
+				WHITE, CLEAR)
+			);
 		}
 	}
 
@@ -123,10 +132,18 @@ namespace Entities
 			return player->dashingState;
 
 		if (!player->jumpBufferTimer.Finished())
+		{
+			int height = 0;
+			while (++height < 8)
+				if (!player->GetCollision(player->faceDir, height))
+				{
+					return player->ledgeJumpingState;
+				}
 			return player->walljumpingState;
+		}
 
 		player->velocity.y -= reducedGravity * dt;
-		player->velocity.y = std::clamp(player->velocity.y, -fallSpeed, 0.0f);
+		player->velocity.y = std::clamp(player->velocity.y, -fallSpeed/2.0f, 0.0f);
 
 		if (player->InputDirX() == -player->faceDir)
 			return player->walkingState;
@@ -164,10 +181,20 @@ namespace Entities
 			return player->walkingState;
 		else
 		{
+
+			for (int i = 0; i < 5; i++)
+			{
+				Game::particles->particles.push_back(Particle
+				(
+					Game::player->position + int2(8, 8), { 4.0f,4.0f },
+					DOWN * 2.0f, { 0.4f, 5.0f },
+					0.3f, 0.2f,
+					RED, BLUE*0.3f)
+				);
+			}
+
 			dashTimer.Tick(dt);
 			player->velocity = dashSpeed * dashDir;
-
-			if (dashDir.y != 0.0f) return nullptr; // Height correct only when horizontally dashing
 
 			if (player->GetCollision(player->faceDir, 0))
 			{
