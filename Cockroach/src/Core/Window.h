@@ -15,10 +15,15 @@ namespace Cockroach
 		~Window();
 
 		void OnUpdate();
+		void SetWindowMode(bool fullscreen);
 
 		GLFWwindow* GLFWWindow;
+		GLFWmonitor* GLFWMonitor;
 
 		std::string title;
 		int width, height;
+		int2 pos;
+
+		bool fullscreen;
 	};
 }

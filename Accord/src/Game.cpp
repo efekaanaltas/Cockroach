@@ -62,6 +62,13 @@ void Game::Update(float dt)
 		player->position = EditorCursor::WorldPosition();
 	int2 worldPosCur = EditorCursor::WorldPosition();
 	EditorCursor::Update(dt);
+
+	static bool muted = false;
+
+	if (Input::IsDown(CR_KEY_F))
+		Application::GetWindow().SetWindowMode(!Application::GetWindow().fullscreen);
+	if (Input::IsDown(CR_KEY_M))
+		Audio::ToggleSound(muted = !muted);
 }
 
 #pragma warning (disable: 4244) // No need for DrawQuad... warnings

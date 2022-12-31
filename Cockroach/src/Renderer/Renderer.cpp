@@ -139,7 +139,6 @@ namespace Cockroach
 		s_Data.ViewProjectionMatrix = camera.GetViewProjectionMatrix();
 		s_Data.QuadShader->Bind();
 		s_Data.QuadShader->UploadUniformMat4("u_ViewProjection", s_Data.ViewProjectionMatrix);
-
 		s_Data.QuadIndexCount = 0;
 		s_Data.QuadVBPtr = s_Data.QuadVBBase;
 

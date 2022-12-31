@@ -26,4 +26,9 @@ namespace Cockroach
 	{
 		ma_engine_play_sound(&engine, filepath.c_str(), NULL);
 	}
+
+	void Audio::ToggleSound(bool mute)
+	{
+		ma_engine_set_volume(&engine, mute ? 0.0f : 1.0f);
+	}
 }
