@@ -346,6 +346,7 @@ namespace Entities
 		int h = size.y / 8;
 
 		if (w > 1.0f && h > 1.0f)
+		{
 			for (int x = 0; x < w; x++)
 				for (int y = 0; y < h; y++)
 				{
@@ -353,6 +354,8 @@ namespace Entities
 					int yOffset = (y == 0) ? 3 : (y == h - 1) ? 5 : 4;
 					Renderer::DrawQuad((float2)position + float2(8 * x, 8 * y), { sprite.XSize(), sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,yOffset }, { 8,8 }), { overlayColor, overlayWeight });
 				}
+
+		}
 		else if (w > 1.0f)
 			for (int x = 0; x < w; x++)
 			{
@@ -367,6 +370,7 @@ namespace Entities
 			}
 		else
 			Renderer::DrawQuad((float2)position, { sprite.XSize(), sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 }), { overlayColor, overlayWeight });
+
 	}
 }
 
@@ -454,7 +458,7 @@ Cockroach::Entity* Cockroach::CreateEntity(int2 position, int2 size, int entityT
 	{
 		e = new Entities::Igniter(position, size);
 		e->size = size;
-		e->sprite = Sprite(Game::baseSpriteSheet, { 8.0f*8/ Game::baseSpriteSheet->width, 2.0f*8/ Game::baseSpriteSheet->height }, { (8.0f*8 + size.x) / Game::baseSpriteSheet->width, (2.0f*8 + size.y) / Game::baseSpriteSheet->height });
+		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 1,0 }, { 8,8 });
 		break;
 	}
 	}
