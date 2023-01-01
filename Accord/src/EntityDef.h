@@ -142,6 +142,7 @@ namespace Entities
 		Timer flashTimer = Timer(0.3f);
 
 		virtual void Update(float dt) override;
+		virtual void Render() override;
 	};
 
 	class CameraController : public Entity

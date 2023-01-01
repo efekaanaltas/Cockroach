@@ -339,6 +339,35 @@ namespace Entities
 			overlayWeight = lerp(1.0f, 0.0f, flashTimer.Progress01());
 		}
 	}
+
+	void Igniter::Render()
+	{
+		int w = size.x / 8;
+		int h = size.y / 8;
+
+		if (w > 1.0f && h > 1.0f)
+			for (int x = 0; x < w; x++)
+				for (int y = 0; y < h; y++)
+				{
+					int xOffset = (x == 0) ? 8 : (x == w - 1) ? 10 : 9;
+					int yOffset = (y == 0) ? 3 : (y == h - 1) ? 5 : 4;
+					Renderer::DrawQuad((float2)position + float2(8 * x, 8 * y), { sprite.XSize(), sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,yOffset }, { 8,8 }), { overlayColor, overlayWeight });
+				}
+		else if (w > 1.0f)
+			for (int x = 0; x < w; x++)
+			{
+				int xOffset = (x == 0) ? 8 : (x == w - 1) ? 10 : 9;
+				Renderer::DrawQuad((float2)position + float2(8 * x, 0), { sprite.XSize(), sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,2 }, { 8,8 }), { overlayColor, overlayWeight });
+			}
+		else if (h > 1.0f)
+			for (int y = 0; y < h; y++)
+			{
+				int yOffset = (y == 0) ? 3 : (y == h - 1) ? 5 : 4;
+				Renderer::DrawQuad((float2)position + float2(0, 8*y), { sprite.XSize(), sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,yOffset }, { 8,8 }), { overlayColor, overlayWeight });
+			}
+		else
+			Renderer::DrawQuad((float2)position, { sprite.XSize(), sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 }), { overlayColor, overlayWeight });
+	}
 }
 
 Cockroach::Entity* Cockroach::CreateEntity(int2 position, int2 size, int entityType)
