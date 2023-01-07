@@ -9,7 +9,7 @@ namespace Entities
 	{
 		walkingState = new WalkingState;
 		jumpingState = new JumpingState(50.0f, 140.0f, 0.0f);
-		superjumpingState = new JumpingState(50.0f, 120.0f, 150.0f);
+		superjumpingState = new JumpingState(50.0f, 120.0f, 180.0f);
 		walljumpingState = new JumpingState(50.0f, 80.0f, -160.0);
 		ledgeJumpingState = new JumpingState(80.0f, 80.0f, 0.0f);
 		clingingState = new ClingingState;
@@ -42,8 +42,8 @@ namespace Entities
 
 	void Player::Render()
 	{
-		float2 adjustedPosition = (float2)position + (float2(1, 1) - size) * float2(sprite.XSize() / 2, 0);
-		float2 adjustedSize = { sprite.XSize() * size.x, sprite.YSize() * size.y };
+		float2 adjustedPosition = (float2)position + (float2(1, 1) - renderSize) * float2(sprite.XSize() / 2, 0);
+		float2 adjustedSize = { sprite.XSize() * renderSize.x, sprite.YSize() * renderSize.y };
 		Renderer::DrawQuadWithOutline(adjustedPosition, adjustedSize, sprite, { overlayColor ,overlayWeight }, BLACK);
 	}
 
@@ -83,12 +83,12 @@ namespace Entities
 		grounded = verticalCollision == -1;
 
 		if (grounded && !groundedAtStartOfFrame)
-			size.y = 0.6f;
+			renderSize.y = 0.6f;
 		if (canDash && !canDashAtStartOfFrame)
 			flashTimer.Reset();
 
-		size.x = std::clamp(size.x + 2 * dt, 0.0f, 1.0f);
-		size.y = std::clamp(size.y + 2 * dt, 0.0f, 1.0f);
+		renderSize.x = std::clamp(renderSize.x + 2 * dt, 0.0f, 1.0f);
+		renderSize.y = std::clamp(renderSize.y + 2 * dt, 0.0f, 1.0f);
 
 		sprite = currentSheet.CurrentSprite();
 		sprite.flipX = faceDir == -1;
@@ -154,6 +154,12 @@ namespace Entities
 		currentState->Exit(this);
 		currentState = newState;
 		currentState->Enter(this);
+	}
+
+	void Player::RegainDash()
+	{
+		flashTimer.Reset();
+		canDash = true;
 	}
 
 	void Player::Die()

@@ -11,6 +11,38 @@ using namespace Cockroach;
 
 namespace Entities
 {
+	void RenderDynamicSizedEntity(Entity* entity, int2 texCoordOffset)
+	{
+		int w = entity->size.x / 8;
+		int h = entity->size.y / 8;
+
+		if (w > 1.0f && h > 1.0f)
+		{
+			for (int x = 0; x < w; x++)
+				for (int y = 0; y < h; y++)
+				{
+					int xOffset = (x == 0) ? texCoordOffset.x - 3 : (x == w - 1) ? texCoordOffset.x - 1 : texCoordOffset.x - 2;
+					int yOffset = (y == 0) ? texCoordOffset.y + 1 : (y == h - 1) ? texCoordOffset.y + 3 : texCoordOffset.y + 2;
+					Renderer::DrawQuad((float2)entity->position + float2(8 * x, 8 * y), { entity->sprite.XSize(), entity->sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,yOffset }, { 8,8 }), { entity->overlayColor, entity->overlayWeight });
+				}
+
+		}
+		else if (w > 1.0f)
+			for (int x = 0; x < w; x++)
+			{
+				int xOffset = (x == 0) ? texCoordOffset.x - 3 : (x == w - 1) ? texCoordOffset.x - 1 : texCoordOffset.x - 2;
+				Renderer::DrawQuad((float2)entity->position + float2(8 * x, 0), { entity->sprite.XSize(), entity->sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,2 }, { 8,8 }), { entity->overlayColor, entity->overlayWeight });
+			}
+		else if (h > 1.0f)
+			for (int y = 0; y < h; y++)
+			{
+				int yOffset = (y == 0) ? texCoordOffset.y + 1 : (y == h - 1) ? texCoordOffset.y + 3 : texCoordOffset.y + 2;
+				Renderer::DrawQuad((float2)entity->position + float2(0, 8 * y), { entity->sprite.XSize(), entity->sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,yOffset }, { 8,8 }), { entity->overlayColor, entity->overlayWeight });
+			}
+		else
+			Renderer::DrawQuad((float2)entity->position, { entity->sprite.XSize(), entity->sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, texCoordOffset, { 8,8 }), { entity->overlayColor, entity->overlayWeight });
+	}
+
 	int Dynamic::MoveX(float amount)
 	{
 		xRemainder += amount;
@@ -168,14 +200,14 @@ namespace Entities
 		camera.SetZoom(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
 	}
 
-	Turbine::Turbine(int2 position, int2 hitboxMin, int2 hitboxMax, int horizontal, int vertical)
-	: Dynamic(position, hitboxMin, hitboxMax), horizontal(horizontal), vertical(vertical)
+	Turbine::Turbine(int2 position, int2 size, int horizontal, int vertical)
+	: Dynamic(position, int2(0, 0), size), horizontal(horizontal), vertical(vertical)
 	{
 		int iter = 0;
 		int xStart = std::min(position.x, position.x + horizontal * span);
-		int xEnd = std::max(position.x, position.x + horizontal * span) + 8;
+		int xEnd = std::max(position.x, position.x + horizontal * span) + size.x;
 		int yStart = std::min(position.y, position.y + vertical * span);
-		int yEnd = std::max(position.y, position.y + vertical * span) + 8;
+		int yEnd = std::max(position.y, position.y + vertical * span) + size.y;
 		turbineRect = Rect({ xStart, yStart }, { xEnd, yEnd });
 	}
 
@@ -185,6 +217,19 @@ namespace Entities
 			Game::player->velocity.x += horizontal * turbineAcceleration * dt;
 		if (vertical && turbineRect.OverlapsWith(Game::player->WorldHitbox(), 0, 0))
 			Game::player->velocity.y += vertical * turbineAcceleration * dt;
+
+		Game::particles->particles.push_back(Particle
+		(
+			position + size / 2 + (int2)UP*4, { size.x / 2, 0 },
+			UP * 25.0f, { 1.0f, 1.0f },
+			1.0f, 1.3f,
+			WHITE, BLACK)
+		);
+	}
+
+	void Turbine::Render()
+	{
+		RenderDynamicSizedEntity(this, { 23,2 });
 	}
 
 	EssenceRed::EssenceRed(int2 position, int2 hitboxMin, int2 hitboxMax)
@@ -207,7 +252,7 @@ namespace Entities
 
 			if (OverlapsWith(Game::player, 0, 0) && !Game::player->canDash)
 			{
-				Game::player->canDash = true;
+				Game::player->RegainDash();
 				Absorb();
 			}
 		}
@@ -426,25 +471,29 @@ Cockroach::Entity* Cockroach::CreateEntity(int2 position, int2 size, int entityT
 	}
 	case EntityType::TurbineLeft:
 	{
-		e = new Turbine(position, { 0, 0 }, { 8, 8 }, -1, 0);
+		e = new Turbine(position, size, -1, 0);
+		e->size = size;
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
 		break;
 	}
 	case EntityType::TurbineRight:
 	{
-		e = new Turbine(position, { 0,0 }, { 8,8 }, 1, 0);
+		e = new Turbine(position, size, 1, 0);
+		e->size = size;
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
 		break;
 	}
 	case EntityType::TurbineDown:
 	{
-		e = new Turbine(position, { 0,0 }, { 8,8 }, 0, -1);
+		e = new Turbine(position, size, 0, -1);
+		e->size = size;
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
 		break;
 	}
 	case EntityType::TurbineUp:
 	{
-		e = new Turbine(position, { 0,0 }, { 8,8 }, 0, 1);
+		e = new Turbine(position, size, 0, 1);
+		e->size = size;
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
 		break;
 	}

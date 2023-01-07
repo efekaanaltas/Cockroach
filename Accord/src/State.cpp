@@ -89,7 +89,7 @@ namespace Entities
 		player->velocity.y = maxJumpSpeed;
 
 		player->currentSheet = player->jumpingSheet;
-		player->size.x = 0.6f;
+		player->renderSize.x = 0.6f;
 		Audio::Play("assets/audio/Jump.wav");
 
 		for (int i = 0; i < 30; i++)

@@ -80,7 +80,6 @@ namespace Cockroach
 	void Window::SetWindowMode(bool fullscreen)
 	{
 
-		CR_CORE_INFO(width);
 		if (fullscreen == this->fullscreen)
 			return;
 

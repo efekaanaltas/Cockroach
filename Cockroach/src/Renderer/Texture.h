@@ -47,7 +47,7 @@ namespace Cockroach
 
 		Ref<Texture2D> texture;
 		float2 min = {0.0f, 0.0f}, max = {1.0f, 1.0f};
-		bool flipX = false, flipY = false;
+		bool flipX = false, flipY = false; // Make flips part of entity?
 	};
 
 }

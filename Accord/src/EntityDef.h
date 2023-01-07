@@ -27,6 +27,8 @@ struct Sheet
 
 namespace Entities
 {
+	void RenderDynamicSizedEntity(Entity* entity, int2 texCoordOffset);
+
 	class Dynamic : public Entity
 	{
 	public:
@@ -107,7 +109,7 @@ namespace Entities
 	class Turbine : public Dynamic
 	{
 	public:
-		Turbine(int2 position, int2 hitboxMin, int2 hitboxMax, int horizontal, int vertical);
+		Turbine(int2 position, int2 size, int horizontal, int vertical);
 
 		float turbineAcceleration = 200.0f;
 		int horizontal = 1, vertical = 0;
@@ -115,6 +117,7 @@ namespace Entities
 		Rect turbineRect;
 
 		virtual void Update(float dt) override;
+		virtual void Render() override;
 	};
 
 	class EssenceRed : public Dynamic
@@ -169,4 +172,5 @@ namespace Entities
 
 		Rect Bounds() { return Rect((float2)camera.GetPosition() - float2(aspectRatio * zoom, zoom), { (float2)camera.GetPosition() + float2(aspectRatio * zoom, zoom) }); }
 	};
+
 }

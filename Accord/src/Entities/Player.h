@@ -1,6 +1,5 @@
 #pragma once
 
-//#include "../EntityDef.h"
 #include "../State.h"
 
 template<typename T>
@@ -37,6 +36,8 @@ namespace Entities
 		ClingingState* clingingState = nullptr;
 		DashingState* dashingState = nullptr;
 
+		float2 renderSize = { 1.0f, 1.0f };
+
 		Sheet idleSheet, walkingSheet, fallingSheet, jumpingSheet, clingingSheet, dashingSheet;
 		Sheet currentSheet;
 
@@ -53,6 +54,7 @@ namespace Entities
 
 		void TrySwitchState(State<Player>* state);
 
+		void RegainDash();
 		void Die();
 	};
 }

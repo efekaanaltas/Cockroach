@@ -19,7 +19,7 @@ namespace Cockroach
 		int type = -1;
 
 		int2 position;
-		float2 size = { 1, 1 };
+		int2 size = { 8, 8 };
 		
 		float3 overlayColor = CLEAR;
 		float overlayWeight = 0.0f;
