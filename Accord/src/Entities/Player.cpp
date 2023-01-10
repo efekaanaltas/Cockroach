@@ -36,7 +36,8 @@ namespace Entities
 		currentState = walkingState;
 		currentState->Enter(this);
 
-		jumpBufferTimer.remainingTime = 0.0f;
+		bufferedJumpInput.Cancel();
+		bufferedDashInput.Cancel();
 		gravityHaltTimer.remainingTime = 0.0f;
 	}
 
@@ -44,7 +45,7 @@ namespace Entities
 	{
 		float2 adjustedPosition = (float2)position + (float2(1, 1) - renderSize) * float2(sprite.XSize() / 2, 0);
 		float2 adjustedSize = { sprite.XSize() * renderSize.x, sprite.YSize() * renderSize.y };
-		Renderer::DrawQuadWithOutline(adjustedPosition, adjustedSize, sprite, { overlayColor ,overlayWeight }, BLACK);
+		Renderer::DrawQuadWithOutline(float3(adjustedPosition.x, adjustedPosition.y, 10), adjustedSize, sprite, { overlayColor ,overlayWeight }, BLACK);
 	}
 
 	void Player::Update(float dt)
@@ -53,8 +54,8 @@ namespace Entities
 		bool canDashAtStartOfFrame = canDash;
 		velocityLastFrame = velocity;
 
-		if (Input::IsDown(CR_KEY_SPACE)) jumpBufferTimer.Reset();
-		else							 jumpBufferTimer.Tick(1.0f);
+		bufferedJumpInput.Update();
+		bufferedDashInput.Update();
 
 		if (grounded) coyoteTimer.Reset();
 		else		  coyoteTimer.Tick(1.0f);

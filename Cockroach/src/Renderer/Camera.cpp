@@ -7,14 +7,14 @@
 namespace Cockroach
 {
 	Camera::Camera(float left, float right, float bottom, float top)
-		: position(0.0f), projectionMatrix(glm::ortho(left, right, bottom, top, -1.0f, 1.0f)), viewMatrix(1.0f)
+		: position(0.0f), projectionMatrix(glm::ortho(left, right, bottom, top, -100.0f, 100.0f)), viewMatrix(1.0f)
 	{
 		viewProjectionMatrix = projectionMatrix * viewMatrix;
 	}
 
 	void Camera::SetZoom(float left, float right, float bottom, float top)
 	{
-		projectionMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
+		projectionMatrix = glm::ortho(left, right, bottom, top, -100.0f, 100.0f);
 		viewProjectionMatrix = projectionMatrix * viewMatrix;
 	}
 

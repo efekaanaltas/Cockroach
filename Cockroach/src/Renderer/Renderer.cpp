@@ -216,19 +216,19 @@ namespace Cockroach
 		s_Data.QuadVBPtr->OverlayColor = overlayColor;
 		s_Data.QuadVBPtr++;
 
-		s_Data.QuadVBPtr->Position = { position.x + size.x, position.y, 0.0f };
+		s_Data.QuadVBPtr->Position = { position.x + size.x, position.y, position.z };
 		s_Data.QuadVBPtr->TexCoord = { max.x, min.y };
 		s_Data.QuadVBPtr->TexIndex = textureIndex;
 		s_Data.QuadVBPtr->OverlayColor = overlayColor;
 		s_Data.QuadVBPtr++;
 
-		s_Data.QuadVBPtr->Position = { position.x, position.y + size.y, 0.0f };
+		s_Data.QuadVBPtr->Position = { position.x, position.y + size.y, position.z };
 		s_Data.QuadVBPtr->TexCoord = { min.x, max.y };
 		s_Data.QuadVBPtr->TexIndex = textureIndex;
 		s_Data.QuadVBPtr->OverlayColor = overlayColor;
 		s_Data.QuadVBPtr++;
 
-		s_Data.QuadVBPtr->Position = { position.x + size.x, position.y + size.y, 0.0f };
+		s_Data.QuadVBPtr->Position = { position.x + size.x, position.y + size.y, position.z };
 		s_Data.QuadVBPtr->TexCoord = { max.x, max.y };
 		s_Data.QuadVBPtr->TexIndex = textureIndex;
 		s_Data.QuadVBPtr->OverlayColor = overlayColor;
@@ -239,7 +239,7 @@ namespace Cockroach
 
 	void Renderer::DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, texture, { 0.0f, 0.0f }, { 1.0f, 1.0f }, float4(1.0f,1.0f,1.0f,0.0f));
+		DrawQuad({ position.x, position.y, position.z }, size, texture, { 0.0f, 0.0f }, { 1.0f, 1.0f }, float4(1.0f,1.0f,1.0f,0.0f));
 	}
 	
 	void Renderer::DrawQuad(const float3& position, const float2& size, const Sprite& subTexture, const float4& overlayColor)
@@ -250,7 +250,7 @@ namespace Cockroach
 		if (subTexture.flipX) { min.x = subTexture.max.x; max.x = subTexture.min.x; }
 		if (subTexture.flipY) { min.y = subTexture.max.y; max.y = subTexture.min.y; }
 
-		DrawQuad({ position.x, position.y, 0.0f }, size, subTexture.texture, min, max, overlayColor);
+		DrawQuad({ position.x, position.y, position.z }, size, subTexture.texture, min, max, overlayColor);
 	}
 
 	void Renderer::DrawQuad(const float2& position, const float2& size, const Sprite& subTexture, const float4& overlayColor)
@@ -263,7 +263,7 @@ namespace Cockroach
 		DrawQuad({ position.x, position.y, 0.0f }, size, texture, min, max, float4(1.0f, 1.0f, 1.0f, 0.0f));
 	}
 
-	void Renderer::DrawQuadWithOutline(const float2& position, const float2& size, const Sprite& subTexture, float4 overlayColor, float4 outlineColor)
+	void Renderer::DrawQuadWithOutline(const float3& position, const float2& size, const Sprite& subTexture, float4 overlayColor, float4 outlineColor)
 	{
 		float2 min = subTexture.min;
 		float2 max = subTexture.max;
@@ -271,11 +271,11 @@ namespace Cockroach
 		if (subTexture.flipX) { min.x = subTexture.max.x; max.x = subTexture.min.x; }
 		if (subTexture.flipY) { min.y = subTexture.max.y; max.y = subTexture.min.y; }
 
-		DrawQuad({ position.x + 1, position.y, 0.0f }, size, subTexture, outlineColor);
-		DrawQuad({ position.x - 1, position.y, 0.0f }, size, subTexture, outlineColor);
-		DrawQuad({ position.x, position.y + 1, 0.0f }, size, subTexture, outlineColor);
-		DrawQuad({ position.x, position.y - 1, 0.0f }, size, subTexture, outlineColor);
-		DrawQuad({ position.x, position.y, 0.0f }, size, subTexture, overlayColor);
+		DrawQuad({ position.x + 1, position.y,     position.z }, size, subTexture, outlineColor);
+		DrawQuad({ position.x - 1, position.y,     position.z }, size, subTexture, outlineColor);
+		DrawQuad({ position.x    , position.y + 1, position.z }, size, subTexture, outlineColor);
+		DrawQuad({ position.x    , position.y - 1, position.z }, size, subTexture, outlineColor);
+		DrawQuad({ position.x    , position.y,     position.z }, size, subTexture, overlayColor);
 	}
 
 	void Renderer::DrawQuadOutline(float x0, float x1, float y0, float y1, float4 color)

@@ -9,6 +9,28 @@ class JumpingState;
 class ClingingState;
 class DashingState;
 
+struct BufferedInput
+{
+	BufferedInput(u16 keycode, int bufferFrames)
+		: keycode(keycode), bufferFramesTimer((float)bufferFrames)
+	{
+	};
+
+	u16 keycode;
+	Timer bufferFramesTimer;
+
+	void Update()
+	{
+		if (Input::IsDown(keycode))
+			bufferFramesTimer.Reset();
+		else
+			bufferFramesTimer.Tick(1.0f);
+	}
+
+	void Cancel() { bufferFramesTimer.remainingTime = 0.0f; }
+	bool Active() { return !bufferFramesTimer.Finished(); }
+};
+
 namespace Entities
 {
 	class Player : public Dynamic
@@ -41,7 +63,9 @@ namespace Entities
 		Sheet idleSheet, walkingSheet, fallingSheet, jumpingSheet, clingingSheet, dashingSheet;
 		Sheet currentSheet;
 
-		Timer jumpBufferTimer = Timer(10.0f);
+		BufferedInput bufferedJumpInput = BufferedInput(CR_KEY_SPACE, 6);
+		BufferedInput bufferedDashInput = BufferedInput(CR_KEY_LEFT_SHIFT, 10);
+
 		Timer coyoteTimer = Timer(10.0f);
 		Timer flashTimer = Timer(5.0f);
 		Timer gravityHaltTimer = Timer(10.0f);

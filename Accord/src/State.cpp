@@ -24,7 +24,7 @@ namespace Entities
 	void WalkingState::Enter(Player* player)
 	{
 		player->coyoteTimer.remainingTime = 0.0f;
-		player->jumpBufferTimer.remainingTime = 0.0f;
+		player->bufferedJumpInput.Cancel();
 	}
 
 	State<Player>* WalkingState::Update(Player* player, float dt)
@@ -45,10 +45,10 @@ namespace Entities
 			return player->walljumpingState;
 		}
 
-		if (!player->coyoteTimer.Finished() && !player->jumpBufferTimer.Finished())
+		if (!player->coyoteTimer.Finished() && player->bufferedJumpInput.Active())
 			return player->jumpingState;
 
-		if (Input::IsDown(CR_KEY_LEFT_SHIFT) && player->canDash)
+		if (player->bufferedDashInput.Active() && player->canDash)
 			return player->dashingState;
 
 		if (player->gravityHaltTimer.Finished())
@@ -70,13 +70,6 @@ namespace Entities
 		}
 
 		return nullptr;
-	}
-
-	float random(float2 uv) // Lazy random function for now
-	{
-		float noise = sin(dot(uv, float2(12.9898f, 78.233f) * 2.0f)) * 43758.5453f;
-		noise = fmod(noise, 1.0f);
-		return abs(noise) * 0.5f;
 	}
 
 	void JumpingState::Enter(Player* player)
@@ -128,10 +121,10 @@ namespace Entities
 		if (!player->WallDir())
 			return player->walkingState;
 
-		if (Input::IsDown(CR_KEY_LEFT_SHIFT) && player->canDash)
+		if (player->bufferedDashInput.Active() && player->canDash)
 			return player->dashingState;
 
-		if (!player->jumpBufferTimer.Finished())
+		if (player->bufferedJumpInput.Active())
 		{
 			int height = 0;
 			while (++height < 8)
@@ -154,6 +147,7 @@ namespace Entities
 	void DashingState::Enter(Player* player)
 	{
 		player->canDash = false;
+		player->bufferedDashInput.Cancel();
 		dashTimer.Reset();
 
 		player->velocity.y = 0;
@@ -161,7 +155,6 @@ namespace Entities
 		bool down = Input::IsPressed(CR_KEY_DOWN);
 		bool up = Input::IsPressed(CR_KEY_UP);
 		dashDir = { 0.0f, 0.0f };
-
 		if (player->InputDirX() != 0 || player->InputDirY() != 0)
 			dashDir = glm::normalize(float2(player->InputDirX(), player->InputDirY()));
 		else dashDir = { player->faceDir, 0.0f };
@@ -174,7 +167,7 @@ namespace Entities
 
 	State<Player>* DashingState::Update(Player* player, float dt)
 	{
-		if (Input::IsDown(CR_KEY_SPACE) && player->GetCollision(0, -1))
+		if (player->bufferedJumpInput.Active() && player->GetCollision(0, -1))
 			return player->superjumpingState;
 
 		if (dashTimer.Finished())

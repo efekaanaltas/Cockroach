@@ -124,7 +124,7 @@ namespace Cockroach
 	{
 		TileType type = tiles[RoomPositionToIndex(x, y)].type;
 
-		if (!IsFilled(x, y, type)) return;
+		if (x < 0 || x >= width || y < 0 || y >= height) return;
 
 		int rightLeft = (IsFilled(x + 1, y, type) << 1) | (int)IsFilled(x - 1, y, type);
 		int downUp =	(IsFilled(x, y - 1, type) << 1) | (int)IsFilled(x, y + 1, type);
