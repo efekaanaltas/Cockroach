@@ -19,7 +19,7 @@ namespace Cockroach
 		void Unbind() const;
 
 		void UploadUniformInt(const std::string& name, int value);
-		void UploadUniformIntArray(const std::string& name, int* values, uint32_t count);
+		void UploadUniformIntArray(const std::string& name, int* values, int count);
 
 		void UploadUniformFloat(const std::string& name, float value);
 		void UploadUniformFloat2(const std::string& name, const float2& value);
@@ -33,6 +33,6 @@ namespace Cockroach
 		std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
 		void Compile(const std::unordered_map<GLenum, std::string>& shaderSources);
 	private:
-		uint32_t rendererID;
+		u32 rendererID;
 	};
 }

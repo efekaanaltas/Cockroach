@@ -3,7 +3,7 @@
 
 namespace Cockroach
 {
-	Rect::Rect(glm::ivec2 min, glm::ivec2 max)
+	Rect::Rect(int2 min, int2 max)
 		: min(min), max(max)
 	{
 	}
@@ -22,7 +22,7 @@ namespace Cockroach
 		return x && y;
 	}
 
-	bool Rect::Contains(glm::ivec2 coord) const
+	bool Rect::Contains(int2 coord) const
 	{
 		bool x = min.x <= coord.x && coord.x <= max.x;
 		bool y = min.y <= coord.y && coord.y <= max.y;

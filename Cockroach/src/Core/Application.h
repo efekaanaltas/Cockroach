@@ -32,9 +32,8 @@ namespace Cockroach
 		inline static Application& Get() { return *s_Instance; }
 		
 		int frameCount = 0;
-		Timer freezeTimer = Timer(0.0f);
 	private:
-		Scope<Window> window;
+		Window* window;
 		bool running = true;
 		bool minimized = false;
 		float lastFrameTime = 0.0f;

@@ -1,8 +1,8 @@
 #include "crpch.h"
 #include "Window.h"
 
-#include "Application.h" // Temporary
-#include "Input.h"		 // Temporary
+#include "Application.h"
+#include "Input.h"
 
 #include "glad/glad.h"
 
@@ -20,7 +20,6 @@ namespace Cockroach
 	{
 		if (!GLFWInitialized)
 		{
-			// TODO: glfwTerminate on system shutdown
 			int success = glfwInit();
 			CR_CORE_ASSERT(success, "Could not initialize GLFW!");
 			glfwSetErrorCallback(GLFWErrorCallback);
@@ -39,31 +38,20 @@ namespace Cockroach
 
 		glfwSwapInterval(1);
 
-		// Set GLFW callbacks
 		glfwSetWindowSizeCallback(GLFWWindow, [](GLFWwindow* window, int width, int height)
-		{
-			Application::Get().OnWindowResize(width, height);
-		});
+		{ Application::Get().OnWindowResize(width, height); });
 
 		glfwSetWindowCloseCallback(GLFWWindow, [](GLFWwindow* window)
-		{
-			Application::Get().OnQuit();
-		});
+		{ Application::Get().OnQuit(); });
 
 		glfwSetKeyCallback(GLFWWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods)
-		{
-			Application::Get().OnInputCallback(key, action == GLFW_PRESS || action == GLFW_REPEAT);
-		});
+		{ Application::Get().OnInputCallback(key, action == GLFW_PRESS || action == GLFW_REPEAT); });
 
 		glfwSetMouseButtonCallback(GLFWWindow, [](GLFWwindow* window, int button, int action, int mods)
-		{
-			Application::Get().OnInputCallback(button, action == GLFW_PRESS || action == GLFW_REPEAT);
-		});
+		{ Application::Get().OnInputCallback(button, action == GLFW_PRESS || action == GLFW_REPEAT); });
 
 		glfwSetScrollCallback(GLFWWindow, [](GLFWwindow* window, double xOffset, double yOffset)
-		{
-			Input::scroll = yOffset;
-		});
+		{ Input::scroll = (float)yOffset; });
 	}
 
 	Window::~Window()
@@ -79,7 +67,6 @@ namespace Cockroach
 
 	void Window::SetWindowMode(bool fullscreen)
 	{
-
 		if (fullscreen == this->fullscreen)
 			return;
 

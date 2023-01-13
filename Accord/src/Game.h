@@ -21,7 +21,6 @@ public:
 	void ImGuiRender();
 
 	static void RenderGrid();
-	void RenderCursor();
 	static void RenderHitboxes();
 
 	static CameraController* cameraController;
@@ -32,12 +31,11 @@ public:
 	static Ref<Texture2D> background;
 
 	static std::vector<Ref<Room>> rooms;
+
+	static Timer freezeTimer;
 private:
 	bool renderGrid = true;
 	bool renderHitboxes = true;
 	bool renderAllRooms = false;
 	bool renderRoomBoundaries = false;
-
-	bool isBoxPlacing = false;
-	int2 boxPlaceStartPos = { 0.0f, 0.0f };
 };

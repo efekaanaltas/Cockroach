@@ -12,7 +12,7 @@ namespace Cockroach
 	public:
 		virtual ~Texture() = default;
 		
-		virtual void Bind(uint32_t slot = 0) const = 0;
+		virtual void Bind(u32 slot = 0) const = 0;
 		virtual bool operator ==(const Texture& other) const = 0;
 	};
 
@@ -22,7 +22,7 @@ namespace Cockroach
 		Texture2D(const std::string& path);
 		virtual ~Texture2D() override;
 
-		virtual void Bind(uint32_t slot = 0) const override;
+		virtual void Bind(u32 slot = 0) const override;
 
 		virtual bool operator ==(const Texture& other) const override
 		{
@@ -30,8 +30,8 @@ namespace Cockroach
 		}
 
 		std::string path;
-		uint32_t rendererID;
-		uint32_t width, height;
+		u32 rendererID;
+		int width, height;
 	};
 
 	class Sprite

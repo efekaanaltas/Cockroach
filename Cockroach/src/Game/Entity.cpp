@@ -5,14 +5,13 @@
 
 namespace Cockroach
 {
-
 	int Entity::lastID = 0;
 
 	Entity::Entity()
 		: Entity({ 0,0 })
 	{}
 
-	Entity::Entity(const glm::ivec2& position)
+	Entity::Entity(const int2& position)
 	{
 		this->position = position;
 		ID = lastID++;

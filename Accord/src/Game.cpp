@@ -22,6 +22,8 @@ Ref<Texture2D> Game::background = nullptr;
 
 std::vector<Ref<Room>> Game::rooms;
 
+Timer Game::freezeTimer = Timer(0.0f);
+
 Game::Game()
 	: Application()
 {
@@ -53,6 +55,12 @@ Game::Game()
 
 void Game::Update(float dt)
 {
+	if (!freezeTimer.Finished())
+	{
+		freezeTimer.Tick(1.0f);
+		return;
+	}
+
 	cameraController->Update(dt);
 	player->Update(dt);
 	particles->Update(dt);

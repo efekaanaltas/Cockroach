@@ -7,7 +7,7 @@ namespace Cockroach
 		None = 0, Float, Float2, Float3, Float4, Mat3, Mat4, Int, Int2, Int3, Int4, Bool
 	};
 
-	static uint32_t ShaderDataTypeSize(ShaderDataType type)
+	static u32 ShaderDataTypeSize(ShaderDataType type)
 	{
 		switch (type)
 		{
@@ -32,8 +32,8 @@ namespace Cockroach
 	{
 		std::string Name;
 		ShaderDataType Type;
-		uint32_t Offset;
-		uint32_t Size;
+		u32 Offset;
+		u32 Size;
 		bool Normalized;
 
 		BufferElement() {}
@@ -43,7 +43,7 @@ namespace Cockroach
 		{
 		}
 
-		uint32_t GetComponentCount() const
+		u32 GetComponentCount() const
 		{
 			switch (Type)
 			{
@@ -92,37 +92,37 @@ namespace Cockroach
 		}
 	public:
 		std::vector<BufferElement> elements;
-		uint32_t stride = 0;
+		u32 stride = 0;
 	};
 	
 	class VertexBuffer
 	{
 	public:
-		VertexBuffer(uint32_t size);
-		VertexBuffer(float* vertices, uint32_t size);
+		VertexBuffer(u32 size);
+		VertexBuffer(float* vertices, u32 size);
 		~VertexBuffer();
 
 		void Bind() const;
 		void Unbind() const;
 
-		void SetData(const void* data, uint32_t size);
+		void SetData(const void* data, u32 size);
 
 		BufferLayout layout;
 	private:
-		uint32_t rendererID;
+		u32 rendererID;
 	};
 
 	class IndexBuffer
 	{
 	public:
-		IndexBuffer(uint32_t* indices, uint32_t count);
+		IndexBuffer(u32* indices, u32 count);
 		~IndexBuffer();
 
 		void Bind() const;
 		void Unbind() const;
 
-		uint32_t count;
+		u32 count;
 	private:
-		uint32_t rendererID;
+		u32 rendererID;
 	};
 }

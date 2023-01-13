@@ -18,7 +18,7 @@ namespace Cockroach
 		viewProjectionMatrix = projectionMatrix * viewMatrix;
 	}
 
-	float2 Camera::ScreenToWorldPosition(const glm::ivec2& screenCoord)
+	float2 Camera::ScreenToWorldPosition(const int2& screenCoord)
 	{
 		Window& window = Application::Get().GetWindow();
 		float2 screenCoordYFlip = { screenCoord.x, window.height - screenCoord.y};

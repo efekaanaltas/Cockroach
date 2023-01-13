@@ -23,15 +23,15 @@ namespace Cockroach
 
 	struct RendererData
 	{
-		static const uint32_t BatchQuadCount = 10000;
-		static const uint32_t BatchVertexCount = BatchQuadCount * 4;
-		static const uint32_t BatchIndexCount = BatchQuadCount * 6;
-		static const uint32_t MaxTextureSlots = 32;
+		static const int BatchQuadCount = 10000;
+		static const int BatchVertexCount = BatchQuadCount * 4;
+		static const int BatchIndexCount = BatchQuadCount * 6;
+		static const int MaxTextureSlots = 32;
 
 		Ref<VertexArray> QuadVA;
 		Ref<VertexBuffer> QuadVB;
 		Ref<Shader> QuadShader;
-		uint32_t QuadIndexCount = 0;
+		int QuadIndexCount = 0;
 		QuadVertex* QuadVBBase = nullptr;
 		QuadVertex* QuadVBPtr = nullptr;
 
@@ -40,15 +40,15 @@ namespace Cockroach
 		Ref<VertexArray> LineVA;
 		Ref<VertexBuffer> LineVB;
 		Ref<Shader> LineShader;
-		uint32_t LineVertexCount = 0;
+		int LineVertexCount = 0;
 		LineVertex* LineVBBase = nullptr;
 		LineVertex* LineVBPtr = nullptr;
 
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
-		uint32_t TextureSlotIndex = 0;
+		int TextureSlotIndex = 0;
 	};
 
-	static RendererData s_Data;
+	static RendererData data;
 
 	void Renderer::Init()
 	{
@@ -59,24 +59,24 @@ namespace Cockroach
 		glDepthFunc(GL_LEQUAL);
 
 		// Quads
-		s_Data.QuadVA = CreateRef<VertexArray>();
+		data.QuadVA = CreateRef<VertexArray>();
 
-		s_Data.QuadVB = CreateRef<VertexBuffer>(s_Data.BatchVertexCount * sizeof(QuadVertex));
-		s_Data.QuadVB->layout =
+		data.QuadVB = CreateRef<VertexBuffer>(data.BatchVertexCount * sizeof(QuadVertex));
+		data.QuadVB->layout =
 		{
-			{ ShaderDataType::Float3, "a_Position" },
-			{ ShaderDataType::Float2, "a_TexCoord" },
-			{ ShaderDataType::Float,  "a_TexIndex" },
-			{ ShaderDataType::Float4, "a_OverlayColor"	   }
+			{ ShaderDataType::Float3, "a_Position"		},
+			{ ShaderDataType::Float2, "a_TexCoord"		},
+			{ ShaderDataType::Float,  "a_TexIndex"		},
+			{ ShaderDataType::Float4, "a_OverlayColor"	}
 		};
-		s_Data.QuadVA->AddVertexBuffer(s_Data.QuadVB);
+		data.QuadVA->AddVertexBuffer(data.QuadVB);
 
-		s_Data.QuadVBBase = new QuadVertex[s_Data.BatchVertexCount];
+		data.QuadVBBase = new QuadVertex[data.BatchVertexCount];
 
-		uint32_t* quadIndices = new uint32_t[s_Data.BatchIndexCount];
+		u32* quadIndices = new u32[data.BatchIndexCount];
 		
-		uint32_t offset = 0;
-		for (uint32_t i = 0; i < s_Data.BatchIndexCount; i += 6)
+		int offset = 0;
+		for (int i = 0; i < data.BatchIndexCount; i += 6)
 		{
 			quadIndices[i + 0] = offset + 0;
 			quadIndices[i + 1] = offset + 1;
@@ -89,37 +89,37 @@ namespace Cockroach
 			offset += 4;
 		}
 
-		Ref<IndexBuffer> quadIB = CreateRef<IndexBuffer>(quadIndices, s_Data.BatchIndexCount);
-		s_Data.QuadVA->SetIndexBuffer(quadIB);
+		Ref<IndexBuffer> quadIB = CreateRef<IndexBuffer>(quadIndices, data.BatchIndexCount);
+		data.QuadVA->SetIndexBuffer(quadIB);
 		delete[] quadIndices;
 
-		int32_t samplers[s_Data.MaxTextureSlots];
-		for (uint32_t i = 0; i < s_Data.MaxTextureSlots; i++)
+		int samplers[data.MaxTextureSlots];
+		for (int i = 0; i < data.MaxTextureSlots; i++)
 			samplers[i] = i;
 
-		s_Data.QuadShader = CreateRef<Shader>("assets/shaders/Texture.glsl");
-		s_Data.QuadShader->UploadUniformIntArray("u_Textures", samplers, s_Data.MaxTextureSlots);
+		data.QuadShader = CreateRef<Shader>("assets/shaders/Texture.glsl");
+		data.QuadShader->UploadUniformIntArray("u_Textures", samplers, data.MaxTextureSlots);
 
 		// Lines
-		s_Data.LineVA = CreateRef<VertexArray>();
+		data.LineVA = CreateRef<VertexArray>();
 
-		s_Data.LineVB = CreateRef<VertexBuffer>(s_Data.BatchVertexCount * sizeof(LineVertex));
-		s_Data.LineVB->layout =
+		data.LineVB = CreateRef<VertexBuffer>(data.BatchVertexCount * sizeof(LineVertex));
+		data.LineVB->layout =
 		{
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float4, "a_Color"    }
 		};
-		s_Data.LineVA->AddVertexBuffer(s_Data.LineVB);
-		s_Data.LineVBBase = new LineVertex[s_Data.BatchVertexCount];
+		data.LineVA->AddVertexBuffer(data.LineVB);
+		data.LineVBBase = new LineVertex[data.BatchVertexCount];
 
-		s_Data.LineShader = CreateRef<Shader>("assets/shaders/Line.glsl");
+		data.LineShader = CreateRef<Shader>("assets/shaders/Line.glsl");
 	}
 
 	void Renderer::Shutdown()
 	{
 	}
 
-	void Renderer::OnWindowResize(uint32_t width, uint32_t height)
+	void Renderer::OnWindowResize(int width, int height)
 	{
 		glViewport(0, 0, width, height);
 	}
@@ -136,42 +136,42 @@ namespace Cockroach
 
 	void Renderer::BeginScene(Camera& camera)
 	{
-		s_Data.ViewProjectionMatrix = camera.GetViewProjectionMatrix();
-		s_Data.QuadShader->Bind();
-		s_Data.QuadShader->UploadUniformMat4("u_ViewProjection", s_Data.ViewProjectionMatrix);
-		s_Data.QuadIndexCount = 0;
-		s_Data.QuadVBPtr = s_Data.QuadVBBase;
+		data.ViewProjectionMatrix = camera.GetViewProjectionMatrix();
+		data.QuadShader->Bind();
+		data.QuadShader->UploadUniformMat4("u_ViewProjection", data.ViewProjectionMatrix);
+		data.QuadIndexCount = 0;
+		data.QuadVBPtr = data.QuadVBBase;
 
-		s_Data.TextureSlotIndex = 0;
+		data.TextureSlotIndex = 0;
 
-		s_Data.LineShader->Bind();
-		s_Data.LineShader->UploadUniformMat4("u_ViewProjection", s_Data.ViewProjectionMatrix);
-		s_Data.LineVertexCount = 0;
-		s_Data.LineVBPtr = s_Data.LineVBBase;
+		data.LineShader->Bind();
+		data.LineShader->UploadUniformMat4("u_ViewProjection", data.ViewProjectionMatrix);
+		data.LineVertexCount = 0;
+		data.LineVBPtr = data.LineVBBase;
 	}
 
 	void Renderer::EndScene()
 	{
-		if (s_Data.QuadIndexCount)
+		if (data.QuadIndexCount)
 		{
-			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.QuadVBPtr - (uint8_t*)s_Data.QuadVBBase);
-			s_Data.QuadVB->SetData(s_Data.QuadVBBase, dataSize);
+			u32 dataSize = (u32)((u8*)data.QuadVBPtr - (u8*)data.QuadVBBase);
+			data.QuadVB->SetData(data.QuadVBBase, dataSize);
 
-			for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
-				s_Data.TextureSlots[i]->Bind(i);
+			for (u32 i = 0; i < data.TextureSlotIndex; i++)
+				data.TextureSlots[i]->Bind(i);
 
-			s_Data.QuadVA->Bind();
-			s_Data.QuadShader->Bind();
-			glDrawElements(GL_TRIANGLES, s_Data.QuadIndexCount, GL_UNSIGNED_INT, nullptr);
+			data.QuadVA->Bind();
+			data.QuadShader->Bind();
+			glDrawElements(GL_TRIANGLES, data.QuadIndexCount, GL_UNSIGNED_INT, nullptr);
 		}
-		if (s_Data.LineVertexCount)
+		if (data.LineVertexCount)
 		{
-			uint32_t dataSize = (uint32_t)((uint8_t*)s_Data.LineVBPtr - (uint8_t*)s_Data.LineVBBase);
-			s_Data.LineVB->SetData(s_Data.LineVBBase, dataSize);
+			u32 dataSize = (u32)((u8*)data.LineVBPtr - (u8*)data.LineVBBase);
+			data.LineVB->SetData(data.LineVBBase, dataSize);
 
-			s_Data.LineVA->Bind();
-			s_Data.LineShader->Bind();
-			glDrawArrays(GL_LINES, 0, s_Data.LineVertexCount);
+			data.LineVA->Bind();
+			data.LineShader->Bind();
+			glDrawArrays(GL_LINES, 0, data.LineVertexCount);
 		}
 	}
 
@@ -179,24 +179,24 @@ namespace Cockroach
 	{
 		EndScene();
 
-		s_Data.QuadIndexCount = 0;
-		s_Data.QuadVBPtr = s_Data.QuadVBBase;
+		data.QuadIndexCount = 0;
+		data.QuadVBPtr = data.QuadVBBase;
 
-		s_Data.LineVertexCount = 0;
-		s_Data.LineVBPtr = s_Data.LineVBBase;
+		data.LineVertexCount = 0;
+		data.LineVBPtr = data.LineVBBase;
 
-		s_Data.TextureSlotIndex = 0;
+		data.TextureSlotIndex = 0;
 	}
 
 	void Renderer::DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture, const float2& min, const float2& max, const float4& overlayColor)
 	{
-		if (s_Data.QuadIndexCount >= RendererData::BatchIndexCount)
+		if (data.QuadIndexCount >= RendererData::BatchIndexCount)
 			FlushAndReset();
 
 		float textureIndex = -1.0f;
-		for (uint32_t i = 0; i < s_Data.TextureSlotIndex; i++)
+		for (int i = 0; i < data.TextureSlotIndex; i++)
 		{
-			if (*s_Data.TextureSlots[i].get() == *texture.get())
+			if (*data.TextureSlots[i].get() == *texture.get())
 			{
 				textureIndex = (float)i;
 				break;
@@ -205,36 +205,36 @@ namespace Cockroach
 
 		if (textureIndex == -1.0f)
 		{
-			textureIndex = (float)s_Data.TextureSlotIndex;
-			s_Data.TextureSlots[s_Data.TextureSlotIndex] = texture;
-			s_Data.TextureSlotIndex++;
+			textureIndex = (float)data.TextureSlotIndex;
+			data.TextureSlots[data.TextureSlotIndex] = texture;
+			data.TextureSlotIndex++;
 		}
 
-		s_Data.QuadVBPtr->Position = position;
-		s_Data.QuadVBPtr->TexCoord = { min.x, min.y };
-		s_Data.QuadVBPtr->TexIndex = textureIndex;
-		s_Data.QuadVBPtr->OverlayColor = overlayColor;
-		s_Data.QuadVBPtr++;
+		data.QuadVBPtr->Position = position;
+		data.QuadVBPtr->TexCoord = { min.x, min.y };
+		data.QuadVBPtr->TexIndex = textureIndex;
+		data.QuadVBPtr->OverlayColor = overlayColor;
+		data.QuadVBPtr++;
 
-		s_Data.QuadVBPtr->Position = { position.x + size.x, position.y, position.z };
-		s_Data.QuadVBPtr->TexCoord = { max.x, min.y };
-		s_Data.QuadVBPtr->TexIndex = textureIndex;
-		s_Data.QuadVBPtr->OverlayColor = overlayColor;
-		s_Data.QuadVBPtr++;
+		data.QuadVBPtr->Position = { position.x + size.x, position.y, position.z };
+		data.QuadVBPtr->TexCoord = { max.x, min.y };
+		data.QuadVBPtr->TexIndex = textureIndex;
+		data.QuadVBPtr->OverlayColor = overlayColor;
+		data.QuadVBPtr++;
 
-		s_Data.QuadVBPtr->Position = { position.x, position.y + size.y, position.z };
-		s_Data.QuadVBPtr->TexCoord = { min.x, max.y };
-		s_Data.QuadVBPtr->TexIndex = textureIndex;
-		s_Data.QuadVBPtr->OverlayColor = overlayColor;
-		s_Data.QuadVBPtr++;
+		data.QuadVBPtr->Position = { position.x, position.y + size.y, position.z };
+		data.QuadVBPtr->TexCoord = { min.x, max.y };
+		data.QuadVBPtr->TexIndex = textureIndex;
+		data.QuadVBPtr->OverlayColor = overlayColor;
+		data.QuadVBPtr++;
 
-		s_Data.QuadVBPtr->Position = { position.x + size.x, position.y + size.y, position.z };
-		s_Data.QuadVBPtr->TexCoord = { max.x, max.y };
-		s_Data.QuadVBPtr->TexIndex = textureIndex;
-		s_Data.QuadVBPtr->OverlayColor = overlayColor;
-		s_Data.QuadVBPtr++;
+		data.QuadVBPtr->Position = { position.x + size.x, position.y + size.y, position.z };
+		data.QuadVBPtr->TexCoord = { max.x, max.y };
+		data.QuadVBPtr->TexIndex = textureIndex;
+		data.QuadVBPtr->OverlayColor = overlayColor;
+		data.QuadVBPtr++;
 
-		s_Data.QuadIndexCount += 6;
+		data.QuadIndexCount += 6;
 	}
 
 	void Renderer::DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture)
@@ -288,21 +288,21 @@ namespace Cockroach
 
 	void Renderer::DrawLine(const float3& p0, const float3& p1, const float4& color)
 	{
-		s_Data.LineVBPtr->Position = p0;
-		s_Data.LineVBPtr->Color = color;
-		s_Data.LineVBPtr++;
+		data.LineVBPtr->Position = p0;
+		data.LineVBPtr->Color = color;
+		data.LineVBPtr++;
 
-		s_Data.LineVBPtr->Position = p1;
-		s_Data.LineVBPtr->Color = color;
-		s_Data.LineVBPtr++;
+		data.LineVBPtr->Position = p1;
+		data.LineVBPtr->Color = color;
+		data.LineVBPtr++;
 
-		s_Data.LineVertexCount += 2;
+		data.LineVertexCount += 2;
 	}
 
 	void Renderer::Draw(const Ref<Shader> shader, const Ref<VertexArray>& vertexArray, const mat4& transform)
 	{
 		shader->Bind();
-		shader->UploadUniformMat4("u_ViewProjection", s_Data.ViewProjectionMatrix);
+		shader->UploadUniformMat4("u_ViewProjection", data.ViewProjectionMatrix);
 
 		vertexArray->Bind();
 		glDrawElements(GL_TRIANGLES, vertexArray->GetIndexBuffer()->count, GL_UNSIGNED_INT, nullptr);

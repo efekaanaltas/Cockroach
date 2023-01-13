@@ -162,7 +162,7 @@ namespace Entities
 		player->currentSheet = player->dashingSheet;
 		Audio::Play("assets/audio/Dash.wav");
 
-		Application::Get().freezeTimer = Timer(3.0f);
+		Game::freezeTimer = Timer(3.0f);
 	}
 
 	State<Player>* DashingState::Update(Player* player, float dt)

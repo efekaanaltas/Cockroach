@@ -8,14 +8,14 @@ namespace Cockroach
 	{
 	public:
 		Rect() {}
-		Rect(glm::ivec2 min, glm::ivec2 max);
+		Rect(int2 min, int2 max);
 
-		glm::ivec2 min = { 0, 0 };
-		glm::ivec2 max = { 8, 8 };
+		int2 min = { 0, 0 };
+		int2 max = { 8, 8 };
 
 		bool OverlapsWith(Rect other, int xForesense = 0, int yForesense = 0) const;
 
 		bool Contains(Rect other, int xForesense = 0, int yForesense = 0) const;
-		bool Contains(glm::ivec2 coord) const;
+		bool Contains(int2 coord) const;
 	};
 }

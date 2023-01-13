@@ -164,7 +164,7 @@ namespace Cockroach
 		glUniform1i(location, value);
 	}
 
-	void Shader::UploadUniformIntArray(const std::string& name, int* values, uint32_t count)
+	void Shader::UploadUniformIntArray(const std::string& name, int* values, int count)
 	{
 		GLint location = glGetUniformLocation(rendererID, name.c_str());
 		glUniform1iv(location, count, values);

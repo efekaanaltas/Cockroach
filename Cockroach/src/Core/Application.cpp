@@ -12,9 +12,6 @@
 
 namespace Cockroach
 {
-
-#define BIND_EVENT_FN(x) std::bind(&Application::x, this, std::placeholders::_1)
-
 	Application* Application::s_Instance = nullptr;
 
 	Application::Application()
@@ -22,7 +19,7 @@ namespace Cockroach
 		CR_CORE_ASSERT(!s_Instance, "Application already exists!");
 		s_Instance = this;
 
-		window = Scope<Window>( new Window("Cockroach Engine", 1280, 720));
+		window = new Window("Cockroach Engine", 1280, 720);
 
 		Renderer::Init();
 		Audio::Init();
@@ -61,13 +58,9 @@ namespace Cockroach
 
 			if (!minimized)
 			{
-				if (freezeTimer.Finished())
-				{
-					Update(dt);
-					Render();
-					Input::Update();
-				}
-				else freezeTimer.Tick(1.0f);
+				Update(dt);
+				Render();
+				Input::Update();
 			}
 
 			window->OnUpdate();

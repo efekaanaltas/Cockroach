@@ -50,7 +50,7 @@ namespace Cockroach
 		glDeleteTextures(1, &rendererID);
 	}
 
-	void Texture2D::Bind(uint32_t slot) const
+	void Texture2D::Bind(u32 slot) const
 	{
 		glBindTextureUnit(slot, rendererID);
 	}
