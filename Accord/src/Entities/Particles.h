@@ -38,7 +38,7 @@ namespace Entities
 		{
 			for (auto& particle : particles)
 				if (!particle.life.Finished())
-					Renderer::DrawQuad(glm::floor(float3(particle.position.x, particle.position.y, 0.0f)), {1,1}, pixel.texture, pixel.min, pixel.max, particle.color);
+					Renderer::DrawQuad(glm::floor(float3(particle.position.x, particle.position.y, 10.0f)), {1,1}, pixel.texture, pixel.min, pixel.max, particle.color);
 		}
 
 		Sprite pixel;

@@ -45,7 +45,7 @@ namespace Entities
 	{
 		float2 adjustedPosition = (float2)position + (float2(1, 1) - renderSize) * float2(sprite.XSize() / 2, 0);
 		float2 adjustedSize = { sprite.XSize() * renderSize.x, sprite.YSize() * renderSize.y };
-		Renderer::DrawQuadWithOutline(float3(adjustedPosition.x, adjustedPosition.y, 10), adjustedSize, sprite, { overlayColor ,overlayWeight }, BLACK);
+		Renderer::DrawQuadWithOutline(float3(adjustedPosition.x, adjustedPosition.y, 10), adjustedSize, sprite, { overlayColor ,overlayWeight }, BLACK, flipX, flipY);
 	}
 
 	void Player::Update(float dt)
@@ -92,7 +92,7 @@ namespace Entities
 		renderSize.y = std::clamp(renderSize.y + 2 * dt, 0.0f, 1.0f);
 
 		sprite = currentSheet.CurrentSprite();
-		sprite.flipX = faceDir == -1;
+		flipX = faceDir == -1;
 		float flashProgress = flashTimer.Progress01();
 		overlayColor = WHITE;
 		overlayWeight = std::clamp(-flashProgress * flashProgress + 1, 0.0f, 1.0f);

@@ -95,8 +95,9 @@ void Game::Render()
 	float zoom = cameraController->zoom;
 	float aspect = cameraController->aspectRatio;
 
-	Renderer::DrawQuad(cameraController->positionHighRes - float2(aspect * zoom, zoom), 2.0f * float2(aspect * zoom, zoom), background, {0,0}, {1,1});
-
+	Sprite backgroundSprite = Sprite(background, { 0,0 }, { 1,1 });
+	Renderer::DrawQuad(float3(cameraController->positionHighRes, -90.0f)-float3(aspect*zoom,zoom,0), 2.0f * float2(aspect*zoom,zoom), backgroundSprite, { 0,0,0,0 }, false, false); // Turn this into a dedicated function: RenderBackground(Sprite background)?
+	
 	if (renderGrid) RenderGrid();
 
 	bool renderAllVisibleRooms = !Room::current->Contains(player->WorldHitbox());

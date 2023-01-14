@@ -23,7 +23,7 @@ namespace Entities
 				{
 					int xOffset = (x == 0) ? texCoordOffset.x - 3 : (x == w - 1) ? texCoordOffset.x - 1 : texCoordOffset.x - 2;
 					int yOffset = (y == 0) ? texCoordOffset.y + 1 : (y == h - 1) ? texCoordOffset.y + 3 : texCoordOffset.y + 2;
-					Renderer::DrawQuad((float2)entity->position + float2(8 * x, 8 * y), { entity->sprite.XSize(), entity->sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,yOffset }, { 8,8 }), { entity->overlayColor, entity->overlayWeight });
+					Renderer::DrawQuad(float3(entity->position, entity->z) + float3(8 * x, 8 * y, 0), { entity->sprite.XSize(), entity->sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,yOffset }, { 8,8 }), { entity->overlayColor, entity->overlayWeight }, entity->flipX, entity->flipY);
 				}
 
 		}
@@ -31,16 +31,16 @@ namespace Entities
 			for (int x = 0; x < w; x++)
 			{
 				int xOffset = (x == 0) ? texCoordOffset.x - 3 : (x == w - 1) ? texCoordOffset.x - 1 : texCoordOffset.x - 2;
-				Renderer::DrawQuad((float2)entity->position + float2(8 * x, 0), { entity->sprite.XSize(), entity->sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,2 }, { 8,8 }), { entity->overlayColor, entity->overlayWeight });
+				Renderer::DrawQuad(float3(entity->position, entity->z) + float3(8 * x, 0, 0), { entity->sprite.XSize(), entity->sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,2 }, { 8,8 }), { entity->overlayColor, entity->overlayWeight }, entity->flipX, entity->flipX);
 			}
 		else if (h > 1.0f)
 			for (int y = 0; y < h; y++)
 			{
 				int yOffset = (y == 0) ? texCoordOffset.y + 1 : (y == h - 1) ? texCoordOffset.y + 3 : texCoordOffset.y + 2;
-				Renderer::DrawQuad((float2)entity->position + float2(0, 8 * y), { entity->sprite.XSize(), entity->sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,yOffset }, { 8,8 }), { entity->overlayColor, entity->overlayWeight });
+				Renderer::DrawQuad(float3(entity->position, entity->z) + float3(0, 8 * y, 0), { entity->sprite.XSize(), entity->sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,yOffset }, { 8,8 }), { entity->overlayColor, entity->overlayWeight }, entity->flipX, entity->flipY);
 			}
 		else
-			Renderer::DrawQuad((float2)entity->position, { entity->sprite.XSize(), entity->sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, texCoordOffset, { 8,8 }), { entity->overlayColor, entity->overlayWeight });
+			Renderer::DrawQuad(float3(entity->position, entity->z), { entity->sprite.XSize(), entity->sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, texCoordOffset, { 8,8 }), { entity->overlayColor, entity->overlayWeight }, entity->flipX, entity->flipY);
 	}
 
 	int Dynamic::MoveX(float amount)
@@ -387,35 +387,7 @@ namespace Entities
 
 	void Igniter::Render()
 	{
-		int w = size.x / 8;
-		int h = size.y / 8;
-
-		if (w > 1.0f && h > 1.0f)
-		{
-			for (int x = 0; x < w; x++)
-				for (int y = 0; y < h; y++)
-				{
-					int xOffset = (x == 0) ? 8 : (x == w - 1) ? 10 : 9;
-					int yOffset = (y == 0) ? 3 : (y == h - 1) ? 5 : 4;
-					Renderer::DrawQuad((float2)position + float2(8 * x, 8 * y), { sprite.XSize(), sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,yOffset }, { 8,8 }), { overlayColor, overlayWeight });
-				}
-
-		}
-		else if (w > 1.0f)
-			for (int x = 0; x < w; x++)
-			{
-				int xOffset = (x == 0) ? 8 : (x == w - 1) ? 10 : 9;
-				Renderer::DrawQuad((float2)position + float2(8 * x, 0), { sprite.XSize(), sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,2 }, { 8,8 }), { overlayColor, overlayWeight });
-			}
-		else if (h > 1.0f)
-			for (int y = 0; y < h; y++)
-			{
-				int yOffset = (y == 0) ? 3 : (y == h - 1) ? 5 : 4;
-				Renderer::DrawQuad((float2)position + float2(0, 8*y), { sprite.XSize(), sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,yOffset }, { 8,8 }), { overlayColor, overlayWeight });
-			}
-		else
-			Renderer::DrawQuad((float2)position, { sprite.XSize(), sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 }), { overlayColor, overlayWeight });
-
+		RenderDynamicSizedEntity(this, { 11,2 });
 	}
 }
 

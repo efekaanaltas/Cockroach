@@ -6,8 +6,6 @@
 
 namespace Cockroach
 {
-	class Component;
-
 	class Entity
 	{
 	public:
@@ -19,11 +17,13 @@ namespace Cockroach
 		int type = -1;
 
 		int2 position;
+		int z = 0;
 		int2 size = { 8, 8 };
 		
+		Sprite sprite;
 		float3 overlayColor = CLEAR;
 		float overlayWeight = 0.0f;
-		Sprite sprite;
+		bool flipX = false, flipY = false;
 
 		virtual void Update(float dt) {}
 		virtual void Render();
