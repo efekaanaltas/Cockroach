@@ -148,6 +148,19 @@ namespace Entities
 		virtual void Render() override;
 	};
 
+	class Propeller : public Dynamic
+	{
+	public:
+		Propeller(int2 position, int2 size)
+			: Dynamic(position, int2(0,0), size)
+		{
+			blockOnCollision = true;
+		}
+
+		virtual void Update(float dt) override {};
+		virtual void Render() override;
+	};
+
 	class CameraController : public Entity
 	{
 	public:

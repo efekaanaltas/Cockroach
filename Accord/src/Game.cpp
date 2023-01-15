@@ -134,8 +134,10 @@ void Game::Render()
 
 	Cockroach::Renderer::EndScene();
 
+#if CR_DEBUG
 	if(cameraController->editMode)
 		ImGuiRender();
+#endif
 }
 
 void Game::ImGuiRender()
@@ -214,8 +216,8 @@ void Game::RenderGrid()
 		int yFloor = (int)cameraController->camera.GetPosition().y;
 		float yColor = (i + yFloor) % 8 == 0 ? 0.3f : 0.15f;
 
-		Cockroach::Renderer::DrawLine({ i + xFloor, -80.0f + yFloor, 0.0f }, { i + xFloor, 79.0f + yFloor, 0.0f }, { xColor, xColor, xColor, 0.5f });
-		Cockroach::Renderer::DrawLine({ -80.0f + xFloor, i + yFloor, 0.0f }, { 79.0f + xFloor, i + yFloor, 0.0f }, { yColor, yColor, yColor, 0.5f });
+		Cockroach::Renderer::DrawLine({ i + xFloor, -80.0f + yFloor, -1.0f }, { i + xFloor, 79.0f + yFloor, -1.0f }, { xColor, xColor, xColor, 0.5f });
+		Cockroach::Renderer::DrawLine({ -80.0f + xFloor, i + yFloor, -1.0f }, { 79.0f + xFloor, i + yFloor, -1.0f }, { yColor, yColor, yColor, 0.5f });
 	}
 }
 

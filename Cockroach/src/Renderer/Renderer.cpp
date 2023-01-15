@@ -259,10 +259,10 @@ namespace Cockroach
 
 	void Renderer::DrawQuadOutline(float x0, float x1, float y0, float y1, float4 color)
 	{
-		DrawLine({ x0, y0, 0.0f }, { x0, y1, 0.0f }, color);
-		DrawLine({ x0, y1, 0.0f }, { x1, y1, 0.0f }, color);
-		DrawLine({ x1, y1, 0.0f }, { x1, y0, 0.0f }, color);
-		DrawLine({ x1, y0, 0.0f }, { x0, y0, 0.0f }, color);
+		DrawLine({ x0, y0, 90.0f }, { x0, y1, 0.0f }, color);
+		DrawLine({ x0, y1, 90.0f }, { x1, y1, 0.0f }, color);
+		DrawLine({ x1, y1, 90.0f }, { x1, y0, 0.0f }, color);
+		DrawLine({ x1, y0, 90.0f }, { x0, y0, 0.0f }, color);
 	}
 
 	void Renderer::DrawLine(const float3& p0, const float3& p1, const float4& color)

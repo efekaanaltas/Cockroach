@@ -101,9 +101,19 @@ namespace Entities
 	bool Player::OnCollide(Dynamic* other, int horizontal, int vertical)
 	{
 		bool blockCollisions = other ? other->blockOnCollision : true;
-
 		if (blockCollisions)
 		{
+			if (currentState == dashingState && other && other->As<Propeller>())
+			{
+				// Fix unintended upwards boost when dashing horizontally on top of propeller.
+				TrySwitchState(walkingState);
+				if(velocity.x != 0)
+					faceDir *= -1;
+				RegainDash();
+				velocity = -float2(horizontal * 300, vertical * 170);
+				return blockCollisions;
+			}
+
 			if (horizontal)
 			{
 				velocity.x = 0.0f;

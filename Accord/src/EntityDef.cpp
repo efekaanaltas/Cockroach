@@ -389,6 +389,11 @@ namespace Entities
 	{
 		RenderDynamicSizedEntity(this, { 11,2 });
 	}
+
+	void Propeller::Render()
+	{
+		RenderDynamicSizedEntity(this, { 15,2 });
+	}
 }
 
 Cockroach::Entity* Cockroach::CreateEntity(int2 position, int2 size, int entityType)
@@ -478,6 +483,13 @@ Cockroach::Entity* Cockroach::CreateEntity(int2 position, int2 size, int entityT
 	case EntityType::Igniter:
 	{
 		e = new Entities::Igniter(position, size);
+		e->size = size;
+		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 1,0 }, { 8,8 });
+		break;
+	}
+	case EntityType::Propeller:
+	{
+		e = new Entities::Propeller(position, size);
 		e->size = size;
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 1,0 }, { 8,8 });
 		break;
