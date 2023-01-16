@@ -60,8 +60,8 @@ namespace Entities
 		if (grounded) coyoteTimer.Reset();
 		else		  coyoteTimer.Tick(1.0f);
 
+		dashRegainTimer.Tick(1.0f);
 		gravityHaltTimer.Tick(1.0f);
-
 		flashTimer.Tick(1.0f);
 
 		TrySwitchState(currentState->Update(this, dt));
@@ -81,12 +81,12 @@ namespace Entities
 
 		int horizontalCollision = MoveX(velocity.x * dt);
 		int verticalCollision = MoveY((velocityLastFrame.y + velocity.y) * 0.5f * dt);
-		grounded = verticalCollision == -1;
+
+		grounded = GetCollision(0, -1); //verticalCollision == -1;
+		if (grounded && dashRegainTimer.Finished()) RegainDash();
 
 		if (grounded && !groundedAtStartOfFrame)
 			renderSize.y = 0.6f;
-		if (canDash && !canDashAtStartOfFrame)
-			flashTimer.Reset();
 
 		renderSize.x = std::clamp(renderSize.x + 2 * dt, 0.0f, 1.0f);
 		renderSize.y = std::clamp(renderSize.y + 2 * dt, 0.0f, 1.0f);
@@ -105,12 +105,13 @@ namespace Entities
 		{
 			if (currentState == dashingState && other && other->As<Propeller>())
 			{
-				// Fix unintended upwards boost when dashing horizontally on top of propeller.
+				if (vertical == -1 && velocity.y == 0) return blockCollisions;
 				TrySwitchState(walkingState);
 				if(velocity.x != 0)
 					faceDir *= -1;
 				RegainDash();
 				velocity = -float2(horizontal * 300, vertical * 170);
+				Game::Freeze(3);
 				return blockCollisions;
 			}
 
@@ -122,13 +123,8 @@ namespace Entities
 			}
 
 			if (vertical)
-			{
 				velocity.y = 0.0f;
-				grounded = vertical == -1;
-			}
 		}
-
-		if (grounded) canDash = true;
 
 		return blockCollisions;
 	}
@@ -169,7 +165,7 @@ namespace Entities
 
 	void Player::RegainDash()
 	{
-		flashTimer.Reset();
+		if(!canDash) flashTimer.Reset();
 		canDash = true;
 	}
 

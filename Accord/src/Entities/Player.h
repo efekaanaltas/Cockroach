@@ -69,6 +69,7 @@ namespace Entities
 		Timer coyoteTimer = Timer(10.0f);
 		Timer flashTimer = Timer(5.0f);
 		Timer gravityHaltTimer = Timer(10.0f);
+		Timer dashRegainTimer = Timer(4.0f);
 
 		virtual bool OnCollide(Dynamic* other, int horizontal, int vertical) override;
 

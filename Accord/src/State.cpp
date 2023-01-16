@@ -51,10 +51,13 @@ namespace Entities
 		if (player->bufferedDashInput.Active() && player->canDash)
 			return player->dashingState;
 
-		if (player->gravityHaltTimer.Finished())
-			player->velocity.y -= gravity * dt;
-		else
-			player->velocity.y -= gravity * 0.2f * dt;
+		if (!player->grounded)
+		{
+			if (player->gravityHaltTimer.Finished())
+				player->velocity.y -= gravity * dt;
+			else
+				player->velocity.y -= gravity * 0.2f * dt;
+		}
 	
 		player->velocity.y = std::max(player->velocity.y, -maxFallSpeed);
 
@@ -147,10 +150,13 @@ namespace Entities
 	void DashingState::Enter(Player* player)
 	{
 		player->canDash = false;
+		player->grounded = false;
 		player->bufferedDashInput.Cancel();
+		player->dashRegainTimer.Reset();
 		dashTimer.Reset();
 
 		player->velocity.y = 0;
+		player->velocityLastFrame.y = 0;
 
 		bool down = Input::IsPressed(CR_KEY_DOWN);
 		bool up = Input::IsPressed(CR_KEY_UP);
@@ -162,7 +168,7 @@ namespace Entities
 		player->currentSheet = player->dashingSheet;
 		Audio::Play("assets/audio/Dash.wav");
 
-		Game::freezeTimer = Timer(3.0f);
+		Game::Freeze(3);
 	}
 
 	State<Player>* DashingState::Update(Player* player, float dt)
@@ -188,6 +194,8 @@ namespace Entities
 
 			dashTimer.Tick(dt);
 			player->velocity = dashSpeed * dashDir;
+
+			if (dashDir.y != 0) return nullptr;
 
 			if (player->GetCollision(player->faceDir, 0))
 			{

@@ -242,6 +242,11 @@ void Game::RenderHitboxes()
 	}
 }
 
+void Game::Freeze(int frames)
+{
+	freezeTimer = Timer(frames);
+}
+
 Cockroach::Application* Cockroach::CreateApplication()
 {
 	return new Game();

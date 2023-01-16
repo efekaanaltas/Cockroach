@@ -32,8 +32,11 @@ public:
 
 	static std::vector<Ref<Room>> rooms;
 
-	static Timer freezeTimer;
+	static void Freeze(int frames);
+
 private:
+	static Timer freezeTimer;
+
 	bool renderGrid = true;
 	bool renderHitboxes = true;
 	bool renderAllRooms = false;
