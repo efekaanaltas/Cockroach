@@ -449,28 +449,24 @@ Cockroach::Entity* Cockroach::CreateEntity(int2 position, int2 size, int entityT
 	case EntityType::TurbineLeft:
 	{
 		e = new Turbine(position, size, -1, 0);
-		e->size = size;
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
 		break;
 	}
 	case EntityType::TurbineRight:
 	{
 		e = new Turbine(position, size, 1, 0);
-		e->size = size;
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
 		break;
 	}
 	case EntityType::TurbineDown:
 	{
 		e = new Turbine(position, size, 0, -1);
-		e->size = size;
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
 		break;
 	}
 	case EntityType::TurbineUp:
 	{
 		e = new Turbine(position, size, 0, 1);
-		e->size = size;
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
 		break;
 	}
@@ -483,19 +479,20 @@ Cockroach::Entity* Cockroach::CreateEntity(int2 position, int2 size, int entityT
 	case EntityType::Igniter:
 	{
 		e = new Entities::Igniter(position, size);
-		e->size = size;
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 1,0 }, { 8,8 });
 		break;
 	}
 	case EntityType::Propeller:
 	{
 		e = new Entities::Propeller(position, size);
-		e->size = size;
 		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 1,0 }, { 8,8 });
 		break;
 	}
 	}
 	if (e != nullptr)
+	{
 		e->type = entityType;
+		e->size = size;
+	}
 	return e;
 }

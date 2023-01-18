@@ -199,7 +199,9 @@ void Game::ImGuiRender()
 		EditorCursor::tileType = backgroundTile ? Room::BackgroundBasic : Room::TileBasic;
 	}
 	if (EditorCursor::brushMode == EditorCursor::Entity)
-		SliderInt("Entity Type", &EditorCursor::entityType, EntityType::Camera+1, EntityType::END-1);
+		for (int i = EntityType::Particles + 1; i < EntityType::END; i++)
+			if(ImGui::Button(entityTypeNames[i].c_str(), {200,20}))
+				EditorCursor::entityType = i;
 		
 	End();
 
