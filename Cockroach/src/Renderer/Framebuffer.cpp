@@ -6,6 +6,7 @@
 namespace Cockroach
 {
 	Framebuffer::Framebuffer(int width, int height)
+		: width(width), height(height)
 	{
 		glCreateFramebuffers(1, &rendererID);
 		glBindFramebuffer(GL_FRAMEBUFFER, rendererID);

@@ -7,7 +7,7 @@
 using namespace Entities;
 
 // As far as I'm aware, C++ doesn't have a simple way to get the name of an enum value, and having to manually update a string array when adding a new entity is cumbersome.
-// The code below generates a string list for the EntityType enum. It may look kind of confusing, but it's the best I could do.
+// The code below generates a string list for the EntityType enum. It may look kind of confusing, but its the best I could do.	
 inline std::vector<std::string> DeclareEntityTypeNames(const std::string& entityTypeEnumDefinition)
 {
 	std::vector<std::string> entityTypeNames;
@@ -49,6 +49,7 @@ public:
 	static Entities::Player* player;
 	static Entities::Particles* particles;
 
+	static Ref<Framebuffer> framebuffer;
 	static Ref<Texture2D> baseSpriteSheet;
 	static Ref<Texture2D> background;
 

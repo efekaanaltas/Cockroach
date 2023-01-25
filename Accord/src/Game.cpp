@@ -17,6 +17,7 @@ CameraController* Game::cameraController = nullptr;
 Player* Game::player = nullptr;
 Entities::Particles* Game::particles = nullptr;
 
+Ref<Framebuffer> Game::framebuffer = nullptr;
 Ref<Texture2D> Game::baseSpriteSheet = nullptr;
 Ref<Texture2D> Game::background = nullptr;
 
@@ -27,6 +28,7 @@ Timer Game::freezeTimer = Timer(0.0f);
 Game::Game()
 	: Application()
 {
+	Game::framebuffer = CreateRef<Framebuffer>(320, 180);
 	Game::background = CreateRef<Texture2D>("assets/textures/BG_RED.png");
 	Game::baseSpriteSheet = CreateRef<Texture2D>("assets/textures/SpriteSheet.png");
 
@@ -83,8 +85,12 @@ void Game::Update(float dt)
 
 void Game::Render()
 {
+	framebuffer->Bind();
+	glViewport(0, 0, 320, 180);
+
 	Renderer::SetClearColor({ 0.1f, 0.0f, 0.0f, 1 });
 	Renderer::Clear();
+	glEnable(GL_DEPTH_TEST);
 
 	Renderer::BeginScene(cameraController->camera);
 
@@ -132,7 +138,10 @@ void Game::Render()
 
 	EditorCursor::Render();
 
-	Cockroach::Renderer::EndScene();
+	Renderer::EndScene();
+	glViewport(0, 0, Application::Get().GetWindow().width, Application::Get().GetWindow().height );
+	framebuffer->Unbind();
+	Renderer::BlitToScreen(framebuffer);
 
 #if CR_DEBUG
 	if(cameraController->editMode)

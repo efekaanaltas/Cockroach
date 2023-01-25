@@ -55,23 +55,20 @@ namespace Entities
 
 			while (move != 0)
 			{
-				Dynamic* collidingHitbox = GetEntityCollision(sign, 0);
+				Dynamic* collidingDynamic = GetEntityCollision(sign, 0);
 				bool tilemapCollision = GetTilemapCollision(sign, 0);
-				if (!collidingHitbox && !tilemapCollision)
+				if (!collidingDynamic && !tilemapCollision)
 				{
 					position.x += sign;
 					move -= sign;
 				}
-				else if (OnCollide(collidingHitbox, sign, 0))
-						return sign;
 				else
 				{
-					position.x += sign;
-					move -= sign;
+					OnCollide(collidingDynamic, sign, 0);
+					return sign;
 				}
 			}
 		}
-		return GetCollision(sign, 0) ? sign : 0;
 	}
 
 	int Dynamic::MoveY(float amount)
@@ -79,30 +76,27 @@ namespace Entities
 		yRemainder += amount;
 		int move = (int)yRemainder;
 		int sign = move > 0 ? 1 : -1;
-	
+
 		if (move != 0)
 		{
 			yRemainder -= move;
 
 			while (move != 0)
 			{
-				Dynamic* collidingHitbox = GetEntityCollision(0, sign);
+				Dynamic* collidingDynamic = GetEntityCollision(0, sign);
 				bool tilemapCollision = GetTilemapCollision(0, sign);
-				if (!collidingHitbox && !tilemapCollision)
+				if (!collidingDynamic && !tilemapCollision)
 				{
 					position.y += sign;
 					move -= sign;
 				}
-				else if (OnCollide(collidingHitbox, 0, sign))
-					return sign;
 				else
 				{
-					position.y += sign;
-					move -= sign;
+					OnCollide(collidingDynamic, 0, sign);
+					return sign;
 				}
 			}
 		}
-		return GetCollision(0, sign) ? sign : 0;
 	}
 
 	Dynamic* Dynamic::GetEntityCollision(int xForesense, int yForesense)

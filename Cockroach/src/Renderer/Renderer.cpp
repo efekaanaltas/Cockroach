@@ -35,14 +35,16 @@ namespace Cockroach
 		QuadVertex* QuadVBBase = nullptr;
 		QuadVertex* QuadVBPtr = nullptr;
 
-		mat4 ViewProjectionMatrix;
-
 		Ref<VertexArray> LineVA;
 		Ref<VertexBuffer> LineVB;
 		Ref<Shader> LineShader;
 		int LineVertexCount = 0;
 		LineVertex* LineVBBase = nullptr;
 		LineVertex* LineVBPtr = nullptr;
+
+		Ref<Shader> PostProcessingShader;
+
+		mat4 ViewProjectionMatrix;
 
 		std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
 		int TextureSlotIndex = 0;
@@ -113,6 +115,8 @@ namespace Cockroach
 		data.LineVBBase = new LineVertex[data.BatchVertexCount];
 
 		data.LineShader = CreateRef<Shader>("assets/shaders/Line.glsl");
+
+		data.PostProcessingShader = CreateRef<Shader>("assets/shaders/PostProcessing.glsl");
 	}
 
 	void Renderer::Shutdown()
@@ -186,6 +190,14 @@ namespace Cockroach
 		data.LineVBPtr = data.LineVBBase;
 
 		data.TextureSlotIndex = 0;
+	}
+
+	void Renderer::BlitToScreen(Ref<Framebuffer> framebuffer)
+	{
+		glDisable(GL_DEPTH_TEST);
+		data.PostProcessingShader->Bind();
+		glBindTexture(GL_TEXTURE_2D, framebuffer->colorAttachment);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	}
 
 	void Renderer::DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture, const float2& min, const float2& max, const float4& overlayColor)
