@@ -31,6 +31,7 @@ namespace Cockroach
 		int width, height;
 		int2 position = { 0,0 };
 		Tile* tiles;
+		int2* renderTilesTexCoordOffsets;
 		std::vector<Entity*> entities;
 
 		void Update(float dt);

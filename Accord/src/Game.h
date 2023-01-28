@@ -57,6 +57,7 @@ public:
 
 	static void Freeze(int frames);
 
+	static bool editMode;
 private:
 	static Timer freezeTimer;
 

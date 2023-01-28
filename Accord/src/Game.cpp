@@ -25,6 +25,8 @@ std::vector<Ref<Room>> Game::rooms;
 
 Timer Game::freezeTimer = Timer(0.0f);
 
+bool Game::editMode = true;
+
 Game::Game()
 	: Application()
 {
@@ -64,14 +66,23 @@ void Game::Update(float dt)
 	}
 
 	cameraController->Update(dt);
-	player->Update(dt);
-	particles->Update(dt);
-	Room::current->Update(dt);
+	if (!editMode)
+	{
+		player->Update(dt);
+		particles->Update(dt);
+		Room::current->Update(dt);
+	}
 
 	if (Input::IsPressed(CR_MOUSE_BUTTON_MIDDLE))
 		player->position = EditorCursor::WorldPosition();
 	int2 worldPosCur = EditorCursor::WorldPosition();
 	EditorCursor::Update(dt);
+
+	if (Input::IsDown(CR_KEY_TAB))
+	{
+		cameraController->SetZoom(90.0f);
+		editMode = !editMode;
+	}
 
 	static bool muted = false;
 
@@ -144,7 +155,7 @@ void Game::Render()
 	Renderer::BlitToScreen(framebuffer);
 
 #if CR_DEBUG
-	if(cameraController->editMode)
+	if(editMode)
 		ImGuiRender();
 #endif
 }

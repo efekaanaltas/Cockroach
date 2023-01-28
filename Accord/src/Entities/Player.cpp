@@ -79,8 +79,8 @@ namespace Entities
 		if (velocity.x != 0.0f)
 			faceDir = velocity.x < 0.0f ? -1 : 1;
 
-		int horizontalCollision = MoveX(velocity.x * dt);
-		int verticalCollision = MoveY((velocityLastFrame.y + velocity.y) * 0.5f * dt);
+		MoveX(velocity.x * dt);
+		MoveY((velocityLastFrame.y + velocity.y) * 0.5f * dt);
 
 		grounded = GetCollision(0, -1); //verticalCollision == -1;
 		if (grounded && dashRegainTimer.Finished()) RegainDash();

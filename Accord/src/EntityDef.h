@@ -55,8 +55,8 @@ namespace Entities
 		bool Contains(Dynamic* other, int xForesense, int yForesense) const { return WorldHitbox().Contains(other->WorldHitbox(), xForesense, yForesense); }
 		bool Contains(int2 coord) const { return WorldHitbox().Contains(coord); }
 
-		virtual int MoveX(float amount);
-		virtual int MoveY(float amount);
+		virtual void MoveX(float amount);
+		virtual void MoveY(float amount);
 		virtual bool OnCollide(Dynamic* other, int horizontal, int vertical) { return blockOnCollision; }
 
 		Dynamic* GetEntityCollision(int xForesense, int yForesense);
@@ -72,8 +72,8 @@ namespace Entities
 			: Dynamic(position, hitboxMin, hitboxMax)
 		{}
 
-		virtual int MoveX(float amount) override;
-		virtual int MoveY(float amount) override;
+		virtual void MoveX(float amount) override;
+		virtual void MoveY(float amount) override;
 
 		std::vector<Dynamic*> GetRiders();
 	};
@@ -180,8 +180,6 @@ namespace Entities
 		float zoom = 90.0f;
 
 		float speed = 1.0f;
-
-		bool editMode = true;
 
 		Rect Bounds() { return Rect((float2)camera.GetPosition() - float2(aspectRatio * zoom, zoom), { (float2)camera.GetPosition() + float2(aspectRatio * zoom, zoom) }); }
 	};

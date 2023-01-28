@@ -8,11 +8,44 @@ namespace Cockroach
 {
 	Ref<Room> Room::current = nullptr;
 
+	void InitTexCoordOffsets(Room* room)
+	{
+		const int2 uvOffsetLUT[16] =
+		{
+			{+1,+0},
+			{-4,+1},
+			{-3,+1},
+			{-1,+0},
+			{-4,+2},
+			{-2,+1},
+			{-3,+0},
+			{-2,+0},
+			{-3,+2},
+			{-4,+0},
+			{+0,+1},
+			{+0,+0},
+			{-1,+2},
+			{-2,+2},
+			{+0,+2},
+			{-1,+1},
+
+		};
+		for (int y = 0; y <= room->height; y++)
+			for (int x = 0; x <= room->width; x++)
+			{
+				int indexNum = room->IsFilled(x - 1, y - 1, Room::TileBasic) * 8 + room->IsFilled(x, y - 1, Room::TileBasic) * 4 +
+					room->IsFilled(x - 1, y, Room::TileBasic) * 2 + room->IsFilled(x, y, Room::TileBasic);
+				room->renderTilesTexCoordOffsets[x + (y) * (room->width + 1)] = uvOffsetLUT[indexNum];
+			}
+	}
+
 	Room::Room(std::string name, int width, int height, int posX, int posY)
 		: name(name), width(width), height(height)
 	{
 		position = { posX, posY };
 		tiles = new Tile[width * height];
+		renderTilesTexCoordOffsets = new int2[(width + 1) * (height + 1)];
+		memset(renderTilesTexCoordOffsets, 0, sizeof(int2) * (width + 1) * (height + 1));
 	}
 
 	void Room::Update(float dt)
@@ -23,12 +56,13 @@ namespace Cockroach
 
 	void Room::Render(Ref<Texture2D> tilemapTexture)
 	{
-		for (int i = 0; i < width * height; i++)
+		for (int i = 0; i < (width+1) * (height+1); i++)
 		{
-			if (tiles[i].type == Air) continue;
-			Sprite sprite = Sprite::CreateFromCoords(tilemapTexture, tiles[i].texCoordOffset, {8,8});
-			int2 roomPos = IndexToRoomPosition(i);
-			Renderer::DrawQuad(float3(RoomToWorldPosition(roomPos), 0), { 8,8 }, sprite, { 0,0,0,0 }, false, false);
+			//if (tiles[i].type == Air) continue;
+			if (renderTilesTexCoordOffsets[i].x > 0) continue;
+			Sprite sprite = Sprite::CreateFromCoords(tilemapTexture, int2(35,5)+renderTilesTexCoordOffsets[i], {8,8});
+			int2 roomPos = { i % (width + 1), i / (width + 1) };//IndexToRoomPosition(i);
+			Renderer::DrawQuad(float3(RoomToWorldPosition(roomPos), 0)-float3(4,4,0), {8,8}, sprite, {0,0,0,0}, false, false);
 		}
 		for (int i = 0; i < entities.size(); i++)
 			entities[i]->Render();
@@ -56,6 +90,7 @@ namespace Cockroach
 			tiles[index].type = tileType;
 			tiles[index].texCoordOffset = { 0,0 };
 
+			InitTexCoordOffsets(this);
 			UpdateTile(roomPosition.x, roomPosition.y);
 			UpdateTile(roomPosition.x + 1, roomPosition.y);
 			UpdateTile(roomPosition.x - 1, roomPosition.y);
@@ -142,7 +177,7 @@ namespace Cockroach
 	bool Room::IsFilled(int x, int y, TileType type)
 	{
 		int index = RoomPositionToIndex(x, y);
-		if (!Contains({x, y})) return true; // Little hack to make autotiling on borders easier
+		if (!Contains({ x, y })) return true; // Little hack to make autotiling on borders easier
 		return tiles[index].type == type;
 	}
 
@@ -231,9 +266,10 @@ namespace Cockroach
 
 			for (int i = 0; i < room->width * room->height; i++)
 				room->tiles[i].type = (TileType)data[i];
-			for (int y = 0; y < room->height; y++)
+			InitTexCoordOffsets(room.get());
+			/*for (int y = 0; y < room->height; y++)
 				for (int x = 0; x < room->width; x++)
-					room->UpdateTile(x, y);
+					room->UpdateTile(x, y);*/
 
 			while (std::getline(in, line))
 			{

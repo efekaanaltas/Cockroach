@@ -43,7 +43,7 @@ namespace Entities
 			Renderer::DrawQuad(float3(entity->position, entity->z), { entity->sprite.XSize(), entity->sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, texCoordOffset, { 8,8 }), { entity->overlayColor, entity->overlayWeight }, entity->flipX, entity->flipY);
 	}
 
-	int Dynamic::MoveX(float amount)
+	void Dynamic::MoveX(float amount)
 	{
 		xRemainder += amount;
 		int move = (int)xRemainder;
@@ -65,13 +65,13 @@ namespace Entities
 				else
 				{
 					OnCollide(collidingDynamic, sign, 0);
-					return sign;
+					break;
 				}
 			}
 		}
 	}
 
-	int Dynamic::MoveY(float amount)
+	void Dynamic::MoveY(float amount)
 	{
 		yRemainder += amount;
 		int move = (int)yRemainder;
@@ -93,7 +93,7 @@ namespace Entities
 				else
 				{
 					OnCollide(collidingDynamic, 0, sign);
-					return sign;
+					break;
 				}
 			}
 		}
@@ -140,24 +140,19 @@ namespace Entities
 
 	void CameraController::Update(float dt)
 	{
-		for (int i = CR_KEY_KP_1; i <= CR_KEY_KP_3; i++)
+		for (int i = CR_KEY_1; i <= CR_KEY_3; i++)
 			if (Input::IsDown(i))
-				SetZoom(std::powf(10.0f, (float)(i - CR_KEY_KP_1 + 1)));
-		if (Input::IsDown(CR_KEY_KP_0))
-		{
-			SetZoom(90.0f);
-			editMode = !editMode;
-		}
+				SetZoom(std::powf(10.0f, (float)(i - CR_KEY_1 + 1)));
 
-		if (editMode)
+		if (Game::editMode)
 		{
-			if (Input::IsPressed(CR_KEY_LEFT))
+			if (Input::IsPressed(CR_KEY_A))
 				positionHighRes.x -= speed * dt;
-			if (Input::IsPressed(CR_KEY_RIGHT))
+			if (Input::IsPressed(CR_KEY_D))
 				positionHighRes.x += speed * dt;
-			if (Input::IsPressed(CR_KEY_DOWN))
+			if (Input::IsPressed(CR_KEY_S))
 				positionHighRes.y -= speed * dt;
-			if (Input::IsPressed(CR_KEY_UP))
+			if (Input::IsPressed(CR_KEY_W))
 				positionHighRes.y += speed * dt;
 
 			position = int2(positionHighRes.x, positionHighRes.y);
@@ -274,7 +269,7 @@ namespace Entities
 
 #pragma warning (disable: 4244) // Lots of int->float conversions, no need for warnings.
 
-	int Carrier::MoveX(float amount)
+	void Carrier::MoveX(float amount)
 	{
 		xRemainder += amount;
 
@@ -299,11 +294,9 @@ namespace Entities
 			else if (std::find(riders.begin(), riders.end(), Game::player) != riders.end()) // If riders contains this dynamic
 				Game::player->MoveX(moveX);
 		}
-
-		return moveX > 0 ? 1 : -1;
 	}
 
-	int Carrier::MoveY(float amount)
+	void Carrier::MoveY(float amount)
 	{
 		yRemainder += amount;
 
@@ -328,8 +321,6 @@ namespace Entities
 			else if (std::find(riders.begin(), riders.end(), Game::player) != riders.end()) // If riders contains this dynamic
 				Game::player->MoveY(moveY);
 		}
-
-		return moveY > 0 ? 1 : -1;
 	}
 
 	std::vector<Dynamic*> Carrier::GetRiders()
