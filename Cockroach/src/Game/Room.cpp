@@ -8,44 +8,12 @@ namespace Cockroach
 {
 	Ref<Room> Room::current = nullptr;
 
-	void InitTexCoordOffsets(Room* room)
-	{
-		const int2 uvOffsetLUT[16] =
-		{
-			{+1,+0},
-			{-4,+1},
-			{-3,+1},
-			{-1,+0},
-			{-4,+2},
-			{-2,+1},
-			{-3,+0},
-			{-2,+0},
-			{-3,+2},
-			{-4,+0},
-			{+0,+1},
-			{+0,+0},
-			{-1,+2},
-			{-2,+2},
-			{+0,+2},
-			{-1,+1},
-
-		};
-		for (int y = 0; y <= room->height; y++)
-			for (int x = 0; x <= room->width; x++)
-			{
-				int indexNum = room->IsFilled(x - 1, y - 1, Room::TileBasic) * 8 + room->IsFilled(x, y - 1, Room::TileBasic) * 4 +
-					room->IsFilled(x - 1, y, Room::TileBasic) * 2 + room->IsFilled(x, y, Room::TileBasic);
-				room->renderTilesTexCoordOffsets[x + (y) * (room->width + 1)] = uvOffsetLUT[indexNum];
-			}
-	}
-
 	Room::Room(std::string name, int width, int height, int posX, int posY)
 		: name(name), width(width), height(height)
 	{
 		position = { posX, posY };
-		tiles = new Tile[width * height];
-		renderTilesTexCoordOffsets = new int2[(width + 1) * (height + 1)];
-		memset(renderTilesTexCoordOffsets, 0, sizeof(int2) * (width + 1) * (height + 1));
+		tiles = new TileType[width * height];
+		tileUVs = new int2[(width + 1) * (height + 1)];
 	}
 
 	void Room::Update(float dt)
@@ -58,10 +26,9 @@ namespace Cockroach
 	{
 		for (int i = 0; i < (width+1) * (height+1); i++)
 		{
-			//if (tiles[i].type == Air) continue;
-			if (renderTilesTexCoordOffsets[i].x > 0) continue;
-			Sprite sprite = Sprite::CreateFromCoords(tilemapTexture, int2(35,5)+renderTilesTexCoordOffsets[i], {8,8});
-			int2 roomPos = { i % (width + 1), i / (width + 1) };//IndexToRoomPosition(i);
+			if (tileUVs[i] == invalidUV) continue;
+			Sprite sprite = Sprite::CreateFromCoords(tilemapTexture, tileUVs[i], {8,8});
+			int2 roomPos = { i % (width + 1), i / (width + 1) };
 			Renderer::DrawQuad(float3(RoomToWorldPosition(roomPos), 0)-float3(4,4,0), {8,8}, sprite, {0,0,0,0}, false, false);
 		}
 		for (int i = 0; i < entities.size(); i++)
@@ -87,15 +54,11 @@ namespace Cockroach
 
 		if (Contains(roomPosition))
 		{
-			tiles[index].type = tileType;
-			tiles[index].texCoordOffset = { 0,0 };
+			tiles[index] = tileType;
 
-			InitTexCoordOffsets(this);
-			UpdateTile(roomPosition.x, roomPosition.y);
-			UpdateTile(roomPosition.x + 1, roomPosition.y);
-			UpdateTile(roomPosition.x - 1, roomPosition.y);
-			UpdateTile(roomPosition.x, roomPosition.y - 1);
-			UpdateTile(roomPosition.x, roomPosition.y + 1);
+			for (int y = -1; y <= 1; y++)
+				for (int x = -1; x <= 1; x++)
+					UpdateTileUV(roomPosition.x - x, roomPosition.y + y);
 
 			Save();
 		}
@@ -118,13 +81,11 @@ namespace Cockroach
 
 				if (Contains(roomPosition))
 				{
-					tiles[index].type = tileType;
+					tiles[index] = tileType;
 
-					UpdateTile(roomPosition.x, roomPosition.y);
-					UpdateTile(roomPosition.x + 1, roomPosition.y);
-					UpdateTile(roomPosition.x - 1, roomPosition.y);
-					UpdateTile(roomPosition.x, roomPosition.y - 1);
-					UpdateTile(roomPosition.x, roomPosition.y + 1);
+					for (int y = -1; y <= 1; y++)
+						for (int x = -1; x <= 1; x++)
+							UpdateTileUV(roomPosition.x - x, roomPosition.y + y);
 				}
 			}
 
@@ -133,7 +94,7 @@ namespace Cockroach
 
 	void Room::Resize(int newWidth, int newHeight)
 	{
-		Tile* newTiles = new Tile[newWidth * newHeight];
+		TileType* newTiles = new TileType[newWidth * newHeight];
 
 		for (int y = 0; y < height; y++)
 		{
@@ -148,6 +109,9 @@ namespace Cockroach
 
 		delete[] tiles;
 		tiles = newTiles;
+		delete[] tileUVs;
+		tileUVs = new int2[(newWidth + 1) * (newHeight + 1)];
+		UpdateTileUVAll();
 
 		width = newWidth;
 		height = newHeight;
@@ -155,30 +119,44 @@ namespace Cockroach
 		//Save();
 	}
 
-	void Room::UpdateTile(int x, int y)
+	void Room::UpdateTileUV(int x, int y)
 	{
-		TileType type = tiles[RoomPositionToIndex(x, y)].type;
+		TileType type = Air;
+		TileType type0 = tiles[RoomPositionToIndex(x - 1, y - 1)];
+		TileType type1 = tiles[RoomPositionToIndex(x, y - 1)];
+		TileType type2 = tiles[RoomPositionToIndex(x - 1, y)];
+		TileType type3 = tiles[RoomPositionToIndex(x, y)];
+			
+		if (type0 == TileBasic || type1 == TileBasic || type2 == TileBasic || type3 == TileBasic) // There shall be a better way.
+			type = TileBasic;
 
-		if (x < 0 || x >= width || y < 0 || y >= height) return;
+		const int2 uvOffsetLUT[16] =
+		{
+			{-1,-1}, {-4,+1}, {-3,+1}, {-1,+0},
+			{-4,+2}, {-2,+1}, {-3,+0}, {-2,+0},
+			{-3,+2}, {-4,+0}, {+0,+1}, {+0,+0},
+			{-1,+2}, {-2,+2}, {+0,+2}, {-1,+1},
+		};
 
-		int rightLeft = (IsFilled(x + 1, y, type) << 1) | (int)IsFilled(x - 1, y, type);
-		int downUp =	(IsFilled(x, y - 1, type) << 1) | (int)IsFilled(x, y + 1, type);
+		int indexNum = IsFilled(x-1 , y-1, type)*8 + IsFilled(x, y-1, type)*4 + IsFilled(x-1, y, type)*2 + IsFilled(x, y, type);
+		int2 uv = indexNum > 0 ? int2(35, 5) + uvOffsetLUT[indexNum] : invalidUV;
+		tileUVs[x + y*(width + 1)] = uv;
+	}
 
-		if (rightLeft == 3) rightLeft = 2;
-		else if (rightLeft == 2) rightLeft = 3;
-		if (downUp == 3) downUp = 2;
-		else if (downUp == 2) downUp = 3;
-
-		int xStart = type == TileBasic ? 7 : 19;
-
-		tiles[RoomPositionToIndex(x, y)].texCoordOffset = { xStart-rightLeft, 2+downUp };
+	void Room::UpdateTileUVAll()
+	{
+		for (int y = 0; y < height + 1; y++)
+			for (int x = 0; x < width + 1; x++)
+				UpdateTileUV(x, y);
 	}
 
 	bool Room::IsFilled(int x, int y, TileType type)
 	{
 		int index = RoomPositionToIndex(x, y);
 		if (!Contains({ x, y })) return true; // Little hack to make autotiling on borders easier
-		return tiles[index].type == type;
+		// More thought needed on edges
+		if (tiles[index] == Air) return false;
+		else return true;//return tiles[index] == type;
 	}
 
 	bool Room::CollidesWith(Rect rect, int xForesense, int yForesense)
@@ -191,7 +169,7 @@ namespace Cockroach
 			for (int x = minRoomPos.x; x <= maxRoomPos.x; x++)
 			{
 				int index = RoomPositionToIndex(x, y);
-				if (Contains({x, y}) && tiles[index].type == TileBasic) // Do not use IsFilled() as it is intended for autotiling and not collisions
+				if (Contains({x, y}) && tiles[index] == TileBasic) // Do not use IsFilled() as it is intended for autotiling and not collisions
 					return true;
 			}
 		}
@@ -225,7 +203,7 @@ namespace Cockroach
 			out << position.x << ' ';
 			out << position.y << ' ';
 			for (int i = 0; i < width * height; i++)
-				out << tiles[i].type;
+				out << tiles[i];
 			for (int i = 0; i < entities.size(); i++)
 			{
 				out << '\n';
@@ -236,8 +214,7 @@ namespace Cockroach
 				out << "H: " << (int)entities[i]->size.y;
 			}
 		}
-		else
-			CR_CORE_ERROR("Could not open file '{0}'", Filepath());
+		else CR_CORE_ERROR("Could not open file '{0}'", Filepath());
 		out.close();
 	}
 
@@ -265,11 +242,8 @@ namespace Cockroach
 			room = CreateRef<Room>(name, width, height, posX, posY);
 
 			for (int i = 0; i < room->width * room->height; i++)
-				room->tiles[i].type = (TileType)data[i];
-			InitTexCoordOffsets(room.get());
-			/*for (int y = 0; y < room->height; y++)
-				for (int x = 0; x < room->width; x++)
-					room->UpdateTile(x, y);*/
+				room->tiles[i] = (TileType)data[i];
+			room->UpdateTileUVAll();
 
 			while (std::getline(in, line))
 			{
@@ -285,8 +259,7 @@ namespace Cockroach
 				room->AddEntity(CreateEntity(int2(pX, pY), int2(w,h), type));
 			}
 		}
-		else
-			CR_CORE_ERROR("Could not open file '{0}'", filepath);
+		else CR_CORE_ERROR("Could not open file '{0}'", filepath);
 		in.close();
 		
 		return room;
@@ -294,15 +267,10 @@ namespace Cockroach
 
 	void Room::Rename(const std::string& newName)
 	{
-		if (name == newName)
-		{
-			CR_CORE_ERROR("New name is same as old name.");
-			return;
-		}
+		if (name == newName) { CR_CORE_ERROR("New name is same as old name."); return; }
 
 		if (rename(Filepath().c_str(), (roomDir + newName).c_str()))
 			name = newName;
-		else
-			CR_CORE_ERROR("Room could not be renamed from {0} to {1}.", Filepath(), (roomDir + newName));
+		else CR_CORE_ERROR("Room could not be renamed from {0} to {1}.", Filepath(), (roomDir + newName));
 	}
 }

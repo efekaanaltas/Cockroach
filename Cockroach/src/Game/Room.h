@@ -11,27 +11,20 @@ namespace Cockroach
 	public:
 		enum TileType : char
 		{
-			Air = '0', BackgroundBasic = 'G', TileBasic = 'B'
-		};
-
-		struct Tile
-		{
-			TileType type = Air;
-			int2 texCoordOffset = { 0,0 };
+			Air = '0', TileBasic = 'B'
 		};
 
 		static Ref<Room> current;
-
-		static const int2 tileTexCoordLUT[4][4];
 		inline static const std::string roomDir = "assets/rooms/";
+		inline static const int2 invalidUV = { -1, -1 };
 
 		Room(std::string name, int width, int height, int posX, int posY);
 
 		std::string name;
 		int width, height;
 		int2 position = { 0,0 };
-		Tile* tiles;
-		int2* renderTilesTexCoordOffsets;
+		TileType* tiles;
+		int2* tileUVs;
 		std::vector<Entity*> entities;
 
 		void Update(float dt);
@@ -43,7 +36,8 @@ namespace Cockroach
 		void PlaceTile(TileType tileType, int2 worldPosition);
 		void PlaceTileBox(TileType tileType, int2 worldPositionMin, int2 worldPositionMax);
 		void Resize(int newWidth, int newHeight);
-		void UpdateTile(int x, int y);
+		void UpdateTileUV(int x, int y);
+		void UpdateTileUVAll();
 
 		bool IsFilled(int x, int y, TileType type);
 
