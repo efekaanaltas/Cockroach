@@ -132,10 +132,10 @@ namespace Cockroach
 
 		const int2 uvOffsetLUT[16] =
 		{
-			{-1,-1}, {-4,+1}, {-3,+1}, {-1,+0},
-			{-4,+2}, {-2,+1}, {-3,+0}, {-2,+0},
-			{-3,+2}, {-4,+0}, {+0,+1}, {+0,+0},
-			{-1,+2}, {-2,+2}, {+0,+2}, {-1,+1},
+			{-1,-1}, {-4,+1}, {-3,+1}, {-1,+2},
+			{-4,+2}, {+0,+1}, {-3,+0}, {+0,+2},
+			{-3,+2}, {-4,+0}, {-2,+1}, {-2,+2},
+			{-1,+0}, {-0,+0}, {-2,+0}, {-1,+1},
 		};
 
 		int indexNum = IsFilled(x-1 , y-1, type)*8 + IsFilled(x, y-1, type)*4 + IsFilled(x-1, y, type)*2 + IsFilled(x, y, type);
@@ -267,10 +267,12 @@ namespace Cockroach
 
 	void Room::Rename(const std::string& newName)
 	{
+		if (newName.empty()) { CR_CORE_ERROR("New name is empty"); return; }
 		if (name == newName) { CR_CORE_ERROR("New name is same as old name."); return; }
-
-		if (rename(Filepath().c_str(), (roomDir + newName).c_str()))
+		
+		if (rename(Filepath().c_str(), (roomDir + newName).c_str()) == 0)
 			name = newName;
+		
 		else CR_CORE_ERROR("Room could not be renamed from {0} to {1}.", Filepath(), (roomDir + newName));
 	}
 }

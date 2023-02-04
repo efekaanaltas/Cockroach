@@ -39,6 +39,13 @@
 #define DOWN		float2(0.0f, -1.0f)
 #define UP			float2(0.0f, +1.0f)
 
+#define ONEi		int2(1, 1)
+#define ZEROi		int2(0, 0)
+#define LEFTi		int2(-1, 0)
+#define RIGHTi		int2(1, 0)
+#define DOWNi		int2(0, -1)
+#define UPi			int2(0, 1)
+
 #define WHITE		float4(1.0f, 1.0f, 1.0f, 1.0f)
 #define BLACK		float4(0.0f, 0.0f, 0.0f, 1.0f)
 #define CLEAR		float4(0.0f, 0.0f, 0.0f, 0.0f)

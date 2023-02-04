@@ -181,11 +181,14 @@ void Game::ImGuiRender()
 	End();
 
 	Begin("Current Room");
-	
-	Text(Room::current->name.c_str());
+	static char nameBuffer[255];
+	if (strcmp(nameBuffer, Room::current->name.c_str()))
+		strcpy_s(nameBuffer, 255, Room::current->name.c_str());
 
-	char buf[255]{};
-	InputText("Name", buf, sizeof(buf));
+	InputText("Name", nameBuffer, IM_ARRAYSIZE(nameBuffer));
+	
+	if (strcmp(nameBuffer, Room::current->name.c_str()))
+		Room::current->Rename(nameBuffer);
 
 	int pos[2] = { Room::current->position.x, Room::current->position.y };
 	DragInt2("Pos", pos);
