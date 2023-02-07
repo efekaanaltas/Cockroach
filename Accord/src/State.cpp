@@ -92,7 +92,7 @@ namespace Entities
 		{
 			Game::particles->particles.push_back(Particle
 			(
-				Game::player->position + int2(8, 0), { 3,0 },
+				Game::player->position + RIGHTi*8, { 3,0 },
 				{ -Game::player->velocity.x / 10.0f, 12.0f }, { 4.0f, 3.0f },
 				0.7f, 0.3f, 
 				WHITE, CLEAR)
@@ -160,7 +160,7 @@ namespace Entities
 
 		bool down = Input::IsPressed(CR_KEY_DOWN);
 		bool up = Input::IsPressed(CR_KEY_UP);
-		dashDir = { 0.0f, 0.0f };
+		dashDir = ZERO;
 		if (player->InputDirX() != 0 || player->InputDirY() != 0)
 			dashDir = glm::normalize(float2(player->InputDirX(), player->InputDirY()));
 		else dashDir = { player->faceDir, 0.0f };
@@ -185,7 +185,7 @@ namespace Entities
 			{
 				Game::particles->particles.push_back(Particle
 				(
-					Game::player->position + int2(8, 8), { 4.0f,4.0f },
+					Game::player->position + ONEi*8, ONE*4.0f,
 					DOWN * 2.0f, { 0.4f, 5.0f },
 					0.3f, 0.2f,
 					RED, BLUE*0.3f)

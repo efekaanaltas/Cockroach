@@ -192,7 +192,6 @@ namespace Entities
 	Turbine::Turbine(int2 position, int2 size, int horizontal, int vertical)
 	: Dynamic(position, int2(0, 0), size), horizontal(horizontal), vertical(vertical)
 	{
-		int iter = 0;
 		int xStart = std::min(position.x, position.x + horizontal * span);
 		int xEnd = std::max(position.x, position.x + horizontal * span) + size.x;
 		int yStart = std::min(position.y, position.y + vertical * span);
@@ -209,7 +208,7 @@ namespace Entities
 
 		Game::particles->particles.push_back(Particle
 		(
-			position + size / 2 + (int2)UP*4, { size.x / 2, 0 },
+			position + size / 2 + UPi*4, { size.x / 2, 0 },
 			UP * 25.0f, { 1.0f, 1.0f },
 			1.0f, 1.3f,
 			WHITE, BLACK)
@@ -404,80 +403,78 @@ Cockroach::Entity* Cockroach::CreateEntity(int2 position, int2 size, int entityT
 	case EntityType::SpikeLeft:
 	{
 		e = new Spike(position, { 4,0 }, { 8,8 });
-		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 1 }, { 8, 8 });
 		break;
 	}
 	case EntityType::SpikeRight:
 	{
 		e = new Spike(position, { 0,0 }, { 4,8 });
-		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 9, 0 }, { 8, 8 });
 		break;
 	}
 	case EntityType::SpikeDown:
 	{
 		e = new Spike(position, { 0,4 }, { 8,8 });
-		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 8, 1 }, { 8, 8 });
 		break;
 	}
 	case EntityType::SpikeUp:
 	{
 		e = new Spike(position, { 0,0 }, { 8,4 });
-		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 8, 0 }, { 8, 8 });
 		break;
 	}
 	case EntityType::Oscillator:
 	{
 		e = new OscillatorA(position, { 0, 0 }, { 8, 8 });
-		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
 		break;
 	}
 	case EntityType::TurbineLeft:
 	{
 		e = new Turbine(position, size, -1, 0);
-		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
 		break;
 	}
 	case EntityType::TurbineRight:
 	{
 		e = new Turbine(position, size, 1, 0);
-		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
 		break;
 	}
 	case EntityType::TurbineDown:
 	{
 		e = new Turbine(position, size, 0, -1);
-		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
 		break;
 	}
 	case EntityType::TurbineUp:
 	{
 		e = new Turbine(position, size, 0, 1);
-		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,2 }, { 8,8 });
 		break;
 	}
 	case EntityType::EssenceRed:
 	{
 		e = new Entities::EssenceRed(position, { 1,1 }, { 7,7 });
-		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 1,0 }, { 8,8 });
 		break;
 	}
 	case EntityType::Igniter:
 	{
 		e = new Entities::Igniter(position, size);
-		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 1,0 }, { 8,8 });
 		break;
 	}
 	case EntityType::Propeller:
 	{
 		e = new Entities::Propeller(position, size);
-		e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 1,0 }, { 8,8 });
 		break;
 	}
 	}
 	if (e != nullptr)
 	{
+		e->sprite = Game::entitySprites[entityType];
 		e->type = entityType;
 		e->size = size;
 	}
+	return e;
+}
+
+Cockroach::Entity* Cockroach::CreateDecoration(int2 position, int decorationType)
+{
+	Entity* e = new Entity(position);
+	e->type = -1;
+	e->sprite = Game::decorationSprites[decorationType];
+	e->size = { e->sprite.XSize(), e->sprite.YSize() };
 	return e;
 }

@@ -250,13 +250,24 @@ namespace Cockroach
 				std::stringstream stream(line);
 
 				int type = 0, pX = 0, pY = 0, w = 8, h = 8;
-				stream.seekg(line.find("E:") + 2); stream >> type;
-				stream.seekg(line.find("X:") + 2); stream >> pX;
-				stream.seekg(line.find("Y:") + 2); stream >> pY;
-				stream.seekg(line.find("W:") + 2); stream >> w;
-				stream.seekg(line.find("H:") + 2); stream >> h;
+				if (line.find("E:") != std::string::npos)
+				{
+					stream.seekg(line.find("E:") + 2); stream >> type;
+					stream.seekg(line.find("X:") + 2); stream >> pX;
+					stream.seekg(line.find("Y:") + 2); stream >> pY;
+					stream.seekg(line.find("W:") + 2); stream >> w;
+					stream.seekg(line.find("H:") + 2); stream >> h;
 
-				room->AddEntity(CreateEntity(int2(pX, pY), int2(w,h), type));
+					room->AddEntity(CreateEntity(int2(pX, pY), int2(w, h), type));
+				}
+				else
+				{
+					stream.seekg(line.find("D:") + 2); stream >> type;
+					stream.seekg(line.find("X:" + 2)); stream >> pX;
+					stream.seekg(line.find("Y:" + 2)); stream >> pY;
+
+					room->AddEntity(CreateEntity(int2(pX, pY), 8 * ONEi, type));
+				}
 			}
 		}
 		else CR_CORE_ERROR("Could not open file '{0}'", filepath);

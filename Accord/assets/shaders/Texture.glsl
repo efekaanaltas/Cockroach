@@ -41,4 +41,6 @@ void main()
 	color = texture(u_Textures[int(v_TexIndex)], v_TexCoord);
 
 	color = lerp(color, vec4(v_OverlayColor.xyz, color.w), v_OverlayColor.w);
+	
+	if(color.a <= 0.0) discard;
 }

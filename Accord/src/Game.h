@@ -45,6 +45,9 @@ public:
 	static void RenderGrid();
 	static void RenderHitboxes();
 
+	void SaveSprites();
+	void LoadSprites();
+
 	static CameraController* cameraController;
 	static Entities::Player* player;
 	static Entities::Particles* particles;
@@ -52,6 +55,9 @@ public:
 	static Ref<Framebuffer> framebuffer;
 	static Ref<Texture2D> baseSpriteSheet;
 	static Ref<Texture2D> background;
+
+	static std::vector<Sprite> entitySprites;
+	static std::vector<Sprite> decorationSprites;
 
 	static std::vector<Ref<Room>> rooms;
 

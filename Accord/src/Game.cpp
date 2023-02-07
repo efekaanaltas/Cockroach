@@ -12,6 +12,7 @@
 #include "Game.h"
 
 #include <filesystem>
+#include <fstream>
 
 CameraController* Game::cameraController = nullptr;
 Player* Game::player = nullptr;
@@ -20,6 +21,9 @@ Entities::Particles* Game::particles = nullptr;
 Ref<Framebuffer> Game::framebuffer = nullptr;
 Ref<Texture2D> Game::baseSpriteSheet = nullptr;
 Ref<Texture2D> Game::background = nullptr;
+
+std::vector<Sprite> Game::entitySprites;
+std::vector<Sprite> Game::decorationSprites;
 
 std::vector<Ref<Room>> Game::rooms;
 
@@ -34,6 +38,17 @@ Game::Game()
 	Game::background = CreateRef<Texture2D>("assets/textures/BG_RED.png");
 	Game::baseSpriteSheet = CreateRef<Texture2D>("assets/textures/SpriteSheet.png");
 
+	//for (int i = EntityType::SpikeLeft; i < EntityType::END; i++)
+	//{
+	//	Entity* e = CreateEntity(ZEROi, ONEi, i);
+	//	if (entitySprites.size() < i + 1)
+	//		entitySprites.resize(i + 1);
+	//	entitySprites[i] = e->sprite;
+	//}
+	//SaveSprites();
+
+	LoadSprites();
+
 	const std::filesystem::path roomDir{ "assets/rooms" };
 	for (auto& a : std::filesystem::directory_iterator(roomDir))
 	{
@@ -45,7 +60,7 @@ Game::Game()
 	cameraController->type = EntityType::Camera;
 	cameraController->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0,0 }, { 1,1 });
 
-	Game::player = new Entities::Player({10, 20}, {6,0}, {10,12});
+	Game::player = new Entities::Player({10, 32}, {6,0}, {10,12});
 	player->type = EntityType::Payga;
 	player->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 3 }, { 16, 16 });
 
@@ -96,8 +111,11 @@ void Game::Update(float dt)
 
 void Game::Render()
 {
-	framebuffer->Bind();
-	glViewport(0, 0, 320, 180);
+	if (!editMode)
+	{
+		framebuffer->Bind();
+		glViewport(0, 0, 320, 180);
+	}
 
 	Renderer::SetClearColor({ 0.1f, 0.0f, 0.0f, 1 });
 	Renderer::Clear();
@@ -150,9 +168,12 @@ void Game::Render()
 	EditorCursor::Render();
 
 	Renderer::EndScene();
-	glViewport(0, 0, Application::Get().GetWindow().width, Application::Get().GetWindow().height );
-	framebuffer->Unbind();
-	Renderer::BlitToScreen(framebuffer);
+	if (!editMode)
+	{
+		glViewport(0, 0, Application::Get().GetWindow().width, Application::Get().GetWindow().height );
+		framebuffer->Unbind();
+		Renderer::BlitToScreen(framebuffer);
+	}
 
 #if CR_DEBUG
 	if(editMode)
@@ -268,6 +289,77 @@ void Game::RenderHitboxes()
 void Game::Freeze(int frames)
 {
 	freezeTimer = Timer(frames);
+}
+
+void Game::SaveSprites()
+{
+	std::string filepath = "assets/textures/sprites.txt";
+	std::fstream out(filepath, std::ios::out | std::ios::binary | std::ios::trunc);
+
+	if (out)
+	{
+		for (int i = 0; i < entitySprites.size(); i++)
+		{
+			out << "E: " << i << ", ";
+			out << "X0: " << entitySprites[i].min.x << ", ";
+			out << "Y0: " << entitySprites[i].min.y << ", ";
+			out << "X1: " << entitySprites[i].max.x << ", ";
+			out << "Y1: " << entitySprites[i].max.y;
+			out << '\n';
+		}
+		for (int i = 0; i < decorationSprites.size(); i++)
+		{
+			out << "D: " << i << ", ";
+			out << "X0: " << decorationSprites[i].min.x << ", ";
+			out << "Y0: " << decorationSprites[i].min.y << ", ";
+			out << "X1: " << decorationSprites[i].max.x << ", ";
+			out << "Y1: " << decorationSprites[i].max.y;
+			out << '\n';
+		}
+	}
+	else CR_CORE_ERROR("Could not open file '{0}'", filepath);
+	out.close();
+}
+
+void Game::LoadSprites()
+{
+	std::string filepath = "assets/textures/sprites.txt";
+	std::fstream in(filepath, std::ios::in || std::ios::binary);
+
+	if (in)
+	{
+		std::string line;
+
+		while (std::getline(in, line))
+		{
+			std::stringstream stream(line);
+			int type;
+			float x0 = 0, y0 = 0, x1 = 8, y1 = 8;
+
+			stream.seekg(line.find("X0:") + 3); stream >> x0;
+			stream.seekg(line.find("Y0:") + 3); stream >> y0;
+			stream.seekg(line.find("X1:") + 3); stream >> x1;
+			stream.seekg(line.find("Y1:") + 3); stream >> y1;
+			Sprite sprite = Sprite(Game::baseSpriteSheet, float2(x0, y0), float2(x1, y1));
+
+			if (line.find("E:") != std::string::npos)
+			{
+				stream.seekg(line.find("E:") + 2); stream >> type;
+				if (entitySprites.size() < type + 1) 
+					entitySprites.resize(type + 1);
+				entitySprites[type] = sprite;
+			}
+			else if(line.find("D:") != std::string::npos)
+			{
+				stream.seekg(line.find("D:") + 2); stream >> type;
+				if (entitySprites.size() < type + 1) 
+					entitySprites.resize(type + 1);
+				decorationSprites[type] = sprite;
+			}
+		}
+	}
+	else CR_CORE_ERROR("Could not open file '{0}'", filepath);
+	in.close();
 }
 
 Cockroach::Application* Cockroach::CreateApplication()

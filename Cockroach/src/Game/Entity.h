@@ -42,4 +42,5 @@ namespace Cockroach
 	}
 
 	Entity* CreateEntity(int2 position, int2 size, int type);
+	Entity* CreateDecoration(int2 position, int type);
 }

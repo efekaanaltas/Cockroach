@@ -51,7 +51,6 @@ namespace Entities
 	void Player::Update(float dt)
 	{
 		bool groundedAtStartOfFrame = grounded;
-		bool canDashAtStartOfFrame = canDash;
 		velocityLastFrame = velocity;
 
 		bufferedJumpInput.Update();
@@ -171,6 +170,6 @@ namespace Entities
 
 	void Player::Die()
 	{
-		position = { -8,24 };
+		position = { 10,32 };
 	}
 }
