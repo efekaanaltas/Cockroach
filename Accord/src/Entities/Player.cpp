@@ -170,6 +170,6 @@ namespace Entities
 
 	void Player::Die()
 	{
-		position = { 10,32 };
+		position = { -72,32 };
 	}
 }

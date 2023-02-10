@@ -174,7 +174,14 @@ namespace Entities
 	State<Player>* DashingState::Update(Player* player, float dt)
 	{
 		if (player->bufferedJumpInput.Active() && player->GetCollision(0, -1))
+		{
+			if (player->faceDir != player->InputDirX() && player->InputDirX() != 0)
+			{
+				player->velocity.x *= -1;
+				player->faceDir *= -1;
+			}
 			return player->superjumpingState;
+		}
 
 		if (dashTimer.Finished())
 			return player->walkingState;

@@ -1,6 +1,7 @@
 #include "crpch.h"
 #include "Entity.h"
 
+#include "../Core/Utility.h"
 #include "Renderer/Renderer.h"
 
 namespace Cockroach
@@ -20,5 +21,12 @@ namespace Cockroach
 	void Entity::Render()
 	{
 		Renderer::DrawQuad(float3(position, z), { sprite.XSize(), sprite.YSize() }, sprite, { overlayColor, overlayWeight }, flipX, flipY);
+	}
+
+	std::string Entity::GenerateDefinitionString()
+	{
+		return GenerateProperty("E", type)
+			 + GenerateProperty("X", position.x) + GenerateProperty("Y", position.y)
+			 + GenerateProperty("W", size.x) + GenerateProperty("H", size.y) + "\n";
 	}
 }

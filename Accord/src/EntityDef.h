@@ -141,7 +141,7 @@ namespace Entities
 			: Dynamic(position, int2(0, 0), size)
 		{}
 
-		Timer igniteTimer = Timer(2.0f);
+		Timer igniteTimer = Timer(1.0f);
 		Timer flashTimer = Timer(0.3f);
 
 		virtual void Update(float dt) override;

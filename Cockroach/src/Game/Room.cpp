@@ -2,6 +2,7 @@
 #include "Room.h"
 
 #include <fstream>
+#include "../Core/Utility.h"
 #include "Renderer/Renderer.h"
 
 namespace Cockroach
@@ -14,6 +15,8 @@ namespace Cockroach
 		position = { posX, posY };
 		tiles = new TileType[width * height];
 		tileUVs = new int2[(width + 1) * (height + 1)];
+		memset(tiles, Air, width * height * sizeof(TileType));
+		memset(tileUVs, 0, (width+1) * (height+1) * sizeof(int2));
 	}
 
 	void Room::Update(float dt)
@@ -96,25 +99,29 @@ namespace Cockroach
 	{
 		TileType* newTiles = new TileType[newWidth * newHeight];
 
-		for (int y = 0; y < height; y++)
+		for (int y = 0; y < newHeight; y++)
 		{
-			for (int x = 0; x < width; x++)
+			for (int x = 0; x < newWidth; x++)
 			{
 				int oldIndex = RoomPositionToIndex(x, y);
 				int newIndex = y * newWidth + x;
-				if(0 <= x && 0 <= y && x < newWidth && x < width && y < newHeight && y < height)
+				if (0 <= x && 0 <= y && x < newWidth && x < width && y < newHeight && y < height)
 					newTiles[newIndex] = tiles[oldIndex];
+				else
+					newTiles[newIndex] = Air;
 			}
 		}
 
 		delete[] tiles;
 		tiles = newTiles;
-		delete[] tileUVs;
-		tileUVs = new int2[(newWidth + 1) * (newHeight + 1)];
-		UpdateTileUVAll();
 
 		width = newWidth;
 		height = newHeight;
+		
+		int2* newTileUVs = new int2[(newWidth + 1) * (newHeight + 1)];
+		delete[] tileUVs;
+		tileUVs = newTileUVs;
+		UpdateTileUVAll();
 
 		//Save();
 	}
@@ -204,15 +211,9 @@ namespace Cockroach
 			out << position.y << ' ';
 			for (int i = 0; i < width * height; i++)
 				out << tiles[i];
+			out << '\n';
 			for (int i = 0; i < entities.size(); i++)
-			{
-				out << '\n';
-				out << "E: " << entities[i]->type << ", ";
-				out << "X: " << entities[i]->position.x << ", ";
-				out << "Y: " << entities[i]->position.y << ", ";
-				out << "W: " << (int)entities[i]->size.x << ", ";
-				out << "H: " << (int)entities[i]->size.y;
-			}
+				out << entities[i]->GenerateDefinitionString();
 		}
 		else CR_CORE_ERROR("Could not open file '{0}'", Filepath());
 		out.close();
@@ -249,24 +250,18 @@ namespace Cockroach
 			{
 				std::stringstream stream(line);
 
-				int type = 0, pX = 0, pY = 0, w = 8, h = 8;
-				if (line.find("E:") != std::string::npos)
+				if (HasProperty(stream, "E"))
 				{
-					stream.seekg(line.find("E:") + 2); stream >> type;
-					stream.seekg(line.find("X:") + 2); stream >> pX;
-					stream.seekg(line.find("Y:") + 2); stream >> pY;
-					stream.seekg(line.find("W:") + 2); stream >> w;
-					stream.seekg(line.find("H:") + 2); stream >> h;
-
-					room->AddEntity(CreateEntity(int2(pX, pY), int2(w, h), type));
+					int type = GetProperty<int>(stream, "E");
+					int2 position = { GetProperty<int>(stream, "X"), GetProperty<int>(stream, "Y") };
+					int2 size = { GetProperty<int>(stream, "W"), GetProperty<int>(stream, "H") };
+					room->AddEntity(CreateEntity(position, size, type));
 				}
-				else
+				else if(HasProperty(stream, "D"))
 				{
-					stream.seekg(line.find("D:") + 2); stream >> type;
-					stream.seekg(line.find("X:" + 2)); stream >> pX;
-					stream.seekg(line.find("Y:" + 2)); stream >> pY;
-
-					room->AddEntity(CreateEntity(int2(pX, pY), 8 * ONEi, type));
+					int type = GetProperty<int>(stream, "D");
+					int2 position = { GetProperty<int>(stream, "X"), GetProperty<int>(stream, "Y") };
+					room->AddEntity(CreateDecoration(position, type));
 				}
 			}
 		}

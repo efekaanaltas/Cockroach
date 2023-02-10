@@ -60,7 +60,7 @@ Game::Game()
 	cameraController->type = EntityType::Camera;
 	cameraController->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0,0 }, { 1,1 });
 
-	Game::player = new Entities::Player({10, 32}, {6,0}, {10,12});
+	Game::player = new Entities::Player({-72, 32}, {6,0}, {10,12});
 	player->type = EntityType::Payga;
 	player->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 3 }, { 16, 16 });
 
@@ -300,20 +300,20 @@ void Game::SaveSprites()
 	{
 		for (int i = 0; i < entitySprites.size(); i++)
 		{
-			out << "E: " << i << ", ";
-			out << "X0: " << entitySprites[i].min.x << ", ";
-			out << "Y0: " << entitySprites[i].min.y << ", ";
-			out << "X1: " << entitySprites[i].max.x << ", ";
-			out << "Y1: " << entitySprites[i].max.y;
+			out << GenerateProperty("E", i);
+			out << GenerateProperty("X0", entitySprites[i].min.x);
+			out << GenerateProperty("Y0", entitySprites[i].min.y);
+			out << GenerateProperty("X1", entitySprites[i].max.x);
+			out << GenerateProperty("Y1", entitySprites[i].max.y);
 			out << '\n';
 		}
 		for (int i = 0; i < decorationSprites.size(); i++)
 		{
-			out << "D: " << i << ", ";
-			out << "X0: " << decorationSprites[i].min.x << ", ";
-			out << "Y0: " << decorationSprites[i].min.y << ", ";
-			out << "X1: " << decorationSprites[i].max.x << ", ";
-			out << "Y1: " << decorationSprites[i].max.y;
+			out << GenerateProperty("D", i);
+			out << GenerateProperty("X0", entitySprites[i].min.x);
+			out << GenerateProperty("Y0", entitySprites[i].min.y);
+			out << GenerateProperty("X1", entitySprites[i].max.x);
+			out << GenerateProperty("Y1", entitySprites[i].max.y);
 			out << '\n';
 		}
 	}
@@ -334,24 +334,21 @@ void Game::LoadSprites()
 		{
 			std::stringstream stream(line);
 			int type;
-			float x0 = 0, y0 = 0, x1 = 8, y1 = 8;
 
-			stream.seekg(line.find("X0:") + 3); stream >> x0;
-			stream.seekg(line.find("Y0:") + 3); stream >> y0;
-			stream.seekg(line.find("X1:") + 3); stream >> x1;
-			stream.seekg(line.find("Y1:") + 3); stream >> y1;
-			Sprite sprite = Sprite(Game::baseSpriteSheet, float2(x0, y0), float2(x1, y1));
+			float2 min = { GetProperty<float>(stream, "X0"), GetProperty<float>(stream, "Y0") };
+			float2 max = { GetProperty<float>(stream, "X1"), GetProperty<float>(stream, "Y1") };
+			Sprite sprite = Sprite(Game::baseSpriteSheet, min, max);
 
-			if (line.find("E:") != std::string::npos)
+			if (HasProperty(stream, "E"))
 			{
-				stream.seekg(line.find("E:") + 2); stream >> type;
+				type = GetProperty<int>(stream, "E");
 				if (entitySprites.size() < type + 1) 
 					entitySprites.resize(type + 1);
 				entitySprites[type] = sprite;
 			}
-			else if(line.find("D:") != std::string::npos)
+			else if(HasProperty(stream, "D"))
 			{
-				stream.seekg(line.find("D:") + 2); stream >> type;
+				type = GetProperty<int>(stream, "D");
 				if (entitySprites.size() < type + 1) 
 					entitySprites.resize(type + 1);
 				decorationSprites[type] = sprite;

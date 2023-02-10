@@ -28,6 +28,8 @@ namespace Cockroach
 		virtual void Update(float dt) {}
 		virtual void Render();
 
+		std::string GenerateDefinitionString();
+
 		template<typename T>
 		T* As();
 

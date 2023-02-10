@@ -1,5 +1,4 @@
 #include "EditorCursor.h"
-using namespace Cockroach;
 #include "Game.h"
 
 EditorCursor::BrushMode EditorCursor::brushMode = BrushMode::Tile;
@@ -71,6 +70,7 @@ void EditorCursor::Update(float dt)
 		case BrushMode::Room:
 		{
 			Game::rooms.push_back(CreateRef<Cockroach::Room>(std::to_string(Game::rooms.size() - 1), (maxPos.x - minPos.x)/8+1, (maxPos.y - minPos.y)/8+1, minPos.x/8, minPos.y/8));
+			Game::rooms[Game::rooms.size() - 1]->UpdateTileUVAll();
 			Game::rooms[Game::rooms.size() - 1]->Save();
 			break;
 		}

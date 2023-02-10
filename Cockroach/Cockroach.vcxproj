@@ -147,6 +147,7 @@
     <ClInclude Include="src\Core\EntryPoint.h" />
     <ClInclude Include="src\Core\Input.h" />
     <ClInclude Include="src\Core\Log.h" />
+    <ClInclude Include="src\Core\Utility.h" />
     <ClInclude Include="src\Core\Window.h" />
     <ClInclude Include="src\Game\Entity.h" />
     <ClInclude Include="src\Game\Rect.h" />
@@ -582,6 +583,7 @@
     <ClCompile Include="src\Core\Application.cpp" />
     <ClCompile Include="src\Core\Input.cpp" />
     <ClCompile Include="src\Core\Log.cpp" />
+    <ClCompile Include="src\Core\Utility.cpp" />
     <ClCompile Include="src\Core\Window.cpp" />
     <ClCompile Include="src\Game\Entity.cpp" />
     <ClCompile Include="src\Game\Rect.cpp" />

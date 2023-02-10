@@ -39,10 +39,4 @@ namespace Cockroach
 	{
 		return std::make_shared<T>(std::forward<Args>(args)...);
 	}
-
-	template<typename T>
-	T lerp(T a, T b, float t)
-	{
-		return a + t * (b - a);
-	}
 }

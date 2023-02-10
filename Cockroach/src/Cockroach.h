@@ -2,7 +2,7 @@
 
 #include "Core/Application.h"
 #include "Core/Log.h"
-
+#include "Core/Utility.h"
 #include "Core/Input.h"
 
 // ---Renderer-----------------------------
