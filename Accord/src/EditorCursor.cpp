@@ -3,12 +3,18 @@
 
 EditorCursor::BrushMode EditorCursor::brushMode = BrushMode::Tile;
 Room::TileType EditorCursor::tileType = Room::TileBasic;
-int EditorCursor::entityType = 2;
+int EditorCursor::entityType = EntityType::SpikeLeft;
 bool EditorCursor::isBoxPlacing = false;
 int2 EditorCursor::boxPlaceStartPos = { 0.0f, 0.0f };
 
 void EditorCursor::Update(float dt)
 {
+	if (Input::IsPressed(CR_MOUSE_BUTTON_MIDDLE))
+	{
+		Game::player->position = EditorCursor::WorldPosition();
+		Game::player->TryChangeRoom();
+	}
+
 	if (Input::IsPressed(CR_MOUSE_BUTTON_LEFT))
 	{
 		switch (brushMode)

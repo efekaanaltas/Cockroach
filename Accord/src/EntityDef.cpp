@@ -208,8 +208,8 @@ namespace Entities
 
 		Game::particles->particles.push_back(Particle
 		(
-			position + size / 2 + UPi*4, { size.x / 2, 0 },
-			UP * 25.0f, { 1.0f, 1.0f },
+			position + size / 2 + UPi*vertical*4, { size.x / 2, 0 },
+			UPi * vertical * 25, { 1.0f, 1.0f },
 			1.0f, 1.3f,
 			WHITE, BLACK)
 		);
@@ -248,6 +248,7 @@ namespace Entities
 
 	void EssenceRed::Absorb()
 	{
+		Game::Freeze(3.0f);
 		respawnTimer.Reset();
 		sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 0,1 }, { 8,8 });
 		active = false;

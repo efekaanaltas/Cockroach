@@ -88,9 +88,6 @@ void Game::Update(float dt)
 	}
 	Room::current->Update(dt);
 
-	if (Input::IsPressed(CR_MOUSE_BUTTON_MIDDLE))
-		player->position = EditorCursor::WorldPosition();
-	int2 worldPosCur = EditorCursor::WorldPosition();
 	EditorCursor::Update(dt);
 
 	if (Input::IsDown(CR_KEY_TAB))

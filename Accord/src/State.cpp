@@ -35,12 +35,15 @@ namespace Entities
 		{
 			player->faceDir = player->WallDir();
 
-			int height = 0;
-			while (++height < 8)
-				if (!player->GetCollision(player->faceDir, height))
-				{
-					return player->ledgeJumpingState;
-				}
+			if (player->InputDirY() == 1)
+			{
+				int height = 0;
+				while (++height < 8)
+					if (!player->GetCollision(player->faceDir, height))
+					{
+						return player->ledgeJumpingState;
+					}
+			}
 
 			return player->walljumpingState;
 		}
@@ -129,12 +132,15 @@ namespace Entities
 
 		if (player->bufferedJumpInput.Active())
 		{
-			int height = 0;
-			while (++height < 8)
-				if (!player->GetCollision(player->faceDir, height))
-				{
-					return player->ledgeJumpingState;
-				}
+			if (player->InputDirY() == 1)
+			{
+				int height = 0;
+				while (++height < 8)
+					if (!player->GetCollision(player->faceDir, height))
+					{
+						return player->ledgeJumpingState;
+					}
+			}
 			return player->walljumpingState;
 		}
 

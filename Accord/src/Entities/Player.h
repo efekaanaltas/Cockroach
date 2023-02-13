@@ -46,8 +46,11 @@ namespace Entities
 		bool grounded = false;
 		bool canDash = false;
 
-		float2 velocity = { 0.0f, 0.0f };
-		float2 velocityLastFrame = { 0.0f, 0.0f };
+		bool lookingForCheckpoint = false;
+		int2 checkpointPosition = ZEROi;
+
+		float2 velocity = ZERO;
+		float2 velocityLastFrame = ZERO;
 
 		State<Player>* currentState = nullptr;
 		WalkingState* walkingState = nullptr;
@@ -58,7 +61,7 @@ namespace Entities
 		ClingingState* clingingState = nullptr;
 		DashingState* dashingState = nullptr;
 
-		float2 renderSize = { 1.0f, 1.0f };
+		float2 renderSize = ONE;
 
 		Sheet idleSheet, walkingSheet, fallingSheet, jumpingSheet, clingingSheet, dashingSheet;
 		Sheet currentSheet;
@@ -79,6 +82,7 @@ namespace Entities
 
 		void TrySwitchState(State<Player>* state);
 
+		void TryChangeRoom();
 		void RegainDash();
 		void Die();
 	};

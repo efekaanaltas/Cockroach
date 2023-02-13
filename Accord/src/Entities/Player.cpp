@@ -10,7 +10,7 @@ namespace Entities
 		walkingState = new WalkingState;
 		jumpingState = new JumpingState(50.0f, 140.0f, 0.0f);
 		superjumpingState = new JumpingState(50.0f, 120.0f, 180.0f);
-		walljumpingState = new JumpingState(50.0f, 80.0f, -160.0);
+		walljumpingState = new JumpingState(50.0f, 80.0f, -180.0);
 		ledgeJumpingState = new JumpingState(80.0f, 80.0f, 0.0f);
 		clingingState = new ClingingState;
 		dashingState = new DashingState;
@@ -39,6 +39,8 @@ namespace Entities
 		bufferedJumpInput.Cancel();
 		bufferedDashInput.Cancel();
 		gravityHaltTimer.remainingTime = 0.0f;
+
+		checkpointPosition = position;
 	}
 
 	void Player::Render()
@@ -65,15 +67,14 @@ namespace Entities
 
 		TrySwitchState(currentState->Update(this, dt));
 
-		if(!Room::current->Contains(WorldHitbox()))
-			for(auto& room : Game::rooms)
-				if (room != Room::current && room->OverlapsWith(WorldHitbox(), 0, 0))
-				{
-					Room::current = room;
-					Rect bounds = room->Bounds();
-					position = glm::clamp(position, Room::current->Bounds().min - hitbox.min, Room::current->Bounds().max - hitbox.max);
-					break;
-				}
+		if (lookingForCheckpoint && grounded)
+		{
+			checkpointPosition = position;
+			lookingForCheckpoint = false;
+		}
+
+		if (!Room::current->Contains(WorldHitbox()))
+			TryChangeRoom();
 
 		if (velocity.x != 0.0f)
 			faceDir = velocity.x < 0.0f ? -1 : 1;
@@ -162,6 +163,19 @@ namespace Entities
 		currentState->Enter(this);
 	}
 
+	void Player::TryChangeRoom()
+	{
+		for (auto& room : Game::rooms)
+			if (room != Room::current && room->OverlapsWith(WorldHitbox(), 0, 0))
+			{
+				Room::current = room;
+				Rect bounds = room->Bounds();
+				position = glm::clamp(position, bounds.min - hitbox.min, bounds.max - hitbox.max);
+				lookingForCheckpoint = true;
+				break;
+			}
+	}
+
 	void Player::RegainDash()
 	{
 		if(!canDash) flashTimer.Reset();
@@ -170,6 +184,6 @@ namespace Entities
 
 	void Player::Die()
 	{
-		position = { -72,32 };
+		position = checkpointPosition;
 	}
 }
