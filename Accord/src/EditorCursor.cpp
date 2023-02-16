@@ -4,6 +4,7 @@
 EditorCursor::BrushMode EditorCursor::brushMode = BrushMode::Tile;
 Room::TileType EditorCursor::tileType = Room::TileBasic;
 int EditorCursor::entityType = EntityType::SpikeLeft;
+int EditorCursor::decorationType = 0;
 bool EditorCursor::isBoxPlacing = false;
 int2 EditorCursor::boxPlaceStartPos = { 0.0f, 0.0f };
 
@@ -38,7 +39,19 @@ void EditorCursor::Update(float dt)
 			break;
 		}
 		}
-
+	}
+	
+	if (Input::IsDown(CR_MOUSE_BUTTON_LEFT) && brushMode == Decoration)
+	{
+		Cockroach::Entity* decorationOverCursor = nullptr;
+		for (auto& ent : Room::current->entities)
+			if (Entities::Decoration* deco = ent->As<Entities::Decoration>())
+				if (deco->WorldHitbox().OverlapsWith(Rect(WorldPosition(), WorldPosition() + 8 * ONEi), 0, 0))
+					decorationOverCursor = ent;
+		if (Input::IsPressed(CR_KEY_LEFT_CONTROL) && decorationOverCursor)
+			Room::current->RemoveEntity(decorationOverCursor);
+		else if(!Input::IsPressed(CR_KEY_LEFT_CONTROL))
+			Room::current->AddEntity(CreateDecoration(WorldPosition(), decorationType));
 	}
 
 	if (Input::IsDown(CR_MOUSE_BUTTON_RIGHT))

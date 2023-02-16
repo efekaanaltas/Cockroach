@@ -183,8 +183,7 @@ void Game::ImGuiRender()
 	using namespace ImGui;
 	Application::ImGuiBegin();
 
-	ImGuiIO io = ImGui::GetIO();
-
+	ImGuiIO& io = ImGui::GetIO();
 	Begin("Info");
 	Text("%.3f ms (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 
@@ -229,9 +228,9 @@ void Game::ImGuiRender()
 	Begin("Brush Settings");
 
 	int* brushModeIntPtr = (int*)&EditorCursor::brushMode;
-	const char* elems_names[3] = { "Tile", "Entity", "Room" };
+	const char* elems_names[4] = { "Tile", "Entity", "Decoration", "Room" };
 	const char* elem_name = elems_names[*brushModeIntPtr];
-	SliderInt("Mode", brushModeIntPtr, 0, 2, elem_name);
+	SliderInt("Mode", brushModeIntPtr, 0, 3, elem_name);
 
 	if (EditorCursor::brushMode == EditorCursor::Tile)
 	{
@@ -241,10 +240,115 @@ void Game::ImGuiRender()
 		for (int i = EntityType::Particles + 1; i < EntityType::END; i++)
 			if(ImGui::Button(entityTypeNames[i].c_str(), {200,20}))
 				EditorCursor::entityType = i;
+	if (EditorCursor::brushMode == EditorCursor::Decoration)
+	{
+		static bool showSpriteEditor = false;
+
+		if (Button("Add Decoration"))
+			decorationSprites.push_back(Sprite(Game::baseSpriteSheet, ZERO, ONE));
+		if (Button("Open Sprite Editor"))
+			showSpriteEditor = true;
+
+		if (showSpriteEditor) ShowSpriteEditor(&showSpriteEditor);
+
+		for (int i = 0; i < decorationSprites.size(); i++)
+		{
+			Sprite& decoration = decorationSprites[i];
+			
+			const float displaySize = 100;
+			float2 size = { displaySize, displaySize };
+			if (decoration.YSize() != 0) // Don't divide by zero
+			{
+				float aspect = decoration.XSize() / decoration.YSize();
+				if (aspect > 1.0f) size.y = displaySize / aspect;
+				else			   size.x = displaySize * aspect;
+			}
+
+			if (ImageButton(std::to_string(i).c_str(), (void*)(intptr_t)Game::baseSpriteSheet->rendererID, { size.x,size.y }, { decoration.min.x, decoration.max.y }, { decoration.max.x, decoration.min.y }))
+			{
+				EditorCursor::decorationType = i;
+			}
+		}
+	
+	}
 		
 	End();
 
 	Application::ImGuiEnd();
+}
+
+void Game::ShowSpriteEditor(bool* open)
+{
+	// Derived from ImGui custom rendering canvas example.
+	using namespace ImGui;
+	ImGuiIO& io = ImGui::GetIO();
+	Begin("Sprite Editor", open);
+
+	Ref<Texture2D> texture = Game::baseSpriteSheet;
+	const float spriteTileScale = 8.0f;
+	const float canvasScale = 10.0f;
+	static float2 rectStart, rectEnd;
+	static float2 scrolling(0.0f, 0.0f);
+	static bool boxSelecting = false;
+
+	float2 canvasStart = { ImGui::GetCursorScreenPos().x, ImGui::GetCursorScreenPos().y };
+	float2 canvasSize = { ImGui::GetContentRegionAvail().x, ImGui::GetContentRegionAvail().y };
+	if (canvasSize.x < 50.0f) canvasSize.x = 50.0f;
+	if (canvasSize.y < 50.0f) canvasSize.y = 50.0f;
+	float2 canvasEnd = float2(canvasStart.x + canvasSize.x, canvasStart.y + canvasSize.y);
+
+	ImDrawList* draw_list = ImGui::GetWindowDrawList();
+	draw_list->AddRectFilled({ canvasStart.x, canvasStart.y }, { canvasEnd.x, canvasEnd.y }, IM_COL32(20, 20, 20, 255));
+	draw_list->AddRect({ canvasStart.x, canvasStart.y }, { canvasEnd.x, canvasEnd.y }, IM_COL32(255, 255, 255, 255));
+
+	ImGui::InvisibleButton("canvas", { canvasSize.x, canvasSize.y }, ImGuiButtonFlags_MouseButtonLeft | ImGuiButtonFlags_MouseButtonRight);
+	const bool hovered = ImGui::IsItemHovered();
+	const bool active = ImGui::IsItemActive();
+	const float2 origin(canvasStart.x + scrolling.x, canvasStart.y + scrolling.y);
+	const ImVec2 mouse_pos_in_canvas(io.MousePos.x - origin.x, io.MousePos.y - origin.y);
+	float2 discreteMousePos = float2(mouse_pos_in_canvas.x - fmodf(mouse_pos_in_canvas.x, canvasScale), mouse_pos_in_canvas.y - fmodf(mouse_pos_in_canvas.y, canvasScale));
+
+	if (hovered && !boxSelecting && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+	{
+		rectStart = discreteMousePos;
+		boxSelecting = true;
+	}
+	if (boxSelecting)
+	{
+		rectEnd = discreteMousePos;
+		if (!ImGui::IsMouseDown(ImGuiMouseButton_Left))
+			boxSelecting = false;
+		if (rectStart - rectEnd != ZERO)
+		{
+			float2 rectMin = { std::min(rectStart.x, rectEnd.x), std::min(rectStart.y, rectEnd.y) };
+			float2 rectMax = { std::max(rectStart.x, rectEnd.x), std::max(rectStart.y, rectEnd.y) };
+
+			float2 uvStart = float2(rectMin.x / canvasScale, texture->height - (rectMax.y / canvasScale)) / float2(texture->width, texture->height);
+			float2 uvEnd = float2(rectMax.x / canvasScale, texture->height - (rectMin.y / canvasScale)) / float2(texture->width, texture->height);
+
+			decorationSprites[EditorCursor::decorationType] = Sprite(texture, uvStart, uvEnd);
+			SaveSprites();
+		}
+	}
+
+	if (active && ImGui::IsMouseDragging(ImGuiMouseButton_Right, 0.0f))
+		scrolling += float2(io.MouseDelta.x, io.MouseDelta.y);
+
+	draw_list->PushClipRect({ canvasStart.x, canvasStart.y }, { canvasEnd.x, canvasEnd.y }, true);
+	float2 textureStart = origin;
+	float2 textureEnd = origin + canvasScale * float2(texture->width, texture->height);
+	draw_list->AddImage((void*)(intptr_t)texture->rendererID, { textureStart.x, textureStart.y }, { textureEnd.x, textureEnd.y }, { 0,1 }, { 1,0 });
+
+	float GRID_STEP = canvasScale * spriteTileScale;
+	for (float x = fmodf(scrolling.x, GRID_STEP); x < canvasSize.x; x += GRID_STEP)
+		draw_list->AddLine({ canvasStart.x + x, canvasStart.y }, { canvasStart.x + x, canvasEnd.y }, IM_COL32(200, 200, 200, 40));
+	for (float y = fmodf(scrolling.y, GRID_STEP); y < canvasSize.y; y += GRID_STEP)
+		draw_list->AddLine({ canvasStart.x, canvasStart.y + y }, { canvasEnd.x, canvasStart.y + y }, IM_COL32(200, 200, 200, 40));
+	draw_list->AddRectFilled({ origin.x + rectStart.x, origin.y + rectStart.y }, { origin.x + rectEnd.x, origin.y + rectEnd.y }, IM_COL32(0, 135, 0, 120));
+	draw_list->AddRect({ origin.x + rectStart.x, origin.y + rectStart.y }, { origin.x + rectEnd.x, origin.y + rectEnd.y }, IM_COL32(0, 220, 0, 255));
+	draw_list->PopClipRect();
+
+	End();
 }
 
 void Game::RenderGrid()
@@ -268,6 +372,12 @@ void Game::RenderHitboxes()
 
 	for (auto& ent : Room::current->entities)
 	{
+		if (EditorCursor::brushMode == EditorCursor::BrushMode::Decoration)
+		{
+			Decoration* deco = ent->As<Decoration>();
+			if(deco)
+				Renderer::DrawQuadOutline((float)deco->Left(), (float)deco->Right(), (float)deco->Bottom(), (float)deco->Top(), { 0.0f, 1.0f, 1.0f, 1.0f });
+		}
 		Dynamic* dyn = ent->As<Dynamic>();
 		if (dyn)
 			Renderer::DrawQuadOutline((float)dyn->Left(), (float)dyn->Right(), (float)dyn->Bottom(), (float)dyn->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
@@ -307,10 +417,10 @@ void Game::SaveSprites()
 		for (int i = 0; i < decorationSprites.size(); i++)
 		{
 			out << GenerateProperty("D", i);
-			out << GenerateProperty("X0", entitySprites[i].min.x);
-			out << GenerateProperty("Y0", entitySprites[i].min.y);
-			out << GenerateProperty("X1", entitySprites[i].max.x);
-			out << GenerateProperty("Y1", entitySprites[i].max.y);
+			out << GenerateProperty("X0", decorationSprites[i].min.x);
+			out << GenerateProperty("Y0", decorationSprites[i].min.y);
+			out << GenerateProperty("X1", decorationSprites[i].max.x);
+			out << GenerateProperty("Y1", decorationSprites[i].max.y);
 			out << '\n';
 		}
 	}
@@ -346,8 +456,8 @@ void Game::LoadSprites()
 			else if(HasProperty(stream, "D"))
 			{
 				type = GetProperty<int>(stream, "D");
-				if (entitySprites.size() < type + 1) 
-					entitySprites.resize(type + 1);
+				if (decorationSprites.size() < type + 1) 
+					decorationSprites.resize(type + 1);
 				decorationSprites[type] = sprite;
 			}
 		}

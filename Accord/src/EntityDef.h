@@ -111,7 +111,7 @@ namespace Entities
 	public:
 		Turbine(int2 position, int2 size, int horizontal, int vertical);
 
-		float turbineAcceleration = 200.0f;
+		float turbineAcceleration = 300.0f;
 		int horizontal = 1, vertical = 0;
 		int span = 56;
 		Rect turbineRect;
@@ -138,7 +138,7 @@ namespace Entities
 	{
 	public:
 		Igniter(int2 position, int2 size)
-			: Dynamic(position, int2(0, 0), size)
+			: Dynamic(position, ZEROi, size)
 		{}
 
 		Timer igniteTimer = Timer(1.0f);
@@ -152,7 +152,7 @@ namespace Entities
 	{
 	public:
 		Propeller(int2 position, int2 size)
-			: Dynamic(position, int2(0,0), size)
+			: Dynamic(position, ZEROi, size)
 		{
 			blockOnCollision = true;
 		}
@@ -174,7 +174,7 @@ namespace Entities
 
 		void SetZoom(float zoom);
 
-		float2 positionHighRes = { 0.0f, 0.0f };
+		float2 positionHighRes = ZERO;
 
 		float aspectRatio = 16.0f / 9.0f;
 		float zoom = 90.0f;
@@ -182,6 +182,36 @@ namespace Entities
 		float speed = 1.0f;
 
 		Rect Bounds() { return Rect((float2)camera.GetPosition() - float2(aspectRatio * zoom, zoom), { (float2)camera.GetPosition() + float2(aspectRatio * zoom, zoom) }); }
+	};
+
+	class Decoration : public Entity
+	{
+	public:
+		Decoration(int2 position, int2 size)
+			: Entity(position), hitbox(ZEROi, size)
+		{}
+
+		int decorationIndex;
+		Rect hitbox;
+
+		virtual std::string GenerateDefinitionString() override
+		{
+			return GenerateProperty("D", decorationIndex)
+				+ GenerateProperty("X", position.x) + GenerateProperty("Y", position.y) + "\n";
+		}
+
+		virtual void Update(float dt) override {}
+
+		int Left() const { return position.x + hitbox.min.x; }
+		int Right() const { return position.x + hitbox.max.x; }
+		int Bottom() const { return position.y + hitbox.min.y; }
+		int Top() const { return position.y + hitbox.max.y; }
+
+		Rect WorldHitbox() const { return Rect(hitbox.min + position, hitbox.max + position); }
+
+		bool OverlapsWith(Dynamic* other, int xForesense, int yForesense) const { return WorldHitbox().OverlapsWith(other->WorldHitbox(), xForesense, yForesense); }
+		bool Contains(Dynamic* other, int xForesense, int yForesense) const { return WorldHitbox().Contains(other->WorldHitbox(), xForesense, yForesense); }
+		bool Contains(int2 coord) const { return WorldHitbox().Contains(coord); }
 	};
 
 }

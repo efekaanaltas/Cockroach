@@ -23,6 +23,8 @@ public:
 	virtual void Render() override;
 	void ImGuiRender();
 
+	void ShowSpriteEditor(bool* open);
+
 	static void RenderGrid();
 	static void RenderHitboxes();
 
