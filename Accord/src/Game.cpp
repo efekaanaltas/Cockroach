@@ -172,10 +172,8 @@ void Game::Render()
 		Renderer::BlitToScreen(framebuffer);
 	}
 
-#if CR_DEBUG
 	if(editMode)
 		ImGuiRender();
-#endif
 }
 
 void Game::ImGuiRender()

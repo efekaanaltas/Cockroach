@@ -172,9 +172,10 @@ namespace Entities
 				Rect bounds = room->Bounds();
 				position = glm::clamp(position, bounds.min - hitbox.min, bounds.max - hitbox.max);
 				lookingForCheckpoint = true;
+				RegainDash();
 				return;
 			}
-		if(!Room::current->Contains(WorldHitbox()))
+		if (!Room::current->Contains(WorldHitbox()))
 			Die();
 	}
 

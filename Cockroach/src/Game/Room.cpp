@@ -195,8 +195,8 @@ namespace Cockroach
 	}
 
 	bool Room::Contains(Rect rect)
-	{
-		return Contains(WorldToRoomPosition(rect.min)) && Contains(WorldToRoomPosition(rect.max));
+	{	
+		return Contains(WorldToRoomPosition(rect.min)) && Contains(WorldToRoomPosition(rect.max-ONEi));
 	}
 
 	void Room::Save()
@@ -238,7 +238,8 @@ namespace Cockroach
 			stream >> posY;
 
 			char* data = new char[width*height];
-			stream >> data;
+			stream.ignore(1);
+			stream.read(data, width * height);
 
 			room = CreateRef<Room>(name, width, height, posX, posY);
 
