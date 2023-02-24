@@ -67,4 +67,16 @@ namespace Entities
 		virtual State<Player>* Update(Player* player, float dt) override;
 		virtual void Exit(Player* player) override;
 	};
+
+	class RollingState : public State<Player>
+	{
+	public:
+		float maxRollSpeed = 170.0f;
+		float groundRollAcceleration = 80.0f;
+		float airRollAcceleration = 50.0f;
+
+		virtual void Enter(Player* player) override;
+		virtual State<Player>* Update(Player* player, float dt) override;
+		virtual void Exit(Player* player) override;
+	};
 }

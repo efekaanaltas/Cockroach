@@ -8,6 +8,7 @@ class WalkingState;
 class JumpingState;
 class ClingingState;
 class DashingState;
+class RollingState;
 
 struct BufferedInput
 {
@@ -56,14 +57,16 @@ namespace Entities
 		WalkingState* walkingState = nullptr;
 		JumpingState* jumpingState = nullptr;
 		JumpingState* superjumpingState = nullptr;
+		JumpingState* rolljumpingState = nullptr;
 		JumpingState* walljumpingState = nullptr;
 		JumpingState* ledgeJumpingState = nullptr;
 		ClingingState* clingingState = nullptr;
 		DashingState* dashingState = nullptr;
+		RollingState* rollingState = nullptr;
 
 		float2 renderSize = ONE;
 
-		Sheet idleSheet, walkingSheet, fallingSheet, jumpingSheet, clingingSheet, dashingSheet;
+		Sheet idleSheet, walkingSheet, fallingSheet, jumpingSheet, clingingSheet, dashingSheet, rollingSheet;
 		Sheet currentSheet;
 
 		BufferedInput bufferedJumpInput = BufferedInput(CR_KEY_SPACE, 6);

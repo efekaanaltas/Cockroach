@@ -35,7 +35,7 @@ namespace Entities
 		{
 			player->faceDir = player->WallDir();
 
-			if (player->InputDirY() == 1)
+			if (player->InputDirY() != -1)
 			{
 				int height = 0;
 				while (++height < 8)
@@ -132,7 +132,7 @@ namespace Entities
 
 		if (player->bufferedJumpInput.Active())
 		{
-			if (player->InputDirY() == 1)
+			if (player->InputDirY() != -1)
 			{
 				int height = 0;
 				while (++height < 8)
@@ -147,7 +147,7 @@ namespace Entities
 		player->velocity.y -= reducedGravity * dt;
 		player->velocity.y = std::clamp(player->velocity.y, -fallSpeed/2.0f, 0.0f);
 
-		if (player->InputDirX() == -player->faceDir)
+		if (player->InputDirX() == -player->faceDir || player->InputDirY() == -1 || player->grounded)
 			return player->walkingState;
 
 		return nullptr;
@@ -164,8 +164,6 @@ namespace Entities
 		player->velocity.y = 0;
 		player->velocityLastFrame.y = 0;
 
-		bool down = Input::IsPressed(CR_KEY_DOWN);
-		bool up = Input::IsPressed(CR_KEY_UP);
 		dashDir = ZERO;
 		if (player->InputDirX() != 0 || player->InputDirY() != 0)
 			dashDir = glm::normalize(float2(player->InputDirX(), player->InputDirY()));
@@ -188,6 +186,9 @@ namespace Entities
 			}
 			return player->superjumpingState;
 		}
+
+		if(dashTimer.Finished() && dashDir.x != 0 && dashDir.y < 0)
+			return player->rollingState;
 
 		if (dashTimer.Finished())
 			return player->walkingState;
@@ -243,5 +244,39 @@ namespace Entities
 			player->gravityHaltTimer.Reset();
 			player->velocity.y = 0.0f;
 		}
+	}
+
+	void RollingState::Enter(Player* player)
+	{
+		player->currentSheet = player->rollingSheet;
+		player->hitbox.min = { 6,  0 };
+		player->hitbox.max = { 10, 8 };
+		player->velocity.x = 100.0f * (player->InputDirX() != 0 ? player->InputDirX() : player->faceDir);
+	}
+
+	State<Player>* RollingState::Update(Player* player, float dt)
+	{
+		player->velocity.x += player->InputDirX() * (player->grounded ? groundRollAcceleration : airRollAcceleration) * dt;
+		player->velocity.x = std::clamp(player->velocity.x, -maxRollSpeed, maxRollSpeed);
+		
+		if(!player->grounded)
+			player->velocity.y -= player->walkingState->gravity * dt;
+
+		if (std::abs(player->velocity.x) < 10.0f)
+			return player->walkingState;
+		if (player->bufferedJumpInput.Active() && player->grounded)
+			return player->rolljumpingState;
+		if (player->bufferedDashInput.Active() && player->canDash)
+			return player->dashingState;
+		if (player->WallDir() != 0)
+			return player->clingingState;
+
+		return nullptr;
+	}
+
+	void RollingState::Exit(Player* player)
+	{
+		player->hitbox.min = { 6, 0 };
+		player->hitbox.max = { 10,12 };
 	}
 }

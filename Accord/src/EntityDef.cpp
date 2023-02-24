@@ -201,10 +201,13 @@ namespace Entities
 
 	void Turbine::Update(float dt)
 	{
-		if (horizontal && turbineRect.OverlapsWith(Game::player->WorldHitbox(), 0, 0))
-			Game::player->velocity.x += horizontal * turbineAcceleration * dt;
-		if (vertical && turbineRect.OverlapsWith(Game::player->WorldHitbox(), 0, 0))
-			Game::player->velocity.y += vertical * turbineAcceleration * dt;
+		if (!Game::player->grounded)
+		{
+			if (horizontal && turbineRect.OverlapsWith(Game::player->WorldHitbox(), 0, 0))
+				Game::player->velocity.x += horizontal * turbineAcceleration * dt;
+			if (vertical && turbineRect.OverlapsWith(Game::player->WorldHitbox(), 0, 0))
+				Game::player->velocity.y += vertical * turbineAcceleration * dt;
+		}
 
 		Game::particles->particles.push_back(Particle
 		(
@@ -248,7 +251,7 @@ namespace Entities
 
 	void EssenceRed::Absorb()
 	{
-		Game::Freeze(3.0f);
+		Game::Freeze(3);
 		respawnTimer.Reset();
 		sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 0,1 }, { 8,8 });
 		active = false;

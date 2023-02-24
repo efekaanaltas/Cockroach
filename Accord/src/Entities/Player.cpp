@@ -10,10 +10,12 @@ namespace Entities
 		walkingState = new WalkingState;
 		jumpingState = new JumpingState(50.0f, 140.0f, 0.0f);
 		superjumpingState = new JumpingState(50.0f, 120.0f, 180.0f);
-		walljumpingState = new JumpingState(50.0f, 80.0f, -180.0);
+		rolljumpingState = new JumpingState(50.0f, 100.0f, 200.0f);
+		walljumpingState = new JumpingState(90.0f, 100.0f, -180.0);
 		ledgeJumpingState = new JumpingState(80.0f, 80.0f, 0.0f);
 		clingingState = new ClingingState;
 		dashingState = new DashingState;
+		rollingState = new RollingState;
 
 		Ref<Texture2D> texture = Game::baseSpriteSheet;
 
@@ -21,15 +23,22 @@ namespace Entities
 		idleSheet.Add(Sprite::CreateFromCoords(texture, { 0, 3 }, { 16, 16 }));
 		idleSheet.Add(Sprite::CreateFromCoords(texture, { 1, 3 }, { 16, 16 }));
 
-		walkingSheet.framePerSecond = 10;
+		walkingSheet.framePerSecond = 6;
 		walkingSheet.Add(Sprite::CreateFromCoords(texture, { 2, 3 }, { 16, 16 }));
 		walkingSheet.Add(Sprite::CreateFromCoords(texture, { 3, 3 }, { 16, 16 }));
 		walkingSheet.Add(Sprite::CreateFromCoords(texture, { 4, 3 }, { 16, 16 }));
+		walkingSheet.Add(Sprite::CreateFromCoords(texture, { 3, 3 }, { 16, 16 }));
 
 		dashingSheet.Add(Sprite::CreateFromCoords(texture, { 5, 3 }, { 16, 16 }));
 		jumpingSheet.Add(Sprite::CreateFromCoords(texture, { 6, 3 }, { 16, 16 }));
 		clingingSheet.Add(Sprite::CreateFromCoords(texture, { 7, 3 }, { 16, 16 }));
 		fallingSheet.Add(Sprite::CreateFromCoords(texture, { 8, 3 }, { 16, 16 }));
+
+		rollingSheet.framePerSecond = 20;
+		rollingSheet.Add(Sprite::CreateFromCoords(texture, { 9, 3 }, { 16,16 }));
+		rollingSheet.Add(Sprite::CreateFromCoords(texture, { 10, 3 }, { 16,16 }));
+		rollingSheet.Add(Sprite::CreateFromCoords(texture, { 11, 3 }, { 16,16 }));
+		rollingSheet.Add(Sprite::CreateFromCoords(texture, { 12, 3 }, { 16,16 }));
 
 		currentSheet = idleSheet;
 
@@ -118,7 +127,7 @@ namespace Entities
 			if (horizontal)
 			{
 				velocity.x = 0.0f;
-				if (!grounded && velocity.y < 0.0f && InputDirX() == horizontal)
+				if (!grounded && velocity.y < 0.0f && InputDirX() == horizontal && InputDirY() != -1)
 					TrySwitchState(clingingState);
 			}
 

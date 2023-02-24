@@ -374,11 +374,11 @@ void Game::RenderHitboxes()
 		{
 			Decoration* deco = ent->As<Decoration>();
 			if(deco)
-				Renderer::DrawQuadOutline((float)deco->Left(), (float)deco->Right(), (float)deco->Bottom(), (float)deco->Top(), { 0.0f, 1.0f, 1.0f, 1.0f });
+				Renderer::DrawQuadOutline((float)deco->Left(), (float)deco->Right(), (float)deco->Bottom(), (float)deco->Top(), CYAN);
 		}
 		Dynamic* dyn = ent->As<Dynamic>();
 		if (dyn)
-			Renderer::DrawQuadOutline((float)dyn->Left(), (float)dyn->Right(), (float)dyn->Bottom(), (float)dyn->Top(), { 1.0f, 0.0f, 0.0f, 1.0f });
+			Renderer::DrawQuadOutline((float)dyn->Left(), (float)dyn->Right(), (float)dyn->Bottom(), (float)dyn->Top(), RED);
 	}
 
 	for (int i = 0; i < Room::current->width * Room::current->height; i++)
@@ -386,7 +386,7 @@ void Game::RenderHitboxes()
 		if (Room::current->tiles[i] == Room::TileBasic)
 		{
 			float2 worldPos = Room::current->RoomToWorldPosition(Room::current->IndexToRoomPosition(i));
-			Renderer::DrawQuadOutline(worldPos.x, worldPos.x + 8.0f, worldPos.y, worldPos.y + 8.0f, { 1.0f, 0.0f, 0.0f, 1.0f });
+			Renderer::DrawQuadOutline(worldPos.x, worldPos.x + 8.0f, worldPos.y, worldPos.y + 8.0f, RED);
 		}
 	}
 }
