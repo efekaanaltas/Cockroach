@@ -95,7 +95,7 @@ void Game::Update(float dt)
 		cameraController->SetZoom(90.0f);
 		editMode = !editMode;
 	}
-
+	
 	static bool muted = false;
 
 	if (Input::IsDown(CR_KEY_F))
@@ -208,7 +208,13 @@ void Game::ImGuiRender()
 	int pos[2] = { Room::current->position.x, Room::current->position.y };
 	DragInt2("Pos", pos);
 	if (Room::current->position.x != pos[0] || Room::current->position.y != pos[1])
+	{
+		int2 delta = { pos[0] - Room::current->position.x, pos[1] - Room::current->position.y };
 		Room::current->position = { pos[0], pos[1] };
+		for (auto& entity : Room::current->entities)
+			entity->position += delta*8;
+		Room::current->Save();
+	}
 
 	int size[2] = { Room::current->width, Room::current->height };
 	DragInt2("Size", size);

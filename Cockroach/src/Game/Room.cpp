@@ -262,7 +262,8 @@ namespace Cockroach
 				{
 					int type = GetProperty<int>(stream, "D");
 					int2 position = { GetProperty<int>(stream, "X"), GetProperty<int>(stream, "Y") };
-					room->AddEntity(CreateDecoration(position, type));
+					int z = GetProperty<int>(stream, "Z");
+					room->AddEntity(CreateDecoration(position, z, type));
 				}
 			}
 		}

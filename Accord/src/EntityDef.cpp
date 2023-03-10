@@ -474,12 +474,13 @@ Cockroach::Entity* Cockroach::CreateEntity(int2 position, int2 size, int entityT
 	return e;
 }
 
-Cockroach::Entity* Cockroach::CreateDecoration(int2 position, int decorationType)
+Cockroach::Entity* Cockroach::CreateDecoration(int2 position, int z, int decorationType)
 {
 	Sprite& sprite = Game::decorationSprites[decorationType];
 	Decoration* e = new Decoration(position, {sprite.XSize(), sprite.YSize()});
 	e->decorationIndex = decorationType;
 	e->type = -1;
+	e->z = z;
 	e->sprite = sprite;
 	e->size = { e->sprite.XSize(), e->sprite.YSize() };
 	return e;

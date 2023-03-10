@@ -41,7 +41,8 @@ void EditorCursor::Update(float dt)
 		}
 	}
 	
-	if (Input::IsDown(CR_MOUSE_BUTTON_LEFT) && brushMode == Decoration)
+	int z = (Input::IsDown(CR_MOUSE_BUTTON_LEFT) ? 1 : (Input::IsDown(CR_MOUSE_BUTTON_RIGHT) ? -1 : 0));
+	if (z != 0 && brushMode == Decoration)
 	{
 		Cockroach::Entity* decorationOverCursor = nullptr;
 		for (auto& ent : Room::current->entities)
@@ -51,7 +52,7 @@ void EditorCursor::Update(float dt)
 		if (Input::IsPressed(CR_KEY_LEFT_CONTROL) && decorationOverCursor)
 			Room::current->RemoveEntity(decorationOverCursor);
 		else if(!Input::IsPressed(CR_KEY_LEFT_CONTROL))
-			Room::current->AddEntity(CreateDecoration(WorldPosition(), decorationType));
+			Room::current->AddEntity(CreateDecoration(WorldPosition(), z, decorationType));
 	}
 
 	if (Input::IsDown(CR_MOUSE_BUTTON_RIGHT))

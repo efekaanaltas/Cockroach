@@ -197,7 +197,7 @@ namespace Entities
 		virtual std::string GenerateDefinitionString() override
 		{
 			return GenerateProperty("D", decorationIndex)
-				+ GenerateProperty("X", position.x) + GenerateProperty("Y", position.y) + "\n";
+				+ GenerateProperty("X", position.x) + GenerateProperty("Y", position.y) + GenerateProperty("Z", z) + "\n";
 		}
 
 		virtual void Update(float dt) override {}
