@@ -51,16 +51,24 @@ namespace Cockroach
 	{
 		while (running)
 		{
+			const float frameTime = 1 / 60.0f;
+			static float accumulatedDelta = 0.0f;
 			float time = (float)glfwGetTime();
 			float dt = (time - lastFrameTime);
+			accumulatedDelta += dt;
 			lastFrameTime = time;
-			frameCount++;
 
 			if (!minimized)
 			{
-				Update(dt);
+				if (accumulatedDelta > frameTime)
+				{
+					accumulatedDelta -= frameTime;
+					dt = frameTime;
+					frameCount++;
+					Update(dt);
+					Input::Update();
+				}
 				Render();
-				Input::Update();
 			}
 
 			window->OnUpdate();

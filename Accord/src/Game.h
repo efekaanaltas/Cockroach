@@ -50,8 +50,8 @@ public:
 private:
 	static Timer freezeTimer;
 
-	bool renderGrid = true;
-	bool renderHitboxes = true;
+	bool renderGrid = false;
+	bool renderHitboxes = false;
 	bool renderAllRooms = false;
 	bool renderRoomBoundaries = false;
 };

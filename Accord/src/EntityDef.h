@@ -81,11 +81,13 @@ namespace Entities
 	class Spike : public Dynamic
 	{
 	public:
-		Spike(int2 position, int2 hitboxMin, int2 hitboxMax)
-			: Dynamic(position, hitboxMin, hitboxMax)
+		Spike(int2 position, int2 hitboxMin, int2 hitboxMax, int2 direction)
+			: Dynamic(position, hitboxMin, hitboxMax), direction(direction)
 		{
 			blockOnCollision = false;
 		}
+
+		int2 direction;
 
 		virtual void Update(float dt) override;
 	};

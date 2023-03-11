@@ -102,6 +102,10 @@ void Game::Update(float dt)
 		Application::GetWindow().SetWindowMode(!Application::GetWindow().fullscreen);
 	if (Input::IsDown(CR_KEY_M))
 		Audio::ToggleSound(muted = !muted);
+
+	if (Input::IsDown(CR_KEY_G)) renderGrid = !renderGrid;
+	if (Input::IsDown(CR_KEY_H)) renderHitboxes = !renderHitboxes;
+	if (Input::IsDown(CR_KEY_R)) renderAllRooms = !renderAllRooms;
 }
 
 #pragma warning (disable: 4244) // No need for DrawQuad... warnings
@@ -119,10 +123,6 @@ void Game::Render()
 	glEnable(GL_DEPTH_TEST);
 
 	Renderer::BeginScene(cameraController->camera);
-
-	if (Input::IsDown(CR_KEY_G)) renderGrid = !renderGrid;
-	if (Input::IsDown(CR_KEY_H)) renderHitboxes = !renderHitboxes;
-	if (Input::IsDown(CR_KEY_R)) renderAllRooms = !renderAllRooms;
 
 	float zoom = cameraController->zoom;
 	float aspect = cameraController->aspectRatio;

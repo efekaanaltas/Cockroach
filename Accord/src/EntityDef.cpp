@@ -266,7 +266,7 @@ namespace Entities
 
 	void Spike::Update(float dt)
 	{
-		if(OverlapsWith(Game::player, 0, 0))
+		if(OverlapsWith(Game::player, 0, 0) && glm::dot((float2)direction, Game::player->velocity) <= 0.0f)
 			Game::player->Die();
 	}
 
@@ -406,22 +406,22 @@ Cockroach::Entity* Cockroach::CreateEntity(int2 position, int2 size, int entityT
 	}
 	case EntityType::SpikeLeft:
 	{
-		e = new Spike(position, { 4,0 }, { 8,8 });
+		e = new Spike(position, { 4,0 }, { 8,8 }, LEFTi);
 		break;
 	}
 	case EntityType::SpikeRight:
 	{
-		e = new Spike(position, { 0,0 }, { 4,8 });
+		e = new Spike(position, { 0,0 }, { 4,8 }, RIGHTi);
 		break;
 	}
 	case EntityType::SpikeDown:
 	{
-		e = new Spike(position, { 0,4 }, { 8,8 });
+		e = new Spike(position, { 0,4 }, { 8,8 }, DOWNi);
 		break;
 	}
 	case EntityType::SpikeUp:
 	{
-		e = new Spike(position, { 0,0 }, { 8,4 });
+		e = new Spike(position, { 0,0 }, { 8,4 }, UPi);
 		break;
 	}
 	case EntityType::Oscillator:

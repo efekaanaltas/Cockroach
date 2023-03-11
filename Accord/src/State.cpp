@@ -262,13 +262,24 @@ namespace Entities
 		if(!player->grounded)
 			player->velocity.y -= player->walkingState->gravity * dt;
 
+		if (player->GetCollision(player->faceDir, 0))
+		{
+			int height = 0;
+			while (++height <= 8)
+				if (!player->GetCollision(player->faceDir*2, height))
+				{
+					player->MoveY(2);
+					break;
+				}
+		}
+
 		if (std::abs(player->velocity.x) < 10.0f)
 			return player->walkingState;
 		if (player->bufferedJumpInput.Active() && player->grounded)
 			return player->rolljumpingState;
 		if (player->bufferedDashInput.Active() && player->canDash)
 			return player->dashingState;
-		if (player->WallDir() != 0)
+		if (player->WallDir() != 0 && player->InputDirY() != -1)
 			return player->clingingState;
 
 		return nullptr;
