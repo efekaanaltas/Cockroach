@@ -125,7 +125,22 @@ namespace Cockroach
 
 	void Renderer::OnWindowResize(int width, int height)
 	{
-		glViewport(0, 0, width, height);
+		//glViewport(0, 0, width, height);
+		const float targetAspect = 16.0f / 9.0f;
+		float aspect = (float)width / height;
+		if (aspect >= targetAspect)
+		{
+			float targetWidth = height * targetAspect;
+			float originX = (width - targetWidth) / 2.0f;
+			glViewport(originX, 0, targetWidth, height);
+		}
+		else
+		{
+			float targetHeight = width / targetAspect;
+			float originY = (height - targetHeight) / 2.0f;
+			glViewport(0, originY, width, targetHeight);
+		}
+		glOrtho(-160, 160, -90, 90, -100, 100);
 	}
 
 	void Renderer::SetClearColor(const float4& color)

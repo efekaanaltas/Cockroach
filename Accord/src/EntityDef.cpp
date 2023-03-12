@@ -164,9 +164,9 @@ namespace Entities
 			zoom -= Input::scroll * 0.1f * zoom;
 			zoom = std::clamp(zoom, 5.0f, 1000.0f);
 
-			float newAspect = (float)Application::Get().GetWindow().width / (float)Application::Get().GetWindow().height;
-			if (aspectRatio != newAspect)
-				aspectRatio = newAspect;
+			//float newAspect = (float)Application::Get().GetWindow//().width / (float)Application::Get().GetWindow().height;
+			//if (aspectRatio != newAspect)
+			//	aspectRatio = newAspect;
 
 			camera.SetZoom(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
 		}

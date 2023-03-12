@@ -275,7 +275,7 @@ namespace Entities
 
 		if (std::abs(player->velocity.x) < 10.0f)
 			return player->walkingState;
-		if (player->bufferedJumpInput.Active() && player->grounded)
+		if (player->bufferedJumpInput.Active() && !player->coyoteTimer.Finished())
 			return player->rolljumpingState;
 		if (player->bufferedDashInput.Active() && player->canDash)
 			return player->dashingState;

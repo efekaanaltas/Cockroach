@@ -9,7 +9,7 @@ namespace Entities
 	{
 		walkingState = new WalkingState;
 		jumpingState = new JumpingState(50.0f, 140.0f, 0.0f);
-		superjumpingState = new JumpingState(50.0f, 120.0f, 180.0f);
+		superjumpingState = new JumpingState(50.0f, 120.0f, 200.0f);
 		rolljumpingState = new JumpingState(50.0f, 150.0f, 200.0f);
 		walljumpingState = new JumpingState(90.0f, 100.0f, -180.0);
 		ledgeJumpingState = new JumpingState(80.0f, 80.0f, 0.0f);

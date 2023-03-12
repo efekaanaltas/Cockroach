@@ -165,9 +165,11 @@ void Game::Render()
 	EditorCursor::Render();
 
 	Renderer::EndScene();
+	Cockroach::Window& window = Application::Get().GetWindow();
+	Renderer::OnWindowResize(window.width, window.height);
+
 	if (!editMode)
 	{
-		glViewport(0, 0, Application::Get().GetWindow().width, Application::Get().GetWindow().height );
 		framebuffer->Unbind();
 		Renderer::BlitToScreen(framebuffer);
 	}
