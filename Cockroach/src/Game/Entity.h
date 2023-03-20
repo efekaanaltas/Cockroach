@@ -6,6 +6,19 @@
 
 namespace Cockroach
 {
+	struct EntityDefinition
+	{
+		int type = 0;
+		bool isDecoration = false;
+		int2 position = ZEROi;
+		int2 size = 8*ONEi;
+		std::optional<int> z = {};
+		std::optional<int2> altPosition = {};
+
+		EntityDefinition(std::stringstream& definition);
+		EntityDefinition(int type, bool isDecoration, int2 position, int2 size);
+	};
+
 	class Entity
 	{
 	public:
@@ -43,6 +56,5 @@ namespace Cockroach
 		return dynamic_cast<T*>(this);
 	}
 
-	Entity* CreateEntity(int2 position, int2 size, int type);
-	Entity* CreateDecoration(int2 position, int z, int type);
+	Entity* CreateEntity(const EntityDefinition& def);
 }

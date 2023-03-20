@@ -250,21 +250,7 @@ namespace Cockroach
 			while (std::getline(in, line))
 			{
 				std::stringstream stream(line);
-
-				if (HasProperty(stream, "E"))
-				{
-					int type = GetProperty<int>(stream, "E");
-					int2 position = { GetProperty<int>(stream, "X"), GetProperty<int>(stream, "Y") };
-					int2 size = { GetProperty<int>(stream, "W"), GetProperty<int>(stream, "H") };
-					room->AddEntity(CreateEntity(position, size, type));
-				}
-				else if(HasProperty(stream, "D"))
-				{
-					int type = GetProperty<int>(stream, "D");
-					int2 position = { GetProperty<int>(stream, "X"), GetProperty<int>(stream, "Y") };
-					int z = GetProperty<int>(stream, "Z");
-					room->AddEntity(CreateDecoration(position, z, type));
-				}
+				room->AddEntity(CreateEntity(stream));
 			}
 		}
 		else CR_CORE_ERROR("Could not open file '{0}'", filepath);

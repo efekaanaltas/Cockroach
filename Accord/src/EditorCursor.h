@@ -11,6 +11,7 @@ public:
 	static void Render();
 
 	static int2 WorldPosition();
+	static int2 WorldPositionSnapped();
 
 	static BrushMode brushMode;
 	static Cockroach::Room::TileType tileType;

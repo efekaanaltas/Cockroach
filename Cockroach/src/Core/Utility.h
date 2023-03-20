@@ -18,7 +18,7 @@ namespace Cockroach
 		return propertyName + ": " + std::to_string(value) + ", ";
 	}
 
-	inline bool HasProperty(std::stringstream& stream, const std::string& propertyName)
+	inline bool HasProperty(const std::stringstream& stream, const std::string& propertyName)
 	{
 		return stream.str().find(propertyName) != std::string::npos;
 	}

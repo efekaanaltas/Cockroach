@@ -384,104 +384,94 @@ namespace Entities
 	}
 }
 
-Cockroach::Entity* Cockroach::CreateEntity(int2 position, int2 size, int entityType)
+Cockroach::Entity* Cockroach::CreateEntity(const EntityDefinition& def)
 {
-	Entity* e = nullptr;
-	switch (entityType)
-	{
-	case EntityType::Payga:
-	{
-		CR_WARN("Do not create an instance of Payga");
-		break;
-	}
-	case EntityType::Camera:
-	{
-		CR_WARN("Do not create an instance of Camera");
-		break;
-	}
-	case EntityType::Particles:
-	{
-		CR_WARN("Do not create an instance of Particles");
-		break;
-	}
-	case EntityType::SpikeLeft:
-	{
-		e = new Spike(position, { 4,0 }, { 8,8 }, LEFTi);
-		break;
-	}
-	case EntityType::SpikeRight:
-	{
-		e = new Spike(position, { 0,0 }, { 4,8 }, RIGHTi);
-		break;
-	}
-	case EntityType::SpikeDown:
-	{
-		e = new Spike(position, { 0,4 }, { 8,8 }, DOWNi);
-		break;
-	}
-	case EntityType::SpikeUp:
-	{
-		e = new Spike(position, { 0,0 }, { 8,4 }, UPi);
-		break;
-	}
-	case EntityType::Oscillator:
-	{
-		e = new OscillatorA(position, { 0, 0 }, { 8, 8 });
-		break;
-	}
-	case EntityType::TurbineLeft:
-	{
-		e = new Turbine(position, size, -1, 0);
-		break;
-	}
-	case EntityType::TurbineRight:
-	{
-		e = new Turbine(position, size, 1, 0);
-		break;
-	}
-	case EntityType::TurbineDown:
-	{
-		e = new Turbine(position, size, 0, -1);
-		break;
-	}
-	case EntityType::TurbineUp:
-	{
-		e = new Turbine(position, size, 0, 1);
-		break;
-	}
-	case EntityType::EssenceRed:
-	{
-		e = new Entities::EssenceRed(position, { 1,1 }, { 7,7 });
-		break;
-	}
-	case EntityType::Igniter:
-	{
-		e = new Entities::Igniter(position, size);
-		break;
-	}
-	case EntityType::Propeller:
-	{
-		e = new Entities::Propeller(position, size);
-		break;
-	}
-	}
-	if (e != nullptr)
-	{
-		e->sprite = Game::entitySprites[entityType];
-		e->type = entityType;
-		e->size = size;
-	}
-	return e;
-}
+	auto GetPositionFunc = [](std::stringstream& def) { return int2(GetProperty<int>(def, "X"), GetProperty<int>(def, "Y")); };
+	auto GetSizeFunc = [](std::stringstream& def) { return int2(GetProperty<int>(def, "W"), GetProperty<int>(def, "H")); };
+	auto GetAltPositionFunc = [](std::stringstream& def) { return int2(GetProperty<int>(def, "X1"), GetProperty<int>(def, "Y1")); };
 
-Cockroach::Entity* Cockroach::CreateDecoration(int2 position, int z, int decorationType)
-{
-	Sprite& sprite = Game::decorationSprites[decorationType];
-	Decoration* e = new Decoration(position, {sprite.XSize(), sprite.YSize()});
-	e->decorationIndex = decorationType;
-	e->type = -1;
-	e->z = z;
-	e->sprite = sprite;
-	e->size = { e->sprite.XSize(), e->sprite.YSize() };
+	Entity* e = nullptr;
+	if (!def.isDecoration)
+	{
+		switch (def.type)
+		{
+		case EntityType::Payga:
+		{
+			CR_WARN("Do not create an instance of Payga");
+			break; }
+		case EntityType::Camera:
+		{
+			CR_WARN("Do not create an instance of Camera");
+			break; }
+		case EntityType::Particles:
+		{
+			CR_WARN("Do not create an instance of Particles");
+			break; }
+		case EntityType::SpikeLeft:
+		{
+			e = new Spike(def.position, { 4,0 }, { 8,8 }, LEFTi);
+			break; }
+		case EntityType::SpikeRight:
+		{
+			e = new Spike(def.position, { 0,0 }, { 4,8 }, RIGHTi);
+			break; }
+		case EntityType::SpikeDown:
+		{
+			e = new Spike(def.position, { 0,4 }, { 8,8 }, DOWNi);
+			break; }
+		case EntityType::SpikeUp:
+		{
+			e = new Spike(def.position, { 0,0 }, { 8,4 }, UPi);
+			break; }
+		case EntityType::Oscillator:
+		{
+			e = new OscillatorA(def.position, { 0, 0 }, { 8, 8 });
+			break; }
+		case EntityType::TurbineLeft:
+		{
+			e = new Turbine(def.position, def.size, -1, 0);
+			break; }
+		case EntityType::TurbineRight:
+		{
+			e = new Turbine(def.position, def.size, 1, 0);
+			break; }
+		case EntityType::TurbineDown:
+		{
+			e = new Turbine(def.position, def.size, 0, -1);
+			break; }
+		case EntityType::TurbineUp:
+		{
+			e = new Turbine(def.position, def.size, 0, 1);
+			break; }
+		case EntityType::EssenceRed:
+		{
+			e = new Entities::EssenceRed(def.position, { 1,1 }, { 7,7 });
+			break; }
+		case EntityType::Igniter:
+		{
+			e = new Entities::Igniter(def.position, def.size);
+			break; }
+		case EntityType::Propeller:
+		{
+			e = new Entities::Propeller(def.position, def.size);
+			break; }
+		case EntityType::MovingPlatform:
+		{
+			e = new Entities::MovingPlatform(def.position, def.size, def.altPosition.value_or(def.position));
+			break; }
+		}
+		if (e != nullptr)
+		{
+			e->sprite = Game::entitySprites[def.type];
+			e->type = def.type;
+			e->size = def.size;
+		}
+	}
+	else
+	{
+		Sprite& sprite = Game::decorationSprites[def.type];
+		e = new Decoration(def.position, def.z.value_or(0), def.type, sprite);
+		
+	}
 	return e;
 }

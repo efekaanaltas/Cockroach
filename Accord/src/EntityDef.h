@@ -163,6 +163,24 @@ namespace Entities
 		virtual void Render() override;
 	};
 
+	class MovingPlatform : public Dynamic
+	{
+	public:
+		MovingPlatform(int2 position, int2 size, int2 altPosition)
+			: Dynamic(position, ZEROi, size), altPosition(altPosition)
+		{
+
+		}
+
+		int2 altPosition;
+		bool goingToAlt = true;
+
+		virtual void Update(float dt) override
+		{
+			// Too lazy to implement right now
+		}
+	};
+
 	class CameraController : public Entity
 	{
 	public:
@@ -189,9 +207,14 @@ namespace Entities
 	class Decoration : public Entity
 	{
 	public:
-		Decoration(int2 position, int2 size)
-			: Entity(position), hitbox(ZEROi, size)
-		{}
+		Decoration(int2 position, int z, int decorationIndex, Sprite sprite)
+			: Entity(position), hitbox(ZEROi, { sprite.XSize(), sprite.YSize() }), decorationIndex(decorationIndex)
+		{
+			size = { sprite.XSize(), sprite.YSize() };
+			type = -1;
+			this->z = z;
+			this->sprite = sprite;
+		}
 
 		int decorationIndex;
 		Rect hitbox;
