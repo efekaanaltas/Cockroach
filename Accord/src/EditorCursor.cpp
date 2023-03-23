@@ -2,6 +2,7 @@
 #include "Game.h"
 
 EditorCursor::BrushMode EditorCursor::brushMode = BrushMode::Tile;
+Cockroach::Entity* EditorCursor::selectedEntity = nullptr;
 Room::TileType EditorCursor::tileType = Room::TileBasic;
 int EditorCursor::entityType = EntityType::SpikeLeft;
 int EditorCursor::decorationType = 0;
@@ -31,7 +32,10 @@ void EditorCursor::Update(float dt)
 			for (auto& ent : Room::current->entities)
 				if (Dynamic* dyn = ent->As<Dynamic>())
 					if (dyn->WorldHitbox().OverlapsWith(Rect(WorldPositionSnapped(), WorldPositionSnapped() + int2(8, 8)), 0, 0))
+					{
 						entityOverCursor = ent;
+						selectedEntity = ent;
+					}
 			if (!Input::IsPressed(CR_KEY_LEFT_CONTROL) && !entityOverCursor)
 				Room::current->AddEntity(CreateEntity(EntityDefinition(entityType, false, WorldPositionSnapped(), {1,1})));
 			else if (Input::IsPressed(CR_KEY_LEFT_CONTROL) && entityOverCursor)
@@ -48,7 +52,10 @@ void EditorCursor::Update(float dt)
 		for (auto& ent : Room::current->entities)
 			if (Entities::Decoration* deco = ent->As<Entities::Decoration>())
 				if (deco->WorldHitbox().OverlapsWith(Rect(WorldPosition(), WorldPosition() + 8 * ONEi), 0, 0))
+				{
 					decorationOverCursor = ent;
+					selectedEntity = ent;
+				}
 		if (Input::IsPressed(CR_KEY_LEFT_CONTROL) && decorationOverCursor)
 			Room::current->RemoveEntity(decorationOverCursor);
 		else if (!Input::IsPressed(CR_KEY_LEFT_CONTROL))
@@ -84,7 +91,10 @@ void EditorCursor::Update(float dt)
 			for (auto& ent : Room::current->entities)
 				if (Dynamic* dyn = ent->As<Dynamic>())
 					if (dyn->WorldHitbox().OverlapsWith(Rect(WorldPositionSnapped(), WorldPositionSnapped() + int2(8, 8)), 0, 0))
+					{
 						entityOverCursor = ent;
+						selectedEntity = ent;
+					}
 			if (!Input::IsPressed(CR_KEY_LEFT_CONTROL) && !entityOverCursor)
 				Room::current->AddEntity(CreateEntity(EntityDefinition(entityType, false, minPos, { maxPos.x-minPos.x+8,maxPos.y-minPos.y+8 })));
 			else if (Input::IsPressed(CR_KEY_LEFT_CONTROL) && entityOverCursor)

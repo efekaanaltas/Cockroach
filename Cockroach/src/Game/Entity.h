@@ -40,6 +40,7 @@ namespace Cockroach
 
 		virtual void Update(float dt) {}
 		virtual void Render();
+		virtual void RenderInspectorUI();
 
 		virtual std::string GenerateDefinitionString();
 

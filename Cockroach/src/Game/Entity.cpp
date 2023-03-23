@@ -4,6 +4,8 @@
 #include "../Core/Utility.h"
 #include "Renderer/Renderer.h"
 
+#include "imgui.h"
+
 namespace Cockroach
 {
 	int Entity::lastID = 0;
@@ -21,6 +23,17 @@ namespace Cockroach
 	void Entity::Render()
 	{
 		Renderer::DrawQuad(float3(position, z), { sprite.XSize(), sprite.YSize() }, sprite, { overlayColor, overlayWeight }, flipX, flipY);
+	}
+
+	void Entity::RenderInspectorUI()
+	{
+		using namespace ImGui;
+		Begin("Inspector");
+		InputInt("X", &position.x, 8, 1);
+		InputInt("Y", &position.y, 8, 1);
+		InputInt("W", &size.x, 8, 8);
+		InputInt("H", &size.y, 8, 8);
+		End();
 	}
 
 	std::string Entity::GenerateDefinitionString()

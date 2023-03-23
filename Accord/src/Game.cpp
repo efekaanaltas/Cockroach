@@ -207,24 +207,26 @@ void Game::ImGuiRender()
 	if (strcmp(nameBuffer, Room::current->name.c_str()))
 		Room::current->Rename(nameBuffer);
 
-	int pos[2] = { Room::current->position.x, Room::current->position.y };
-	DragInt2("Pos", pos);
-	if (Room::current->position.x != pos[0] || Room::current->position.y != pos[1])
+	int2 roomPositionBeforeEdit = Room::current->position;
+	InputInt("X", &Room::current->position.x, 8, 8);
+	InputInt("Y", &Room::current->position.y, 8, 8);
+	if (Room::current->position != roomPositionBeforeEdit)
 	{
-		int2 delta = { pos[0] - Room::current->position.x, pos[1] - Room::current->position.y };
-		Room::current->position = { pos[0], pos[1] };
+		int2 delta = Room::current->position - roomPositionBeforeEdit;
 		for (auto& entity : Room::current->entities)
 			entity->position += delta*8;
 		Room::current->Save();
 	}
 
-	int size[2] = { Room::current->width, Room::current->height };
-	DragInt2("Size", size);
-	if (Room::current->width != size[0] || Room::current->height != size[1])
-		Room::current->Resize(size[0], size[1]);
+	int2 size = { Room::current->width, Room::current->height };
+	InputInt("W", &size.x, 1, 1);
+	InputInt("H", &size.y, 1, 1);
+	if (size != int2(Room::current->width, Room::current->height))
+		Room::current->Resize(size.x, size.y);
 
 	if (Button("Save"))
 		Room::current->Save();
+	SameLine();
 	if (Button("Save All"))
 		for (auto& room : rooms)
 			room->Save();
@@ -232,52 +234,82 @@ void Game::ImGuiRender()
 	End();
 
 	Begin("Brush Settings");
-
-	int* brushModeIntPtr = (int*)&EditorCursor::brushMode;
-	const char* elems_names[4] = { "Tile", "Entity", "Decoration", "Room" };
-	const char* elem_name = elems_names[*brushModeIntPtr];
-	SliderInt("Mode", brushModeIntPtr, 0, 3, elem_name);
-
-	if (EditorCursor::brushMode == EditorCursor::Tile)
+	if (BeginTabBar("Brush Mode"))
 	{
-		EditorCursor::tileType = Room::TileBasic;
-	}
-	if (EditorCursor::brushMode == EditorCursor::Entity)
-		for (int i = EntityType::Particles + 1; i < EntityType::END; i++)
-			if(ImGui::Button(entityTypeNames[i].c_str(), {200,20}))
-				EditorCursor::entityType = i;
-	if (EditorCursor::brushMode == EditorCursor::Decoration)
-	{
-		static bool showSpriteEditor = false;
-
-		if (Button("Add Decoration"))
-			decorationSprites.push_back(Sprite(Game::baseSpriteSheet, ZERO, ONE));
-		if (Button("Open Sprite Editor"))
-			showSpriteEditor = true;
-
-		if (showSpriteEditor) ShowSpriteEditor(&showSpriteEditor);
-
-		for (int i = 0; i < decorationSprites.size(); i++)
+		if (BeginTabItem("Tile"))
 		{
-			Sprite& decoration = decorationSprites[i];
-			
-			const float displaySize = 100;
-			float2 size = { displaySize, displaySize };
-			if (decoration.YSize() != 0) // Don't divide by zero
-			{
-				float aspect = decoration.XSize() / decoration.YSize();
-				if (aspect > 1.0f) size.y = displaySize / aspect;
-				else			   size.x = displaySize * aspect;
-			}
-
-			if (ImageButton(std::to_string(i).c_str(), (void*)(intptr_t)Game::baseSpriteSheet->rendererID, { size.x,size.y }, { decoration.min.x, decoration.max.y }, { decoration.max.x, decoration.min.y }))
-			{
-				EditorCursor::decorationType = i;
-			}
+			EditorCursor::brushMode = EditorCursor::BrushMode::Tile;
+			EditorCursor::tileType = Room::TileBasic;
+			EndTabItem();
 		}
-	
+		if (BeginTabItem("Entity"))
+		{
+			EditorCursor::brushMode = EditorCursor::BrushMode::Entity;
+
+			if (EditorCursor::selectedEntity)
+				EditorCursor::selectedEntity->RenderInspectorUI();
+
+			if (BeginListBox("", GetContentRegionAvail()))
+			{
+				for (int i = EntityType::Particles + 1; i < EntityType::END; i++)
+					if (Selectable(entityTypeNames[i].c_str(), EditorCursor::entityType == i))
+						EditorCursor::entityType = i;
+				EndListBox();
+			}
+			EndTabItem();
+		}
+		if (BeginTabItem("Decoration"))
+		{
+			EditorCursor::brushMode = EditorCursor::BrushMode::Decoration;
+			static bool showSpriteEditor = false;
+
+			if (Button("Add Decoration"))
+				decorationSprites.push_back(Sprite(Game::baseSpriteSheet, ZERO, ONE));
+			SameLine();
+			if (Button("Open Sprite Editor"))
+				showSpriteEditor = true;
+
+			if (showSpriteEditor) ShowSpriteEditor(&showSpriteEditor);
+
+			if (BeginListBox("", GetContentRegionAvail()))
+			{
+				ImGuiStyle& style = ImGui::GetStyle();
+				float window_visible_x2 = ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMax().x;
+				for (int i = 0; i < decorationSprites.size(); i++)
+				{
+					ImGui::PushID(i);
+					Sprite& decoration = decorationSprites[i];
+
+					const float displaySize = 100;
+					float2 size = { displaySize, displaySize };
+					if (decoration.YSize() != 0) // Don't divide by zero
+					{
+						float aspect = decoration.XSize() / decoration.YSize();
+						if (aspect > 1.0f) size.y = displaySize / aspect;
+						else			   size.x = displaySize * aspect;
+					}
+
+					if (ImageButton(std::to_string(i).c_str(), (void*)(intptr_t)Game::baseSpriteSheet->rendererID, { size.x,size.y }, { decoration.min.x, decoration.max.y }, { decoration.max.x, decoration.min.y }))
+					{
+						EditorCursor::decorationType = i;
+					}
+					float last_button_x2 = ImGui::GetItemRectMax().x;
+					float next_button_x2 = last_button_x2 + style.ItemSpacing.x + size.x; // Expected position if next button was on same line
+					if (i + 1 < decorationSprites.size() && next_button_x2 < window_visible_x2)
+						ImGui::SameLine();
+					ImGui::PopID();
+				}
+				EndListBox();
+			}
+			EndTabItem();
+		}
+		if (BeginTabItem("Room"))
+		{
+			EditorCursor::brushMode = EditorCursor::BrushMode::Room;
+			EndTabItem();
+		}
+		EndTabBar();
 	}
-		
 	End();
 
 	Application::ImGuiEnd();
