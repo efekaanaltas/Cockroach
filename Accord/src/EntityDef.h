@@ -163,22 +163,21 @@ namespace Entities
 		virtual void Render() override;
 	};
 
-	class MovingPlatform : public Dynamic
+	class MovingPlatform : public Carrier
 	{
 	public:
 		MovingPlatform(int2 position, int2 size, int2 altPosition)
-			: Dynamic(position, ZEROi, size), altPosition(altPosition)
-		{
+			: Carrier(position, ZEROi, size), startPosition(position), endPosition(altPosition)
+		{}
+		
+		int2 startPosition;
+		int2 endPosition;
 
-		}
-
-		int2 altPosition;
-		bool goingToAlt = true;
-
-		virtual void Update(float dt) override
-		{
-			// Too lazy to implement right now
-		}
+		virtual void Update(float dt) override;
+		virtual void Render() override;
+		virtual void RenderInspectorUI() override;
+		
+		virtual std::string GenerateDefinitionString() override;
 	};
 
 	class CameraController : public Entity

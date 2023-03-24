@@ -30,6 +30,7 @@ namespace Cockroach
 		inline Window& GetWindow() { return *window; }
 		
 		inline static Application& Get() { return *s_Instance; }
+		inline static float Time() { return (float)glfwGetTime(); }
 		
 		int frameCount = 0;
 	private:

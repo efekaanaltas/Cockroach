@@ -7,6 +7,8 @@
 
 #include "Game.h"
 
+#include "imgui/imgui.h"
+
 using namespace Cockroach;
 
 namespace Entities
@@ -131,8 +133,7 @@ namespace Entities
 
 	void OscillatorA::Update(float dt)
 	{
-		float time = (float)glfwGetTime();
-		int2 desiredPos = startPos + int2(10*std::cos(time), 10*std::sin(time));
+		int2 desiredPos = startPos + int2(10*std::cos(Game::Time()), 10*std::sin(Game::Time()));
 		float2 move = desiredPos - position;
 		MoveX(move.x);
 		MoveY(move.y);
@@ -216,11 +217,6 @@ namespace Entities
 			1.0f, 1.3f,
 			WHITE, BLACK)
 		);
-	}
-
-	void Turbine::Render()
-	{
-		RenderDynamicSizedEntity(this, { 23,2 });
 	}
 
 	EssenceRed::EssenceRed(int2 position, int2 hitboxMin, int2 hitboxMax)
@@ -362,7 +358,7 @@ namespace Entities
 		
 		if (igniteTimer.Progress01() > 0.7f)
 		{
-			overlayWeight = fmod(glfwGetTime(), 0.2f) < 0.15f ? 1.0f : 0.0f;
+			overlayWeight = fmod(Game::Time(), 0.2f) < 0.15f ? 1.0f : 0.0f;
 		}
 
 		if (!flashTimer.Finished())
@@ -373,6 +369,20 @@ namespace Entities
 		}
 	}
 
+	void MovingPlatform::Update(float dt)
+	{
+		int2 desiredPos = lerp(startPosition, endPosition, std::abs(std::sin(Game::Time())));
+		int2 move = desiredPos - position;
+
+		MoveX(move.x * dt);
+		MoveY(move.y * dt);
+	}
+
+	void Turbine::Render()
+	{
+		RenderDynamicSizedEntity(this, { 23,2 });
+	}
+
 	void Igniter::Render()
 	{
 		RenderDynamicSizedEntity(this, { 11,2 });
@@ -381,6 +391,32 @@ namespace Entities
 	void Propeller::Render()
 	{
 		RenderDynamicSizedEntity(this, { 15,2 });
+	}
+
+	void MovingPlatform::Render()
+	{
+		RenderDynamicSizedEntity(this, { 15,2 });
+	}
+
+	void MovingPlatform::RenderInspectorUI()
+	{
+		using namespace ImGui;
+		Begin("Inspector");
+		InputInt("X", &startPosition.x, 8, 1);
+		InputInt("Y", &startPosition.y, 8, 1);
+		InputInt("X1", &endPosition.x, 8, 1);
+		InputInt("Y1", &endPosition.y, 8, 1);
+		InputInt("W", &size.x, 8, 8);
+		InputInt("H", &size.y, 8, 8);
+		End();
+	}
+
+	std::string MovingPlatform::GenerateDefinitionString()
+	{
+		return GenerateProperty("E", type)
+			 + GenerateProperty("X", startPosition.x) + GenerateProperty("Y", startPosition.y)
+			 + GenerateProperty("X1", endPosition.x) + GenerateProperty("Y1", endPosition.y)
+			 + GenerateProperty("W", size.x) + GenerateProperty("H", size.y) + "\n";
 	}
 }
 

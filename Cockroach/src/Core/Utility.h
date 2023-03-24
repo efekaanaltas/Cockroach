@@ -10,6 +10,22 @@ namespace Cockroach
 		return a + t * (b - a);
 	}
 
+	//template<>
+	//inline int2 lerp(int2 a, int2 b, float t)
+	//{
+	//	return { lerp(a.x, b.x, t), lerp(a.y, b.y, t) };
+	//}
+
+	template<glm::length_t L, typename T, glm::qualifier Q>
+	inline glm::vec<L, T, Q> lerp(glm::vec<L, T, Q> a, glm::vec<L, T, Q> b, float t) 
+	{
+		glm::vec<L, T, Q> result;
+		for (int i = 0; i < L; i++)
+			result[i] = lerp(a[i], b[i], t);
+		return result;
+	}
+
+
 	std::vector<std::string> Split(const std::string& string, char delim = ',');
 
 	template<typename T>

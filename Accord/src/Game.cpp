@@ -38,16 +38,19 @@ Game::Game()
 	Game::background = CreateRef<Texture2D>("assets/textures/BG_RED.png");
 	Game::baseSpriteSheet = CreateRef<Texture2D>("assets/textures/SpriteSheet.png");
 
+	LoadSprites();
+
 	//for (int i = EntityType::SpikeLeft; i < EntityType::END; i++)
 	//{
-	//	Entity* e = CreateEntity(ZEROi, ONEi, i);
+	//	Entity* e = CreateEntity(EntityDefinition(i, false, ZEROi, ONEi));
 	//	if (entitySprites.size() < i + 1)
 	//		entitySprites.resize(i + 1);
-	//	entitySprites[i] = e->sprite;
+	//	if (e->sprite.texture)
+	//		entitySprites[i] = e->sprite;
+	//	else
+	//		entitySprites[i] = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 3 }, { 8,8 });
 	//}
 	//SaveSprites();
-
-	LoadSprites();
 
 	const std::filesystem::path roomDir{ "assets/rooms" };
 	for (auto& a : std::filesystem::directory_iterator(roomDir))

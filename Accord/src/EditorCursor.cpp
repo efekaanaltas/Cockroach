@@ -69,13 +69,13 @@ void EditorCursor::Update(float dt)
 	if (Input::IsDown(CR_MOUSE_BUTTON_RIGHT))
 	{
 		isBoxPlacing = true;
-		boxPlaceStartPos = WorldPosition();
+		boxPlaceStartPos = WorldPositionSnapped();
 	}
 
 	else if (Input::IsUp(CR_MOUSE_BUTTON_RIGHT))
 	{
 		isBoxPlacing = false;
-		int2 boxPlaceEndPos = WorldPosition();
+		int2 boxPlaceEndPos = WorldPositionSnapped();
 		int2 minPos = { std::min(boxPlaceStartPos.x, boxPlaceEndPos.x), std::min(boxPlaceStartPos.y, boxPlaceEndPos.y) };
 		int2 maxPos = { std::max(boxPlaceStartPos.x, boxPlaceEndPos.x), std::max(boxPlaceStartPos.y, boxPlaceEndPos.y) };
 		switch (brushMode)
