@@ -180,6 +180,7 @@ namespace Entities
 				Room::current = room;
 				Rect bounds = room->Bounds();
 				position = glm::clamp(position, bounds.min - hitbox.min, bounds.max - hitbox.max);
+				Game::cameraController->StartTransition();
 				lookingForCheckpoint = true;
 				RegainDash();
 				return;

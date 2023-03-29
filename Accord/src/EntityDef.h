@@ -190,17 +190,23 @@ namespace Entities
 		{}
 
 		virtual void Update(float dt) override;
-
+		void StartTransition();
 		void SetZoom(float zoom);
 
 		float2 positionHighRes = ZERO;
+		float2 targetPosition = ZERO;
 
 		float aspectRatio = 16.0f / 9.0f;
 		float zoom = 90.0f;
 
 		float speed = 1.0f;
 
+		bool isTransitioning = false;
+
+		Tween<int2> transitionTween;
+
 		Rect Bounds() { return Rect((float2)camera.GetPosition() - float2(aspectRatio * zoom, zoom), { (float2)camera.GetPosition() + float2(aspectRatio * zoom, zoom) }); }
+		int2 RoomBoundedPosition();
 	};
 
 	class Decoration : public Entity

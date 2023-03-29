@@ -11,9 +11,6 @@
 
 #include "Game.h"
 
-#include <filesystem>
-#include <fstream>
-
 CameraController* Game::cameraController = nullptr;
 Player* Game::player = nullptr;
 Entities::Particles* Game::particles = nullptr;
@@ -84,6 +81,8 @@ void Game::Update(float dt)
 	}
 
 	cameraController->Update(dt);
+	if (cameraController->isTransitioning) return;
+
 	if (!editMode)
 	{
 		player->Update(dt);
@@ -135,7 +134,8 @@ void Game::Render()
 	
 	if (renderGrid) RenderGrid();
 
-	bool renderAllVisibleRooms = !Room::current->Contains(player->WorldHitbox());
+	bool renderAllVisibleRooms = cameraController->isTransitioning;
+
 
 	for (int i = 0; i < rooms.size(); i++)
 	{

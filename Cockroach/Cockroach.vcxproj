@@ -153,6 +153,7 @@
     <ClInclude Include="src\Game\Rect.h" />
     <ClInclude Include="src\Game\Room.h" />
     <ClInclude Include="src\Game\Timer.h" />
+    <ClInclude Include="src\Game\Tween.h" />
     <ClInclude Include="src\Renderer\Buffer.h" />
     <ClInclude Include="src\Renderer\Camera.h" />
     <ClInclude Include="src\Renderer\Framebuffer.h" />

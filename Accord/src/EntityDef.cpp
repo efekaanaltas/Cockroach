@@ -146,7 +146,7 @@ namespace Entities
 				SetZoom(std::powf(10.0f, (float)(i - CR_KEY_1 + 1)));
 
 		if (Game::editMode)
-		{
+		{			
 			if (Input::IsPressed(CR_KEY_A))
 				positionHighRes.x -= speed * dt;
 			if (Input::IsPressed(CR_KEY_D))
@@ -173,15 +173,35 @@ namespace Entities
 		}
 		else
 		{
-			position = Game::player->position;
+			if (isTransitioning)
+			{
+				position = transitionTween.Step(dt);
+				if (transitionTween.Finished())
+					isTransitioning = false;
+			}
+			else
+			{
+				position = Game::player->position;
+				position = RoomBoundedPosition();
+			}
 
-			Rect bounds = Room::current->Bounds();
-			position = glm::clamp(position, bounds.min + int2(aspectRatio * zoom, zoom), bounds.max - int2(aspectRatio * zoom, zoom));
-		
 			positionHighRes = position;
 
 			camera.SetPosition(float3(position.x, position.y, 0.0f));
 		}
+	}
+
+	void CameraController::StartTransition()
+	{
+		isTransitioning = true;
+		targetPosition = RoomBoundedPosition();
+		transitionTween = Tween<int2>(position, targetPosition, 1.0f, TweenFunc::Linear);
+	}
+
+	int2 CameraController::RoomBoundedPosition()
+	{
+		Rect roomBounds = Room::current->Bounds();
+		return glm::clamp(position, roomBounds.min + int2(aspectRatio * zoom, zoom), roomBounds.max - int2(aspectRatio * zoom, zoom));
 	}
 
 	void CameraController::SetZoom(float zoom)

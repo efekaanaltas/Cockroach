@@ -26,4 +26,5 @@
 #include "Game/Entity.h"
 #include "Game/Timer.h"
 #include "Game/Rect.h"
+#include "Game/Tween.h"
 // ----------------------------------------

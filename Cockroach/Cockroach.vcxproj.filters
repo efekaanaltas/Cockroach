@@ -81,6 +81,9 @@
     <ClInclude Include="src\Game\Timer.h">
       <Filter>src\Game</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\Tween.h">
+      <Filter>src\Game</Filter>
+    </ClInclude>
     <ClInclude Include="src\Renderer\Buffer.h">
       <Filter>src\Renderer</Filter>
     </ClInclude>
