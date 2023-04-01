@@ -244,7 +244,9 @@ void Game::ImGuiRender()
 		if (BeginTabItem("Tile"))
 		{
 			EditorCursor::brushMode = EditorCursor::BrushMode::Tile;
-			EditorCursor::tileType = Room::TileBasic;
+			static bool isBackground = false;
+			if (Checkbox("Background", &isBackground))
+				EditorCursor::tileType = isBackground ? Room::BackgroundBasic : Room::TileBasic;
 			EndTabItem();
 		}
 		if (BeginTabItem("Entity"))

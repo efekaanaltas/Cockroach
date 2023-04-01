@@ -15,10 +15,14 @@ namespace Cockroach
 		: name(name), width(width), height(height)
 	{
 		position = { posX, posY };
+
 		tiles = new TileType[width * height];
 		tileUVs = new int2[(width + 1) * (height + 1)];
+		backgroundTileUVs = new int2[(width + 1) * (height + 1)];
+
 		memset(tiles, Air, width * height * sizeof(TileType));
-		memset(tileUVs, 0, (width+1) * (height+1) * sizeof(int2));
+		memset(tileUVs, 0, (width + 1) * (height + 1) * sizeof(int2));
+		memset(backgroundTileUVs, 0, (width + 1) * (height + 1) * sizeof(int2));
 	}
 
 	void Room::Update(float dt)
@@ -31,10 +35,17 @@ namespace Cockroach
 	{
 		for (int i = 0; i < (width+1) * (height+1); i++)
 		{
-			if (tileUVs[i] == invalidUV) continue;
-			Sprite sprite = Sprite::CreateFromCoords(tilemapTexture, tileUVs[i], {8,8});
 			int2 roomPos = { i % (width + 1), i / (width + 1) };
-			Renderer::DrawQuad(float3(RoomToWorldPosition(roomPos), 0)-float3(4,4,0), {8,8}, sprite, {0,0,0,0}, false, false);
+			if (tileUVs[i] != invalidUV)
+			{
+				Sprite sprite = Sprite::CreateFromCoords(tilemapTexture, tileUVs[i], {8,8});
+				Renderer::DrawQuad(float3(RoomToWorldPosition(roomPos), 0)-float3(4,4,0), {8,8}, sprite, {0,0,0,0}, false, false);
+			}
+			if (backgroundTileUVs[i] != invalidUV)
+			{
+				Sprite sprite = Sprite::CreateFromCoords(tilemapTexture, backgroundTileUVs[i], { 8,8 });
+				Renderer::DrawQuad(float3(RoomToWorldPosition(roomPos), 0) - float3(4, 4, 0), { 8,8 }, sprite, { 0,0,0,0 }, false, false);
+			}
 		}
 		for (int i = 0; i < entities.size(); i++)
 			entities[i]->Render();
@@ -121,8 +132,13 @@ namespace Cockroach
 		height = newHeight;
 		
 		int2* newTileUVs = new int2[(newWidth + 1) * (newHeight + 1)];
+		int2* newBackgroundTileUVs = new int2[(newWidth + 1) * (newHeight + 1)];
+
 		delete[] tileUVs;
+		delete[] backgroundTileUVs;
+
 		tileUVs = newTileUVs;
+		backgroundTileUVs = newBackgroundTileUVs;
 		UpdateTileUVAll();
 
 		//Save();
@@ -130,15 +146,6 @@ namespace Cockroach
 
 	void Room::UpdateTileUV(int x, int y)
 	{
-		TileType type = Air;
-		TileType type0 = tiles[RoomPositionToIndex(x - 1, y - 1)];
-		TileType type1 = tiles[RoomPositionToIndex(x, y - 1)];
-		TileType type2 = tiles[RoomPositionToIndex(x - 1, y)];
-		TileType type3 = tiles[RoomPositionToIndex(x, y)];
-			
-		if (type0 == TileBasic || type1 == TileBasic || type2 == TileBasic || type3 == TileBasic) // There shall be a better way.
-			type = TileBasic;
-
 		const int2 uvOffsetLUT[16] =
 		{
 			{-1,-1}, {-4,+1}, {-3,+1}, {-1,+2},
@@ -147,10 +154,29 @@ namespace Cockroach
 			{-1,+0}, {-0,+0}, {-2,+0}, {-1,+1},
 		};
 
-		int indexNum = IsFilled(x-1 , y-1, type)*8 + IsFilled(x, y-1, type)*4 + IsFilled(x-1, y, type)*2 + IsFilled(x, y, type);
-		int UVStartY = 3 * random(0, 2);
-		int2 uv = indexNum > 0 ? int2(4, UVStartY) + uvOffsetLUT[indexNum] : invalidUV;
-		tileUVs[x + y*(width + 1)] = uv;
+		{
+			bool ld = IsFilled(x-1,y-1,	TileBasic);
+			bool md = IsFilled(x,y-1,	TileBasic);
+			bool lm = IsFilled(x-1,y,	TileBasic);
+			bool mm = IsFilled(x,y,		TileBasic);
+
+			int indexNum = ld*8+md*4+lm*2+mm;
+			int UVStartY = 3 * random(0, 2);
+			int2 uv = indexNum > 0 ? int2(4, UVStartY) + uvOffsetLUT[indexNum] : invalidUV;
+			tileUVs[x + y * (width + 1)] = uv;
+		}
+
+		{
+			bool ld = IsFilled(x-1,y-1,	BackgroundBasic);
+			bool md = IsFilled(x,y-1,	BackgroundBasic);
+			bool lm = IsFilled(x-1,y,	BackgroundBasic);
+			bool mm = IsFilled(x,y,		BackgroundBasic);
+
+			int indexNum = ld * 8 + md * 4 + lm * 2 + mm;
+			int UVStartY = 3 * random(0, 2);
+			int2 uv = indexNum > 0 ? int2(9, UVStartY) + uvOffsetLUT[indexNum] : invalidUV;
+			backgroundTileUVs[x + y * (width + 1)] = uv;
+		}
 	}
 
 	void Room::UpdateTileUVAll()
@@ -164,8 +190,7 @@ namespace Cockroach
 	{
 		int2 roomPosClamped = glm::clamp(int2(x,y), {0,0}, {width - 1, height - 1});
 		int index = RoomPositionToIndex(roomPosClamped.x, roomPosClamped.y);
-		if (tiles[index] == Air) return false;
-		else return true;//return tiles[index] == type;
+		return tiles[index] == type;
 	}
 
 	bool Room::CollidesWith(Rect rect, int xForesense, int yForesense)

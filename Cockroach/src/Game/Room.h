@@ -11,7 +11,7 @@ namespace Cockroach
 	public:
 		enum TileType : char
 		{
-			Air = '0', TileBasic = 'B'
+			Air = '0', TileBasic = 'B', BackgroundBasic = 'C'
 		};
 
 		static Ref<Room> current;
@@ -25,6 +25,7 @@ namespace Cockroach
 		int2 position = { 0,0 };
 		TileType* tiles;
 		int2* tileUVs;
+		int2* backgroundTileUVs;
 		std::vector<Entity*> entities;
 
 		void Update(float dt);
