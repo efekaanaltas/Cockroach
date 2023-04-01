@@ -5,6 +5,8 @@
 #include "../Core/Utility.h"
 #include "Renderer/Renderer.h"
 
+#include "glm/glm.hpp"
+
 namespace Cockroach
 {
 	Ref<Room> Room::current = nullptr;
@@ -146,7 +148,8 @@ namespace Cockroach
 		};
 
 		int indexNum = IsFilled(x-1 , y-1, type)*8 + IsFilled(x, y-1, type)*4 + IsFilled(x-1, y, type)*2 + IsFilled(x, y, type);
-		int2 uv = indexNum > 0 ? int2(35, 5) + uvOffsetLUT[indexNum] : invalidUV;
+		int UVStartY = 3 * random(0, 2);
+		int2 uv = indexNum > 0 ? int2(4, UVStartY) + uvOffsetLUT[indexNum] : invalidUV;
 		tileUVs[x + y*(width + 1)] = uv;
 	}
 
@@ -159,9 +162,8 @@ namespace Cockroach
 
 	bool Room::IsFilled(int x, int y, TileType type)
 	{
-		int index = RoomPositionToIndex(x, y);
-		if (!Contains({ x, y })) return true; // Little hack to make autotiling on borders easier
-		// More thought needed on edges
+		int2 roomPosClamped = glm::clamp(int2(x,y), {0,0}, {width - 1, height - 1});
+		int index = RoomPositionToIndex(roomPosClamped.x, roomPosClamped.y);
 		if (tiles[index] == Air) return false;
 		else return true;//return tiles[index] == type;
 	}
@@ -213,7 +215,7 @@ namespace Cockroach
 				out << tiles[i];
 			out << '\n';
 			for (int i = 0; i < entities.size(); i++)
-				out << entities[i]->GenerateDefinitionString();
+				out << entities[i]->GenerateDefinition().ToString();
 		}
 		else CR_CORE_ERROR("Could not open file '{0}'", Filepath());
 		out.close();

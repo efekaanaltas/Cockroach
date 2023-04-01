@@ -17,6 +17,8 @@ namespace Cockroach
 
 		EntityDefinition(std::stringstream& definition);
 		EntityDefinition(int type, bool isDecoration, int2 position, int2 size);
+
+		std::string ToString();
 	};
 
 	class Entity
@@ -42,7 +44,7 @@ namespace Cockroach
 		virtual void Render();
 		virtual void RenderInspectorUI();
 
-		virtual std::string GenerateDefinitionString();
+		virtual EntityDefinition GenerateDefinition();
 
 		template<typename T>
 		T* As();

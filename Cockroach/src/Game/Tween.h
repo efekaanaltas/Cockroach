@@ -40,6 +40,7 @@ namespace Cockroach
             return t;
         }
         }
+        return t;
     }
 
     template<typename T>

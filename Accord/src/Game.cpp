@@ -17,6 +17,7 @@ Entities::Particles* Game::particles = nullptr;
 
 Ref<Framebuffer> Game::framebuffer = nullptr;
 Ref<Texture2D> Game::baseSpriteSheet = nullptr;
+Ref<Texture2D> Game::tilemapSheet = nullptr;
 Ref<Texture2D> Game::background = nullptr;
 
 std::vector<Sprite> Game::entitySprites;
@@ -34,6 +35,7 @@ Game::Game()
 	Game::framebuffer = CreateRef<Framebuffer>(320, 180);
 	Game::background = CreateRef<Texture2D>("assets/textures/BG_RED.png");
 	Game::baseSpriteSheet = CreateRef<Texture2D>("assets/textures/SpriteSheet.png");
+	Game::tilemapSheet = CreateRef<Texture2D>("assets/textures/Tilemaps.png");
 
 	LoadSprites();
 
@@ -142,7 +144,7 @@ void Game::Render()
 		bool roomVisible = rooms[i]->OverlapsWith(cameraController->Bounds(), 0, 0);
 		if (rooms[i] == Room::current || renderAllRooms || (renderAllVisibleRooms && roomVisible))
 		{
-			rooms[i]->Render(Game::baseSpriteSheet);
+			rooms[i]->Render(Game::tilemapSheet);
 
 			if (renderRoomBoundaries)
 			{

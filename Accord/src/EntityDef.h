@@ -177,7 +177,7 @@ namespace Entities
 		virtual void Render() override;
 		virtual void RenderInspectorUI() override;
 		
-		virtual std::string GenerateDefinitionString() override;
+		virtual EntityDefinition GenerateDefinition() override;
 	};
 
 	class CameraController : public Entity
@@ -224,10 +224,11 @@ namespace Entities
 		int decorationIndex;
 		Rect hitbox;
 
-		virtual std::string GenerateDefinitionString() override
+		virtual EntityDefinition GenerateDefinition() override
 		{
-			return GenerateProperty("D", decorationIndex)
-				+ GenerateProperty("X", position.x) + GenerateProperty("Y", position.y) + GenerateProperty("Z", z) + "\n";
+			EntityDefinition definition = EntityDefinition(decorationIndex, true, position, size);
+			definition.z = z;
+			return definition;
 		}
 
 		virtual void Update(float dt) override {}

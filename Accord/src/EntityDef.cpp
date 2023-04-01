@@ -193,6 +193,7 @@ namespace Entities
 
 	void CameraController::StartTransition()
 	{
+		if (Game::editMode) return;
 		isTransitioning = true;
 		targetPosition = RoomBoundedPosition();
 		transitionTween = Tween<int2>(position, targetPosition, 1.0f, TweenFunc::Linear);
@@ -431,12 +432,11 @@ namespace Entities
 		End();
 	}
 
-	std::string MovingPlatform::GenerateDefinitionString()
+	EntityDefinition MovingPlatform::GenerateDefinition()
 	{
-		return GenerateProperty("E", type)
-			 + GenerateProperty("X", startPosition.x) + GenerateProperty("Y", startPosition.y)
-			 + GenerateProperty("X1", endPosition.x) + GenerateProperty("Y1", endPosition.y)
-			 + GenerateProperty("W", size.x) + GenerateProperty("H", size.y) + "\n";
+		EntityDefinition definition = EntityDefinition(type, false, startPosition, size);
+		definition.altPosition = endPosition;
+		return definition;
 	}
 }
 

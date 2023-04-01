@@ -36,11 +36,10 @@ namespace Cockroach
 		End();
 	}
 
-	std::string Entity::GenerateDefinitionString()
+	EntityDefinition Entity::GenerateDefinition()
 	{
-		return GenerateProperty("E", type)
-			 + GenerateProperty("X", position.x) + GenerateProperty("Y", position.y)
-			 + GenerateProperty("W", size.x) + GenerateProperty("H", size.y) + "\n";
+		EntityDefinition definition = EntityDefinition(type, false, position, size);
+		return definition;
 	}
 
 	EntityDefinition::EntityDefinition(std::stringstream& definition)
@@ -62,5 +61,19 @@ namespace Cockroach
 		this->isDecoration = isDecoration;
 		this->position = position;
 		this->size = size;
+	}
+
+	std::string EntityDefinition::ToString()
+	{
+		std::string definition;
+		definition += GenerateProperty(isDecoration ? "D" : "E", type)
+					+ GenerateProperty("X", position.x) + GenerateProperty("Y", position.y)
+					+ GenerateProperty("W", size.x) + GenerateProperty("H", size.y);
+		if (z.has_value())
+			definition += GenerateProperty("Z", *z);
+		if (altPosition.has_value())
+			definition += GenerateProperty("X1", altPosition->x) + GenerateProperty("Y1", altPosition->y);
+		definition += "\n";
+		return definition;
 	}
 }

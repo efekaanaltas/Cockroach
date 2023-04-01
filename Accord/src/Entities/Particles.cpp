@@ -3,14 +3,6 @@
 
 namespace Entities
 {
-	float random(float min, float max)
-	{
-		static int seed = 0;
-		++seed;
-		float noise = sin(dot({seed+3.486f, seed+26.846f}, float2(12.9898f, 78.233f) * 2.0f)) * 43758.5453f;
-		noise = fmod(abs(noise), 1.0f) * (max-min) + min;
-		return noise;
-	}
 	Particle::Particle(float2 position, float2 velocity, float duration, float4 color)
 		: position(position), velocity(velocity), life(duration), color(color)
 	{

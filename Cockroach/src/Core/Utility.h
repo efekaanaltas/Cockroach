@@ -10,6 +10,24 @@ namespace Cockroach
 		return a + t * (b - a);
 	}
 
+	static float random(float min, float max)
+	{
+		static int seed = 0;
+		++seed;
+		float noise = sin(dot({ seed + 3.486f, seed + 26.846f }, float2(12.9898f, 78.233f) * 2.0f)) * 43758.5453f;
+		noise = fmod(abs(noise), 1.0f) * (max - min) + min;
+		return noise;
+	}
+
+	static int random(int min, int max)
+	{
+		static int seed = 0;
+		++seed;
+		float noise = sin(dot({ seed + 3.486f, seed + 26.846f }, float2(12.9898f, 78.233f) * 2.0f)) * 43758.5453f;
+		noise = fmod(abs(noise), 1.0f) * (max - min + 1) + min;
+		return (int)noise;
+	}
+
 	template<glm::length_t L, typename T, glm::qualifier Q>
 	inline glm::vec<L, T, Q> lerp(glm::vec<L, T, Q> a, glm::vec<L, T, Q> b, float t) 
 	{

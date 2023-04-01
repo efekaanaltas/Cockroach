@@ -37,6 +37,7 @@ public:
 
 	static Ref<Framebuffer> framebuffer;
 	static Ref<Texture2D> baseSpriteSheet;
+	static Ref<Texture2D> tilemapSheet;
 	static Ref<Texture2D> background;
 
 	static std::vector<Sprite> entitySprites;
