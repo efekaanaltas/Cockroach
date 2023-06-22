@@ -14,7 +14,7 @@ namespace Entities
 		float2 position = ZERO;
 		float2 velocity = ZERO;
 
-		Timer life = Timer(1.0f);
+		float deathTime = 0.0f;
 
 		float4 color = WHITE;
 	};
@@ -24,24 +24,13 @@ namespace Entities
 	public:
 		Particles();
 
-		virtual void Update(float dt) override
-		{
-			for (auto& particle : particles)
-				if (!particle.life.Finished())
-				{
-					particle.life.Tick(dt);
-					particle.position += particle.velocity * dt;
-				}
-		}
+		virtual void Update(float dt) override;
+		virtual void Render() override;
 
-		virtual void Render() override
-		{
-			for (auto& particle : particles)
-				if (!particle.life.Finished())
-					Renderer::DrawQuad(glm::floor(float3(particle.position.x, particle.position.y, 10.0f)), {1,1}, pixel.texture, pixel.min, pixel.max, particle.color);
-		}
+		void Add(const Particle& particle);
 
 		Sprite pixel;
-		std::vector<Particle> particles; // Priority Queue?
+	private:
+		std::vector<Particle> particles;
 	};
 }

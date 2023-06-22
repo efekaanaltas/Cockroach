@@ -14,6 +14,7 @@ namespace Cockroach
 		int2 size = 8*ONEi;
 		std::optional<int> z = {};
 		std::optional<int2> altPosition = {};
+		std::optional<int> variant = {};
 
 		EntityDefinition(std::stringstream& definition);
 		EntityDefinition(int type, bool isDecoration, int2 position, int2 size);

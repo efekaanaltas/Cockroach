@@ -231,7 +231,7 @@ namespace Entities
 				Game::player->velocity.y += vertical * turbineAcceleration * dt;
 		}
 
-		Game::particles->particles.push_back(Particle
+		Game::particles->Add(Particle
 		(
 			position + size / 2 + UPi*vertical*4, { size.x / 2, 0 },
 			UPi * vertical * 25, { 1.0f, 1.0f },
@@ -240,15 +240,15 @@ namespace Entities
 		);
 	}
 
-	EssenceRed::EssenceRed(int2 position, int2 hitboxMin, int2 hitboxMax)
-		: Dynamic(position, hitboxMin, hitboxMax)
+	Essence::Essence(int2 position, int2 hitboxMin, int2 hitboxMax, DashType dashType)
+		: Dynamic(position, hitboxMin, hitboxMax), dashType(dashType)
 	{
 		blockOnCollision = false;
 		respawnTimer.remainingTime = 0;
 		overlayColor = WHITE;
 	}
 
-	void EssenceRed::Update(float dt)
+	void Essence::Update(float dt)
 	{
 		if (!active && respawnTimer.Finished())
 			Refresh();
@@ -258,15 +258,15 @@ namespace Entities
 		{
 			overlayWeight = std::clamp(overlayWeight - 4 * dt, 0.0f, 1.0f);
 
-			if (OverlapsWith(Game::player, 0, 0) && !Game::player->canDash)
+			if (OverlapsWith(Game::player, 0, 0) && (!Game::player->canDash || dashType != Game::player->currentDashType))
 			{
-				Game::player->RegainDash();
+				Game::player->RegainDash(dashType);
 				Absorb();
 			}
 		}
 	}
 
-	void EssenceRed::Absorb()
+	void Essence::Absorb()
 	{
 		Game::Freeze(3);
 		respawnTimer.Reset();
@@ -274,9 +274,13 @@ namespace Entities
 		active = false;
 	}
 
-	void EssenceRed::Refresh()
+	void Essence::Refresh()
 	{
-		sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 1,0 }, { 8,8 });
+		switch (dashType)
+		{
+		case Dash: sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 1,0 }, { 8,8 }); break;
+		case Drift: sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 2,0 }, { 8,8 }); break;
+		}
 		overlayWeight = 1.0f;
 		active = true;
 	}
@@ -438,6 +442,25 @@ namespace Entities
 		definition.altPosition = endPosition;
 		return definition;
 	}
+
+	void Essence::RenderInspectorUI()
+	{
+		using namespace ImGui;
+		Begin("Inspector");
+		InputInt("X", &position.x, 8, 1);
+		InputInt("Y", &position.y, 8, 1);
+		InputInt("V", (int*)&dashType, 1, 1);
+		InputInt("W", &size.x, 8, 8);
+		InputInt("H", &size.y, 8, 8);
+		End();
+	}
+
+	EntityDefinition Essence::GenerateDefinition()
+	{
+		EntityDefinition definition = EntityDefinition(type, false, position, size);
+		definition.variant = (int)dashType;
+		return definition;
+	}
 }
 
 Cockroach::Entity* Cockroach::CreateEntity(const EntityDefinition& def)
@@ -452,69 +475,53 @@ Cockroach::Entity* Cockroach::CreateEntity(const EntityDefinition& def)
 		switch (def.type)
 		{
 		case EntityType::Payga:
-		{
 			CR_WARN("Do not create an instance of Payga");
-			break; }
+		break;
 		case EntityType::Camera:
-		{
 			CR_WARN("Do not create an instance of Camera");
-			break; }
+		break; 
 		case EntityType::Particles:
-		{
 			CR_WARN("Do not create an instance of Particles");
-			break; }
+		break;
 		case EntityType::SpikeLeft:
-		{
 			e = new Spike(def.position, { 4,0 }, { 8,8 }, LEFTi);
-			break; }
+		break;
 		case EntityType::SpikeRight:
-		{
 			e = new Spike(def.position, { 0,0 }, { 4,8 }, RIGHTi);
-			break; }
+		break;
 		case EntityType::SpikeDown:
-		{
 			e = new Spike(def.position, { 0,4 }, { 8,8 }, DOWNi);
-			break; }
+		break;
 		case EntityType::SpikeUp:
-		{
 			e = new Spike(def.position, { 0,0 }, { 8,4 }, UPi);
-			break; }
+		break;
 		case EntityType::Oscillator:
-		{
 			e = new OscillatorA(def.position, { 0, 0 }, { 8, 8 });
-			break; }
+		break;
 		case EntityType::TurbineLeft:
-		{
 			e = new Turbine(def.position, def.size, -1, 0);
-			break; }
+		break;
 		case EntityType::TurbineRight:
-		{
 			e = new Turbine(def.position, def.size, 1, 0);
-			break; }
+		break;
 		case EntityType::TurbineDown:
-		{
 			e = new Turbine(def.position, def.size, 0, -1);
-			break; }
+		break;
 		case EntityType::TurbineUp:
-		{
 			e = new Turbine(def.position, def.size, 0, 1);
-			break; }
-		case EntityType::EssenceRed:
-		{
-			e = new Entities::EssenceRed(def.position, { 1,1 }, { 7,7 });
-			break; }
+		break;
+		case EntityType::Essence:
+			e = new Entities::Essence(def.position, { 1,1 }, { 7,7 }, (DashType)def.variant.value_or(0));
+		break;
 		case EntityType::Igniter:
-		{
 			e = new Entities::Igniter(def.position, def.size);
-			break; }
+		break;
 		case EntityType::Propeller:
-		{
 			e = new Entities::Propeller(def.position, def.size);
-			break; }
+		break;
 		case EntityType::MovingPlatform:
-		{
 			e = new Entities::MovingPlatform(def.position, def.size, def.altPosition.value_or(def.position));
-			break; }
+		break;
 		}
 		if (e != nullptr)
 		{

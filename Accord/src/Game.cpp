@@ -138,7 +138,6 @@ void Game::Render()
 
 	bool renderAllVisibleRooms = cameraController->isTransitioning;
 
-
 	for (int i = 0; i < rooms.size(); i++)
 	{
 		bool roomVisible = rooms[i]->OverlapsWith(cameraController->Bounds(), 0, 0);

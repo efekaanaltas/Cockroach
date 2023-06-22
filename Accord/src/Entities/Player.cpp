@@ -14,7 +14,8 @@ namespace Entities
 		walljumpingState = new JumpingState(90.0f, 100.0f, -180.0);
 		ledgeJumpingState = new JumpingState(80.0f, 80.0f, 0.0f);
 		clingingState = new ClingingState;
-		dashingState = new DashingState;
+		dashingState = new DashingState(150.0f, 0.2f);
+		driftingState = new DashingState(150.0f, 100.0f);
 		rollingState = new RollingState;
 
 		Ref<Texture2D> texture = Game::baseSpriteSheet;
@@ -92,7 +93,7 @@ namespace Entities
 		MoveY((velocityLastFrame.y + velocity.y) * 0.5f * dt);
 
 		grounded = GetCollision(0, -1); //verticalCollision == -1;
-		if (grounded && dashRegainTimer.Finished()) RegainDash();
+		if (grounded && dashRegainTimer.Finished() && !canDash) RegainDash();
 
 		if (grounded && !groundedAtStartOfFrame)
 			renderSize.y = 0.6f;
@@ -189,9 +190,10 @@ namespace Entities
 			Die();
 	}
 
-	void Player::RegainDash()
+	void Player::RegainDash(DashType dashType)
 	{
 		if(!canDash) flashTimer.Reset();
+		currentDashType = dashType;
 		canDash = true;
 	}
 

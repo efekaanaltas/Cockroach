@@ -11,6 +11,8 @@ class JumpingState;
 class ClingingState;
 class DashingState;
 
+enum DashType;
+
 struct Sheet
 {
 	std::vector<Sprite> sheet;
@@ -122,15 +124,19 @@ namespace Entities
 		virtual void Render() override;
 	};
 
-	class EssenceRed : public Dynamic
+	class Essence : public Dynamic
 	{
 	public:
-		EssenceRed(int2 position, int2 hitboxMin, int2 hitboxMax);
+		Essence(int2 position, int2 hitboxMin, int2 hitboxMax, DashType dashType);
 
 		bool active = true;
+		DashType dashType;
 		Timer respawnTimer = Timer(2.0f);
 
 		virtual void Update(float dt) override;
+		virtual void RenderInspectorUI() override;
+
+		virtual EntityDefinition GenerateDefinition() override;
 
 		void Absorb();
 		void Refresh();

@@ -51,8 +51,10 @@ namespace Cockroach
 
 		if (HasProperty(definition, "Z"))
 			this->z = GetProperty<int>(definition, "Z");
-		if(HasProperty(definition, "X1"))
+		if (HasProperty(definition, "X1"))
 			this->altPosition = int2(GetProperty<int>(definition, "X1"), GetProperty<int>(definition, "Y1"));
+		if (HasProperty(definition, "V"))
+			this->variant = GetProperty<int>(definition, "V");
 	}
 
 	EntityDefinition::EntityDefinition(int type, bool isDecoration, int2 position, int2 size)
@@ -73,6 +75,8 @@ namespace Cockroach
 			definition += GenerateProperty("Z", *z);
 		if (altPosition.has_value())
 			definition += GenerateProperty("X1", altPosition->x) + GenerateProperty("Y1", altPosition->y);
+		if (variant.has_value())
+			definition += GenerateProperty("V", *variant);
 		definition += "\n";
 		return definition;
 	}

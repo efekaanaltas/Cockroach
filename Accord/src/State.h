@@ -63,6 +63,10 @@ namespace Entities
 		Timer dashTimer = Timer(0.2f);
 		float2 dashDir = RIGHT;
 
+		DashingState(float dashSpeed, float dashDuration)
+			: dashSpeed(dashSpeed), dashTimer(dashDuration)
+		{}
+	
 		virtual void Enter(Player* player) override;
 		virtual State<Player>* Update(Player* player, float dt) override;
 		virtual void Exit(Player* player) override;

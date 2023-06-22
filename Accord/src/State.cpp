@@ -21,6 +21,16 @@ namespace Entities
 												return player->idleSheet;
 	}
 
+	State<Player>* GetDashingState(Player* player)
+	{
+		switch (player->currentDashType)
+		{
+		case Dash:	return GetDashingState(player);
+		case Drift: return player->driftingState;
+		}
+		return GetDashingState(player);
+	}
+
 	void WalkingState::Enter(Player* player)
 	{
 		player->coyoteTimer.remainingTime = 0.0f;
@@ -52,7 +62,7 @@ namespace Entities
 			return player->jumpingState;
 
 		if (player->bufferedDashInput.Active() && player->canDash)
-			return player->dashingState;
+			return GetDashingState(player);
 
 		if (!player->grounded)
 		{
@@ -93,7 +103,7 @@ namespace Entities
 
 		for (int i = 0; i < 30; i++)
 		{
-			Game::particles->particles.push_back(Particle
+			Game::particles->Add(Particle
 			(
 				Game::player->position + RIGHTi*8, { 3,0 },
 				{ -Game::player->velocity.x / 10.0f, 12.0f }, { 4.0f, 3.0f },
@@ -128,7 +138,7 @@ namespace Entities
 			return player->walkingState;
 
 		if (player->bufferedDashInput.Active() && player->canDash)
-			return player->dashingState;
+			return GetDashingState(player);
 
 		if (player->bufferedJumpInput.Active())
 		{
@@ -194,10 +204,9 @@ namespace Entities
 			return player->walkingState;
 		else
 		{
-
 			for (int i = 0; i < 5; i++)
 			{
-				Game::particles->particles.push_back(Particle
+				Game::particles->Add(Particle
 				(
 					Game::player->position + ONEi*8, ONE*4.0f,
 					DOWN * 2.0f, { 0.4f, 5.0f },
@@ -256,10 +265,21 @@ namespace Entities
 
 	State<Player>* RollingState::Update(Player* player, float dt)
 	{
+		for (int i = 0; i < (player->grounded ? 20 : 5); i++)
+		{
+			Game::particles->Add(Particle
+			(
+				Game::player->position + int2(8 + player->faceDir * 2, 0), { 3,0 },
+				{ -Game::player->velocity.x / 10.0f, 25.0f }, { 7.0f, 10.0f },
+				0.1f, 0.05f,
+				WHITE, CLEAR)
+			);
+		}
+
 		player->velocity.x += player->InputDirX() * (player->grounded ? groundRollAcceleration : airRollAcceleration) * dt;
 		player->velocity.x = std::clamp(player->velocity.x, -maxRollSpeed, maxRollSpeed);
 		
-		if(!player->grounded)
+		if (!player->grounded)
 			player->velocity.y -= player->walkingState->gravity * dt;
 
 		if (player->GetCollision(player->faceDir, 0))
@@ -278,7 +298,7 @@ namespace Entities
 		if (player->bufferedJumpInput.Active() && !player->coyoteTimer.Finished())
 			return player->rolljumpingState;
 		if (player->bufferedDashInput.Active() && player->canDash)
-			return player->dashingState;
+			return GetDashingState(player);
 		if (player->WallDir() != 0 && player->InputDirY() != -1)
 			return player->clingingState;
 

@@ -32,6 +32,11 @@ struct BufferedInput
 	bool Active() { return !bufferFramesTimer.Finished(); }
 };
 
+enum DashType
+{
+	Dash, Drift, Propel, Virtual, Regen, Flashback
+};
+
 namespace Entities
 {
 	class Player : public Dynamic
@@ -53,6 +58,8 @@ namespace Entities
 		float2 velocity = ZERO;
 		float2 velocityLastFrame = ZERO;
 
+		DashType currentDashType = Dash;
+
 		State<Player>* currentState = nullptr;
 		WalkingState* walkingState = nullptr;
 		JumpingState* jumpingState = nullptr;
@@ -62,6 +69,7 @@ namespace Entities
 		JumpingState* ledgeJumpingState = nullptr;
 		ClingingState* clingingState = nullptr;
 		DashingState* dashingState = nullptr;
+		DashingState* driftingState = nullptr;
 		RollingState* rollingState = nullptr;
 
 		float2 renderSize = ONE;
@@ -86,7 +94,7 @@ namespace Entities
 		void TrySwitchState(State<Player>* state);
 
 		void TryChangeRoom();
-		void RegainDash();
+		void RegainDash(DashType dashType = Dash);
 		void Die();
 	};
 }
