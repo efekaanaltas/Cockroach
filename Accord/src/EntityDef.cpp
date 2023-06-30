@@ -196,7 +196,7 @@ namespace Entities
 		if (Game::editMode) return;
 		isTransitioning = true;
 		targetPosition = RoomBoundedPosition();
-		transitionTween = Tween<int2>(position, targetPosition, 1.0f, TweenFunc::Linear);
+		transitionTween = Tween<int2>(position, targetPosition, 0.5f, TweenFunc::Linear);
 	}
 
 	int2 CameraController::RoomBoundedPosition()
@@ -244,15 +244,15 @@ namespace Entities
 		: Dynamic(position, hitboxMin, hitboxMax), dashType(dashType)
 	{
 		blockOnCollision = false;
-		respawnTimer.remainingTime = 0;
+		refreshTimer.remainingTime = 0;
 		overlayColor = WHITE;
 	}
 
 	void Essence::Update(float dt)
 	{
-		if (!active && respawnTimer.Finished())
+		if (!active && refreshTimer.Finished())
 			Refresh();
-		else respawnTimer.Tick(dt);
+		else refreshTimer.Tick(dt);
 
 		if (active)
 		{
@@ -269,7 +269,20 @@ namespace Entities
 	void Essence::Absorb()
 	{
 		Game::Freeze(3);
-		respawnTimer.Reset();
+		Audio::Play("assets/audio/sound1_dontforgettochange.wav");
+		for (int i = 0; i < 500; i++)
+		{
+			float randomAngle = random(0.0f, 2*PI);
+			float2 randomDir = float2(std::cos(randomAngle), std::sin(randomAngle));
+			Game::particles->Add(Particle
+			(
+				(float2)position + randomDir, {-1.0f, 1.0f},
+				random(4.0f, 26.0f)*randomDir, ZERO,
+				0.2f, 0.4f,
+				RED + random(0.0f, 0.9f)*WHITE, CLEAR)
+			);
+		}
+		refreshTimer.Reset();
 		sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 0,1 }, { 8,8 });
 		active = false;
 	}
@@ -282,6 +295,63 @@ namespace Entities
 		case Drift: sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 2,0 }, { 8,8 }); break;
 		}
 		overlayWeight = 1.0f;
+		active = true;
+	}
+
+	void Attractor::Update(float dt)
+	{
+		if (!active && refreshTimer.Finished())
+			Refresh();
+		else refreshTimer.Tick(dt);
+
+		if (active)
+		{
+			overlayWeight = std::clamp(overlayWeight - 4 * dt, 0.0f, 1.0f);
+
+			float2 delta = WorldHitbox().Center() - Game::player->WorldHitbox().Center();
+			float distanceSqr = delta.x*delta.x+delta.y*delta.y;
+
+			if (distanceSqr <= attractionRadius*attractionRadius)
+			{
+				Game::player->velocity = ZERO;
+				if (delta.x != 0) Game::player->MoveX((delta.x > 0 ? 1 : -1));
+				if (delta.y != 0) Game::player->MoveY((delta.y > 0 ? 1 : -1));
+
+				if (!dissolving)
+				{
+					dissolveTimer.Reset();
+					dissolving = true;
+				}
+
+				if (Input::IsDown(CR_KEY_LEFT_SHIFT))
+				{
+					dissolveTimer.remainingTime = 0;
+					Dissolve();
+				}
+			}
+			
+			if (!dissolveTimer.Finished())
+			{
+				dissolveTimer.Tick(dt);
+				if (dissolveTimer.Finished())
+					Dissolve();
+			}
+		}
+	}
+
+	void Attractor::Dissolve()
+	{
+		refreshTimer.Reset();
+		sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 0,1 }, { 8,8 });
+		Audio::Play("assets/audio/sound2_dontforgettochange.wav");
+		active = false;
+		dissolving = false;
+	}
+
+	void Attractor::Refresh()
+	{
+		overlayWeight = 1.0f;
+		sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 0,0 }, { 8,8 });
 		active = true;
 	}
 
@@ -461,6 +531,7 @@ namespace Entities
 		definition.variant = (int)dashType;
 		return definition;
 	}
+
 }
 
 Cockroach::Entity* Cockroach::CreateEntity(const EntityDefinition& def)
@@ -521,6 +592,9 @@ Cockroach::Entity* Cockroach::CreateEntity(const EntityDefinition& def)
 		break;
 		case EntityType::MovingPlatform:
 			e = new Entities::MovingPlatform(def.position, def.size, def.altPosition.value_or(def.position));
+			break;
+		case EntityType::Attractor:
+			e = new Entities::Attractor(def.position, { 1,1 }, { 7,7 });
 		break;
 		}
 		if (e != nullptr)

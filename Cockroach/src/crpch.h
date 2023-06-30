@@ -36,6 +36,8 @@
 #define mat3 glm::mat3
 #define mat4 glm::mat4
 
+#define PI glm::pi<float>()
+
 #define ONE			float2(1.0f, 1.0f)
 #define ZERO		float2(0.0f, 0.0f)
 #define LEFT		float2(-1.0f, 0.0f)

@@ -127,6 +127,14 @@ namespace Entities
 
 			if (horizontal)
 			{
+				int height = 0;
+				while (++height < 4)
+					if (!GetCollision(faceDir, height))
+					{
+						MoveY((float)height);
+						MoveX(faceDir);
+						break;
+					}
 				//velocity.x = 0.0f;
 				if (!grounded && velocity.y < 0.0f && InputDirX() == horizontal && InputDirY() != -1)
 					TrySwitchState(clingingState);
@@ -183,7 +191,7 @@ namespace Entities
 				position = glm::clamp(position, bounds.min - hitbox.min, bounds.max - hitbox.max);
 				Game::cameraController->StartTransition();
 				lookingForCheckpoint = true;
-				RegainDash();
+				RegainDash(currentDashType);
 				return;
 			}
 		if (!Room::current->Contains(WorldHitbox()))

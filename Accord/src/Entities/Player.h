@@ -78,7 +78,7 @@ namespace Entities
 		Sheet currentSheet;
 
 		BufferedInput bufferedJumpInput = BufferedInput(CR_KEY_SPACE, 6);
-		BufferedInput bufferedDashInput = BufferedInput(CR_KEY_LEFT_SHIFT, 10);
+		BufferedInput bufferedDashInput = BufferedInput(CR_KEY_LEFT_SHIFT, 15);
 
 		Timer coyoteTimer = Timer(10.0f);
 		Timer flashTimer = Timer(5.0f);

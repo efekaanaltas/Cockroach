@@ -12,7 +12,7 @@ using namespace Entities;
 	enum ENUM_NAME{ __VA_ARGS__ }; \
 	static std::vector<std::string> entityTypeNames = Cockroach::Split( #__VA_ARGS__ );
 
-DECLARE_ENTITY_TYPE_ENUM(EntityType, Payga, Camera, Particles, SpikeLeft, SpikeRight, SpikeDown, SpikeUp, Oscillator, TurbineLeft, TurbineRight, TurbineDown, TurbineUp, Essence, Igniter, Propeller, MovingPlatform, END);
+DECLARE_ENTITY_TYPE_ENUM(EntityType, Payga, Camera, Particles, SpikeLeft, SpikeRight, SpikeDown, SpikeUp, Oscillator, TurbineLeft, TurbineRight, TurbineDown, TurbineUp, Essence, Igniter, Propeller, MovingPlatform, Attractor, END);
 
 class Game : public Cockroach::Application
 {

@@ -25,10 +25,10 @@ namespace Entities
 	{
 		switch (player->currentDashType)
 		{
-		case Dash:	return GetDashingState(player);
+		case Dash:	return player->dashingState;
 		case Drift: return player->driftingState;
 		}
-		return GetDashingState(player);
+		return player->dashingState;
 	}
 
 	void WalkingState::Enter(Player* player)
@@ -49,7 +49,7 @@ namespace Entities
 			{
 				int height = 0;
 				while (++height < 8)
-					if (!player->GetCollision(player->faceDir, height))
+					if (!player->GetCollision(player->faceDir, height) && player->InputDirX() == player->WallDir())
 					{
 						return player->ledgeJumpingState;
 					}
@@ -146,7 +146,7 @@ namespace Entities
 			{
 				int height = 0;
 				while (++height < 8)
-					if (!player->GetCollision(player->faceDir, height))
+					if (!player->GetCollision(player->faceDir, height) && player->InputDirX() == player->WallDir())
 					{
 						return player->ledgeJumpingState;
 					}
@@ -204,6 +204,12 @@ namespace Entities
 			return player->walkingState;
 		else
 		{
+			dashTimer.Tick(dt);
+			player->velocity = dashSpeed * dashDir;
+
+			if ((player->currentDashType == Drift) && Input::IsDown(CR_KEY_LEFT_SHIFT))
+				return player->walkingState;
+
 			for (int i = 0; i < 5; i++)
 			{
 				Game::particles->Add(Particle
@@ -214,9 +220,6 @@ namespace Entities
 					RED, BLUE*0.3f)
 				);
 			}
-
-			dashTimer.Tick(dt);
-			player->velocity = dashSpeed * dashDir;
 
 			if (dashDir.y != 0) return nullptr;
 
@@ -248,6 +251,7 @@ namespace Entities
 
 	void DashingState::Exit(Player* player)
 	{
+		player->currentDashType = Dash;
 		if (dashDir.y > 0.0f)
 		{
 			player->gravityHaltTimer.Reset();

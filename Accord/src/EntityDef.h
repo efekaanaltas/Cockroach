@@ -131,7 +131,7 @@ namespace Entities
 
 		bool active = true;
 		DashType dashType;
-		Timer respawnTimer = Timer(2.0f);
+		Timer refreshTimer = Timer(2.0f);
 
 		virtual void Update(float dt) override;
 		virtual void RenderInspectorUI() override;
@@ -139,6 +139,29 @@ namespace Entities
 		virtual EntityDefinition GenerateDefinition() override;
 
 		void Absorb();
+		void Refresh();
+	};
+
+	class Attractor : public Dynamic
+	{
+	public:
+		Attractor(int2 position, int2 hitboxMin, int2 hitboxMax)
+			: Dynamic(position, hitboxMin, hitboxMax)
+		{
+			blockOnCollision = false;
+			dissolveTimer.remainingTime = 0;
+		}
+
+		bool active = true;
+		bool dissolving = false;
+		float attractionRadius = 15.0f;
+		float attraction = 200.0f;
+		Timer dissolveTimer = Timer(0.5f);
+		Timer refreshTimer = Timer(2.0f);
+
+		virtual void Update(float dt) override;
+
+		void Dissolve();
 		void Refresh();
 	};
 

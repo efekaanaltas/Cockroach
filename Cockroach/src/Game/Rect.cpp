@@ -28,4 +28,9 @@ namespace Cockroach
 		bool y = min.y <= coord.y && coord.y <= max.y;
 		return x && y;
 	}
+
+	int2 Rect::Center() const
+	{
+		return { (min.x + max.x) / 2, (min.y + max.y) / 2 };
+	}
 }

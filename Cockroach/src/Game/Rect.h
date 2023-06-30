@@ -17,5 +17,7 @@ namespace Cockroach
 
 		bool Contains(Rect other, int xForesense = 0, int yForesense = 0) const;
 		bool Contains(int2 coord) const;
+
+		int2 Center() const;
 	};
 }
