@@ -11,6 +11,8 @@
 
 #include "Game.h"
 
+PlayerData Game::data;
+
 CameraController* Game::cameraController = nullptr;
 Player* Game::player = nullptr;
 Entities::Particles* Game::particles = nullptr;
@@ -47,7 +49,7 @@ Game::Game()
 	//	if (e->sprite.texture)
 	//		entitySprites[i] = e->sprite;
 	//	else
-	//		entitySprites[i] = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 3 }, { 8,8 });
+	//		entitySprites[i] = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 1 }, { 8,8 });
 	//}
 	//SaveSprites();
 
@@ -58,13 +60,15 @@ Game::Game()
 		rooms.push_back(Room::Load(name));
 	}
 
+
+	Game::player = new Entities::Player(data.playerPosition, {6,0}, {10,12});
+	player->type = EntityType::Payga;
+	player->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 3 }, { 16, 16 });
+
 	Game::cameraController = new CameraController();
 	cameraController->type = EntityType::Camera;
 	cameraController->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0,0 }, { 1,1 });
-
-	Game::player = new Entities::Player({-72, 32}, {6,0}, {10,12});
-	player->type = EntityType::Payga;
-	player->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 3 }, { 16, 16 });
+	cameraController->positionHighRes = data.playerPosition;
 
 	Game::particles = new Entities::Particles();
 	particles->type = EntityType::Particles;
@@ -446,29 +450,27 @@ void Game::SaveSprites()
 {
 	std::string filepath = "assets/textures/sprites.txt";
 	std::fstream out(filepath, std::ios::out | std::ios::binary | std::ios::trunc);
-
-	if (out)
+	if (!out) CR_CORE_ERROR("Could not open file '{0}'", filepath);
+	
+	for (int i = 0; i < entitySprites.size(); i++)
 	{
-		for (int i = 0; i < entitySprites.size(); i++)
-		{
-			out << GenerateProperty("E", i);
-			out << GenerateProperty("X0", entitySprites[i].min.x);
-			out << GenerateProperty("Y0", entitySprites[i].min.y);
-			out << GenerateProperty("X1", entitySprites[i].max.x);
-			out << GenerateProperty("Y1", entitySprites[i].max.y);
-			out << '\n';
-		}
-		for (int i = 0; i < decorationSprites.size(); i++)
-		{
-			out << GenerateProperty("D", i);
-			out << GenerateProperty("X0", decorationSprites[i].min.x);
-			out << GenerateProperty("Y0", decorationSprites[i].min.y);
-			out << GenerateProperty("X1", decorationSprites[i].max.x);
-			out << GenerateProperty("Y1", decorationSprites[i].max.y);
-			out << '\n';
-		}
+		out << GenerateProperty("E", i);
+		out << GenerateProperty("X0", entitySprites[i].min.x);
+		out << GenerateProperty("Y0", entitySprites[i].min.y);
+		out << GenerateProperty("X1", entitySprites[i].max.x);
+		out << GenerateProperty("Y1", entitySprites[i].max.y);
+		out << '\n';
 	}
-	else CR_CORE_ERROR("Could not open file '{0}'", filepath);
+	for (int i = 0; i < decorationSprites.size(); i++)
+	{
+		out << GenerateProperty("D", i);
+		out << GenerateProperty("X0", decorationSprites[i].min.x);
+		out << GenerateProperty("Y0", decorationSprites[i].min.y);
+		out << GenerateProperty("X1", decorationSprites[i].max.x);
+		out << GenerateProperty("Y1", decorationSprites[i].max.y);
+		out << '\n';
+	}
+	
 	out.close();
 }
 
@@ -476,37 +478,34 @@ void Game::LoadSprites()
 {
 	std::string filepath = "assets/textures/sprites.txt";
 	std::fstream in(filepath, std::ios::in || std::ios::binary);
+	if (!in) CR_CORE_ERROR("Could not open file '{0}'", filepath);
 
-	if (in)
+	std::string line;
+
+	while (std::getline(in, line))
 	{
-		std::string line;
+		std::stringstream stream(line);
+		int type;
 
-		while (std::getline(in, line))
+		float2 min = { GetProperty<float>(stream, "X0"), GetProperty<float>(stream, "Y0") };
+		float2 max = { GetProperty<float>(stream, "X1"), GetProperty<float>(stream, "Y1") };
+		Sprite sprite = Sprite(Game::baseSpriteSheet, min, max);
+
+		if (HasProperty(stream, "E"))
 		{
-			std::stringstream stream(line);
-			int type;
-
-			float2 min = { GetProperty<float>(stream, "X0"), GetProperty<float>(stream, "Y0") };
-			float2 max = { GetProperty<float>(stream, "X1"), GetProperty<float>(stream, "Y1") };
-			Sprite sprite = Sprite(Game::baseSpriteSheet, min, max);
-
-			if (HasProperty(stream, "E"))
-			{
-				type = GetProperty<int>(stream, "E");
-				if (entitySprites.size() < type + 1) 
-					entitySprites.resize(type + 1);
-				entitySprites[type] = sprite;
-			}
-			else if(HasProperty(stream, "D"))
-			{
-				type = GetProperty<int>(stream, "D");
-				if (decorationSprites.size() < type + 1) 
-					decorationSprites.resize(type + 1);
-				decorationSprites[type] = sprite;
-			}
+			type = GetProperty<int>(stream, "E");
+			if (entitySprites.size() < type + 1) 
+				entitySprites.resize(type + 1);
+			entitySprites[type] = sprite;
+		}
+		else if(HasProperty(stream, "D"))
+		{
+			type = GetProperty<int>(stream, "D");
+			if (decorationSprites.size() < type + 1) 
+				decorationSprites.resize(type + 1);
+			decorationSprites[type] = sprite;
 		}
 	}
-	else CR_CORE_ERROR("Could not open file '{0}'", filepath);
 	in.close();
 }
 

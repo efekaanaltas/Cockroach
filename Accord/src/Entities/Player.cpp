@@ -108,11 +108,14 @@ namespace Entities
 		overlayWeight = std::clamp(-flashProgress * flashProgress + 1, 0.0f, 1.0f);
 	}
 
+	// This function as a whole is just weird isn't it?
 	bool Player::OnCollide(Dynamic* other, int horizontal, int vertical)
 	{
 		bool blockCollisions = other ? other->blockOnCollision : true;
 		if (blockCollisions)
 		{
+			// This code seems to be written very early into the entity system.
+			// Propeller should have it's own update function instead of this weirdness.
 			if (currentState == dashingState && other && other->As<Propeller>())
 			{
 				if (vertical == -1 && velocity.y == 0) return blockCollisions;
@@ -135,7 +138,8 @@ namespace Entities
 						MoveX(faceDir);
 						break;
 					}
-				//velocity.x = 0.0f;
+				// velocity.x = 0.0f; Enabling this makes walljumps feel stronger but doesn't allow for rolling up 1-high tiles. 
+				// I could probably find a way to make both work but I'm not sure how I want walljumping to work yet.
 				if (!grounded && velocity.y < 0.0f && InputDirX() == horizontal && InputDirY() != -1)
 					TrySwitchState(clingingState);
 			}

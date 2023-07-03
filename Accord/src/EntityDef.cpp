@@ -532,6 +532,16 @@ namespace Entities
 		return definition;
 	}
 
+	void Checkpoint::Update(float dt)
+	{
+		if (OverlapsWith(Game::player, 0, 0))
+		{
+			Game::player->checkpointPosition = Game::player->position; // Lazy implementation, should calculate ground level and place player on ground.
+			Game::data.playerPosition = Game::player->checkpointPosition;
+			Game::data.Save();
+		}
+	}
+
 }
 
 Cockroach::Entity* Cockroach::CreateEntity(const EntityDefinition& def)
@@ -592,9 +602,13 @@ Cockroach::Entity* Cockroach::CreateEntity(const EntityDefinition& def)
 		break;
 		case EntityType::MovingPlatform:
 			e = new Entities::MovingPlatform(def.position, def.size, def.altPosition.value_or(def.position));
-			break;
+		break;
 		case EntityType::Attractor:
 			e = new Entities::Attractor(def.position, { 1,1 }, { 7,7 });
+		break;
+		case EntityType::Checkpoint:
+			e = new Entities::Checkpoint(def.position, def.size);
+			e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 0,1 }, { 8,8 });
 		break;
 		}
 		if (e != nullptr)

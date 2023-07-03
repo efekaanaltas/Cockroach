@@ -1,0 +1,1 @@
+PlayerPosX: 281, PlayerPosY: 104, 

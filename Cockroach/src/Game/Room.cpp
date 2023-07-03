@@ -229,20 +229,18 @@ namespace Cockroach
 	void Room::Save()
 	{
 		std::fstream out(Filepath(), std::ios::out | std::ios::binary | std::ios::trunc);
-
-		if (out)
-		{
-			out << width << ' ';
-			out << height << ' ';
-			out << position.x << ' ';
-			out << position.y << ' ';
-			for (int i = 0; i < width * height; i++)
-				out << tiles[i];
-			out << '\n';
-			for (int i = 0; i < entities.size(); i++)
-				out << entities[i]->GenerateDefinition().ToString();
-		}
-		else CR_CORE_ERROR("Could not open file '{0}'", Filepath());
+		if (!out) CR_CORE_ERROR("Could not open file '{0}'", Filepath());
+		
+		out << width << ' ';
+		out << height << ' ';
+		out << position.x << ' ';
+		out << position.y << ' ';
+		for (int i = 0; i < width * height; i++)
+			out << tiles[i];
+		out << '\n';
+		for (int i = 0; i < entities.size(); i++)
+			out << entities[i]->GenerateDefinition().ToString();
+		
 		out.close();
 	}
 
@@ -251,36 +249,34 @@ namespace Cockroach
 		Ref<Room> room;
 		std::string filepath = roomDir + name;
 		std::fstream in(filepath, std::ios::in ||std::ios::binary);
+		if (!in) CR_CORE_ERROR("Could not open file '{0}'", filepath);
+		
+		std::string line;
+		std::getline(in, line);
+		std::stringstream stream(line);
 
-		if (in)
+		int width, height, posX, posY;
+		stream >> width;
+		stream >> height;
+		stream >> posX;
+		stream >> posY;
+
+		char* data = new char[width*height];
+		stream.ignore(1);
+		stream.read(data, width * height);
+
+		room = CreateRef<Room>(name, width, height, posX, posY);
+
+		for (int i = 0; i < room->width * room->height; i++)
+			room->tiles[i] = (TileType)data[i];
+		room->UpdateTileUVAll();
+
+		while (std::getline(in, line))
 		{
-			std::string line;
-			std::getline(in, line);
 			std::stringstream stream(line);
-
-			int width, height, posX, posY;
-			stream >> width;
-			stream >> height;
-			stream >> posX;
-			stream >> posY;
-
-			char* data = new char[width*height];
-			stream.ignore(1);
-			stream.read(data, width * height);
-
-			room = CreateRef<Room>(name, width, height, posX, posY);
-
-			for (int i = 0; i < room->width * room->height; i++)
-				room->tiles[i] = (TileType)data[i];
-			room->UpdateTileUVAll();
-
-			while (std::getline(in, line))
-			{
-				std::stringstream stream(line);
-				room->AddEntity(CreateEntity(stream));
-			}
+			room->AddEntity(CreateEntity(stream));
 		}
-		else CR_CORE_ERROR("Could not open file '{0}'", filepath);
+
 		in.close();
 		
 		return room;

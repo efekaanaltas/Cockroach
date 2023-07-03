@@ -209,6 +209,19 @@ namespace Entities
 		virtual EntityDefinition GenerateDefinition() override;
 	};
 
+	class Checkpoint : public Dynamic
+	{
+	public:
+		Checkpoint(int2 position, int2 size)
+			: Dynamic(position, ZEROi, size)
+		{
+			blockOnCollision = false;
+		}
+
+		virtual void Update(float dt) override;
+		virtual void Render() override { CR_CORE_INFO("hello"); } // Don't render
+	};
+
 	class CameraController : public Entity
 	{
 	public:
