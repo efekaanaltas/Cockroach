@@ -44,7 +44,8 @@ namespace Entities
 
 		Rect hitbox;
 		float xRemainder = 0.0f, yRemainder = 0.0f;
-		bool blockOnCollision = true;
+		bool isSolid = true;
+		bool carriable = false;
 
 		int Left() const { return position.x + hitbox.min.x; }
 		int Right() const { return position.x + hitbox.max.x; }
@@ -59,7 +60,7 @@ namespace Entities
 
 		virtual void MoveX(float amount);
 		virtual void MoveY(float amount);
-		virtual bool OnCollide(Dynamic* other, int horizontal, int vertical) { return blockOnCollision; }
+		virtual bool OnCollide(Dynamic* other, int horizontal, int vertical) { return isSolid; }
 
 		Dynamic* GetEntityCollision(int xForesense, int yForesense);
 		bool GetTilemapCollision(int xForesense, int yForesense);
@@ -86,7 +87,7 @@ namespace Entities
 		Spike(int2 position, int2 hitboxMin, int2 hitboxMax, int2 direction)
 			: Dynamic(position, hitboxMin, hitboxMax), direction(direction)
 		{
-			blockOnCollision = false;
+			isSolid = false;
 		}
 
 		int2 direction;
@@ -148,7 +149,7 @@ namespace Entities
 		Attractor(int2 position, int2 hitboxMin, int2 hitboxMax)
 			: Dynamic(position, hitboxMin, hitboxMax)
 		{
-			blockOnCollision = false;
+			isSolid = false;
 			dissolveTimer.remainingTime = 0;
 		}
 
@@ -185,7 +186,7 @@ namespace Entities
 		Propeller(int2 position, int2 size)
 			: Dynamic(position, ZEROi, size)
 		{
-			blockOnCollision = true;
+			isSolid = true;
 		}
 
 		virtual void Update(float dt) override {};
@@ -215,7 +216,7 @@ namespace Entities
 		Checkpoint(int2 position, int2 size)
 			: Dynamic(position, ZEROi, size)
 		{
-			blockOnCollision = false;
+			isSolid = false;
 		}
 
 		virtual void Update(float dt) override;

@@ -13,7 +13,7 @@ struct PlayerData
 	int2 playerPosition = ZERO;
 
 	void Save();
-	PlayerData Load();
+	void Load();
 };
 
 enum PropertyName

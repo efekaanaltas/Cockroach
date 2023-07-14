@@ -32,14 +32,18 @@ namespace Entities
 
 		dashingSheet.Add(Sprite::CreateFromCoords(texture, { 5, 3 }, { 16, 16 }));
 		jumpingSheet.Add(Sprite::CreateFromCoords(texture, { 6, 3 }, { 16, 16 }));
+
+		clingingSheet.framePerSecond = 2;
 		clingingSheet.Add(Sprite::CreateFromCoords(texture, { 7, 3 }, { 16, 16 }));
-		fallingSheet.Add(Sprite::CreateFromCoords(texture, { 8, 3 }, { 16, 16 }));
+		clingingSheet.Add(Sprite::CreateFromCoords(texture, { 8, 3 }, { 16, 16 }));
+
+		fallingSheet.Add(Sprite::CreateFromCoords(texture, { 9, 3 }, { 16, 16 }));
 
 		rollingSheet.framePerSecond = 20;
-		rollingSheet.Add(Sprite::CreateFromCoords(texture, { 9, 3 }, { 16,16 }));
 		rollingSheet.Add(Sprite::CreateFromCoords(texture, { 10, 3 }, { 16,16 }));
 		rollingSheet.Add(Sprite::CreateFromCoords(texture, { 11, 3 }, { 16,16 }));
 		rollingSheet.Add(Sprite::CreateFromCoords(texture, { 12, 3 }, { 16,16 }));
+		rollingSheet.Add(Sprite::CreateFromCoords(texture, { 13, 3 }, { 16,16 }));
 
 		currentSheet = idleSheet;
 
@@ -51,13 +55,23 @@ namespace Entities
 		gravityHaltTimer.remainingTime = 0.0f;
 
 		checkpointPosition = position;
+
+		for (int i = 0; i < DashTrail::count; i++)
+		{
+			dashTrail[i].sprite = Sprite::CreateFromCoords(texture, { 0,3 }, { 16,16 });
+		}
 	}
 
 	void Player::Render()
 	{
+		for (int i = 0; i < DashTrail::count; i++)
+		{
+			Renderer::DrawQuad(float3((float2)dashTrail[i].position, 9), 16.0f * ONE, dashTrail[i].sprite, float4(1.0f, 1.0f, 1.0f, std::pow(dashTrail[i].strength, 3.0f)), RED, dashTrail[i].flipX, false);
+		}
+
 		float2 adjustedPosition = (float2)position + (float2(1, 1) - renderSize) * float2(sprite.XSize() / 2, 0);
 		float2 adjustedSize = { sprite.XSize() * renderSize.x, sprite.YSize() * renderSize.y };
-		Renderer::DrawQuadWithOutline(float3(adjustedPosition.x, adjustedPosition.y, 10), adjustedSize, sprite, { overlayColor ,overlayWeight }, BLACK, flipX, flipY);
+		Renderer::DrawQuadWithOutline(float3(adjustedPosition.x, adjustedPosition.y, 10), adjustedSize, sprite, color, { overlayColor , overlayWeight }, BLACK, flipX, flipY);
 	}
 
 	void Player::Update(float dt)
@@ -106,12 +120,17 @@ namespace Entities
 		float flashProgress = flashTimer.Progress01();
 		overlayColor = WHITE;
 		overlayWeight = std::clamp(-flashProgress * flashProgress + 1, 0.0f, 1.0f);
+
+		for (int i = 0; i < DashTrail::count; i++)
+		{
+			dashTrail[i].strength = std::max(dashTrail[i].strength - 1/20.0f, 0.0f);
+		}
 	}
 
 	// This function as a whole is just weird isn't it?
 	bool Player::OnCollide(Dynamic* other, int horizontal, int vertical)
 	{
-		bool blockCollisions = other ? other->blockOnCollision : true;
+		bool blockCollisions = other ? other->isSolid : true;
 		if (blockCollisions)
 		{
 			// This code seems to be written very early into the entity system.
@@ -135,7 +154,7 @@ namespace Entities
 					if (!GetCollision(faceDir, height))
 					{
 						MoveY((float)height);
-						MoveX(faceDir);
+						//MoveX(faceDir);
 						break;
 					}
 				// velocity.x = 0.0f; Enabling this makes walljumps feel stronger but doesn't allow for rolling up 1-high tiles. 
@@ -212,5 +231,10 @@ namespace Entities
 	void Player::Die()
 	{
 		position = checkpointPosition;
+	}
+
+	void Player::CreateDashTrail()
+	{
+		dashTrail[(++lastDashTrailIndex%DashTrail::count)] = DashTrail(sprite, position, faceDir == -1);
 	}
 }

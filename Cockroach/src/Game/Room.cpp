@@ -39,12 +39,12 @@ namespace Cockroach
 			if (tileUVs[i] != invalidUV)
 			{
 				Sprite sprite = Sprite::CreateFromCoords(tilemapTexture, tileUVs[i], {8,8});
-				Renderer::DrawQuad(float3(RoomToWorldPosition(roomPos), 0)-float3(4,4,0), {8,8}, sprite, {0,0,0,0}, false, false);
+				Renderer::DrawQuad(float3(RoomToWorldPosition(roomPos), 0)-float3(4,4,0), {8,8}, sprite, WHITE, {0,0,0,0}, false, false);
 			}
 			if (backgroundTileUVs[i] != invalidUV)
 			{
 				Sprite sprite = Sprite::CreateFromCoords(tilemapTexture, backgroundTileUVs[i], { 8,8 });
-				Renderer::DrawQuad(float3(RoomToWorldPosition(roomPos), 0) - float3(4, 4, 0), { 8,8 }, sprite, { 0,0,0,0 }, false, false);
+				Renderer::DrawQuad(float3(RoomToWorldPosition(roomPos), 0) - float3(4, 4, 0), { 8,8 }, sprite, WHITE, { 0,0,0,0 }, false, false);
 			}
 		}
 		for (int i = 0; i < entities.size(); i++)

@@ -15,8 +15,8 @@
     </ClInclude>
     <ClInclude Include="src\EntityDef.h" />
     <ClInclude Include="src\Game.h" />
-    <ClInclude Include="src\State.h" />
     <ClInclude Include="src\PlayerData.h" />
+    <ClInclude Include="src\State.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EditorCursor.cpp" />
@@ -28,7 +28,7 @@
     </ClCompile>
     <ClCompile Include="src\EntityDef.cpp" />
     <ClCompile Include="src\Game.cpp" />
-    <ClCompile Include="src\State.cpp" />
     <ClCompile Include="src\PlayerData.cpp" />
+    <ClCompile Include="src\State.cpp" />
   </ItemGroup>
 </Project>

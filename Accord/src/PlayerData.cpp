@@ -12,7 +12,7 @@ void PlayerData::Save()
 	out.close();
 }
 
-PlayerData PlayerData::Load()
+void PlayerData::Load()
 {
 	std::string filepath = "saves/data1.txt";
 	std::fstream in(filepath, std::ios::in || std::ios::binary);

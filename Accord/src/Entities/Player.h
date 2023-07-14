@@ -4,7 +4,7 @@
 
 template<typename T>
 class State;
-class WalkingState;
+class WalkingState; 
 class JumpingState;
 class ClingingState;
 class DashingState;
@@ -30,6 +30,24 @@ struct BufferedInput
 
 	void Cancel() { bufferFramesTimer.remainingTime = 0.0f; }
 	bool Active() { return !bufferFramesTimer.Finished(); }
+};
+
+struct DashTrail
+{
+	DashTrail()
+		: sprite()
+	{}
+
+	DashTrail(Sprite sprite, int2 position, bool flipX)
+		: sprite(sprite), strength(1.0f), position(position), flipX(flipX)
+	{}
+	
+	static const int count = 20;
+
+	Sprite sprite;
+	float strength = 1.0f;
+	int2 position = ZEROi;
+	bool flipX = false;
 };
 
 enum DashType
@@ -85,6 +103,9 @@ namespace Entities
 		Timer gravityHaltTimer = Timer(10.0f);
 		Timer dashRegainTimer = Timer(4.0f);
 
+		DashTrail dashTrail[DashTrail::count];
+		int lastDashTrailIndex = 0;
+
 		virtual bool OnCollide(Dynamic* other, int horizontal, int vertical) override;
 
 		int InputDirX() const;
@@ -96,5 +117,6 @@ namespace Entities
 		void TryChangeRoom();
 		void RegainDash(DashType dashType = Dash);
 		void Die();
+		void CreateDashTrail();
 	};
 }

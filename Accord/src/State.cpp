@@ -210,6 +210,8 @@ namespace Entities
 			if ((player->currentDashType == Drift) && Input::IsDown(CR_KEY_LEFT_SHIFT))
 				return player->walkingState;
 
+			player->CreateDashTrail();
+
 			for (int i = 0; i < 5; i++)
 			{
 				Game::particles->Add(Particle
@@ -279,6 +281,10 @@ namespace Entities
 				WHITE, CLEAR)
 			);
 		}
+
+		player->CreateDashTrail();
+
+		player->renderSize.y = 1.0f - 0.3f*(player->velocity.x/maxRollSpeed);
 
 		player->velocity.x += player->InputDirX() * (player->grounded ? groundRollAcceleration : airRollAcceleration) * dt;
 		player->velocity.x = std::clamp(player->velocity.x, -maxRollSpeed, maxRollSpeed);

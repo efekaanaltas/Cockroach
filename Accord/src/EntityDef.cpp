@@ -18,6 +18,12 @@ namespace Entities
 		int w = entity->size.x / 8;
 		int h = entity->size.y / 8;
 
+		float2 size = { entity->sprite.XSize(), entity->sprite.YSize() };
+		float4 color = entity->color;
+		float4 overlay = { entity->overlayColor, entity->overlayWeight };
+		bool flipX = entity->flipX;
+		bool flipY = entity->flipY;
+
 		if (w > 1.0f && h > 1.0f)
 		{
 			for (int x = 0; x < w; x++)
@@ -25,7 +31,7 @@ namespace Entities
 				{
 					int xOffset = (x == 0) ? texCoordOffset.x - 3 : (x == w - 1) ? texCoordOffset.x - 1 : texCoordOffset.x - 2;
 					int yOffset = (y == 0) ? texCoordOffset.y + 1 : (y == h - 1) ? texCoordOffset.y + 3 : texCoordOffset.y + 2;
-					Renderer::DrawQuad(float3(entity->position, entity->z) + float3(8 * x, 8 * y, 0), { entity->sprite.XSize(), entity->sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,yOffset }, { 8,8 }), { entity->overlayColor, entity->overlayWeight }, entity->flipX, entity->flipY);
+					Renderer::DrawQuad(float3(entity->position, entity->z) + float3(8 * x, 8 * y, 0), size, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,yOffset }, { 8,8 }), color, overlay, flipX, flipY);
 				}
 
 		}
@@ -33,16 +39,16 @@ namespace Entities
 			for (int x = 0; x < w; x++)
 			{
 				int xOffset = (x == 0) ? texCoordOffset.x - 3 : (x == w - 1) ? texCoordOffset.x - 1 : texCoordOffset.x - 2;
-				Renderer::DrawQuad(float3(entity->position, entity->z) + float3(8 * x, 0, 0), { entity->sprite.XSize(), entity->sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,2 }, { 8,8 }), { entity->overlayColor, entity->overlayWeight }, entity->flipX, entity->flipX);
+				Renderer::DrawQuad(float3(entity->position, entity->z) + float3(8 * x, 0, 0), size, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,2 }, { 8,8 }), color, overlay, flipX, flipX);
 			}
 		else if (h > 1.0f)
 			for (int y = 0; y < h; y++)
 			{
 				int yOffset = (y == 0) ? texCoordOffset.y + 1 : (y == h - 1) ? texCoordOffset.y + 3 : texCoordOffset.y + 2;
-				Renderer::DrawQuad(float3(entity->position, entity->z) + float3(0, 8 * y, 0), { entity->sprite.XSize(), entity->sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,yOffset }, { 8,8 }), { entity->overlayColor, entity->overlayWeight }, entity->flipX, entity->flipY);
+				Renderer::DrawQuad(float3(entity->position, entity->z) + float3(0, 8 * y, 0), size, Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,yOffset }, { 8,8 }), color, overlay, flipX, flipY);
 			}
 		else
-			Renderer::DrawQuad(float3(entity->position, entity->z), { entity->sprite.XSize(), entity->sprite.YSize() }, Sprite::CreateFromCoords(Game::baseSpriteSheet, texCoordOffset, { 8,8 }), { entity->overlayColor, entity->overlayWeight }, entity->flipX, entity->flipY);
+			Renderer::DrawQuad(float3(entity->position, entity->z), size, Sprite::CreateFromCoords(Game::baseSpriteSheet, texCoordOffset, { 8,8 }), color, overlay, flipX, flipY);
 	}
 
 	void Dynamic::MoveX(float amount)
@@ -106,12 +112,12 @@ namespace Entities
 		for (auto& ent : Room::current->entities)
 		{
 			if (Dynamic* dyn = ent->As<Dynamic>())
-				if (dyn != this && OverlapsWith(dyn, xForesense, yForesense) && dyn->blockOnCollision)
+				if (dyn != this && OverlapsWith(dyn, xForesense, yForesense) && dyn->isSolid)
 					return dyn;
 		}
 
 		// Also check for collisions with player
-		if (Game::player != this && OverlapsWith(Game::player, xForesense, yForesense) && Game::player->blockOnCollision)
+		if (Game::player != this && OverlapsWith(Game::player, xForesense, yForesense) && Game::player->isSolid)
 			return Game::player;
 		return nullptr;
 	}
@@ -243,7 +249,7 @@ namespace Entities
 	Essence::Essence(int2 position, int2 hitboxMin, int2 hitboxMax, DashType dashType)
 		: Dynamic(position, hitboxMin, hitboxMax), dashType(dashType)
 	{
-		blockOnCollision = false;
+		isSolid = false;
 		refreshTimer.remainingTime = 0;
 		overlayColor = WHITE;
 	}
@@ -423,7 +429,7 @@ namespace Entities
 		for (auto& ent : Room::current->entities)
 		{
 			Dynamic* dyn = ent->As<Dynamic>();
-			if (dyn && dyn != this && dyn->IsRiding(this))
+			if (dyn && dyn != this && dyn->carriable && dyn->IsRiding(this))
 				riders.push_back(this);
 		}
 

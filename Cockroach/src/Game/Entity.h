@@ -37,6 +37,7 @@ namespace Cockroach
 		int2 size = { 8, 8 };
 		
 		Sprite sprite;
+		float4 color = WHITE;
 		float3 overlayColor = CLEAR;
 		float overlayWeight = 0.0f;
 		bool flipX = false, flipY = false;

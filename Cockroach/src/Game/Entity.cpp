@@ -22,7 +22,7 @@ namespace Cockroach
 
 	void Entity::Render()
 	{
-		Renderer::DrawQuad(float3(position, z), { sprite.XSize(), sprite.YSize() }, sprite, { overlayColor, overlayWeight }, flipX, flipY);
+		Renderer::DrawQuad(float3(position, z), { sprite.XSize(), sprite.YSize() }, sprite, color, { overlayColor, overlayWeight }, flipX, flipY);
 	}
 
 	void Entity::RenderInspectorUI()

@@ -60,7 +60,6 @@ Game::Game()
 		rooms.push_back(Room::Load(name));
 	}
 
-
 	Game::player = new Entities::Player(data.playerPosition, {6,0}, {10,12});
 	player->type = EntityType::Payga;
 	player->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 3 }, { 16, 16 });
@@ -94,6 +93,7 @@ void Game::Update(float dt)
 		player->Update(dt);
 		particles->Update(dt);
 	}
+	
 	Room::current->Update(dt);
 
 	EditorCursor::Update(dt);
@@ -136,7 +136,7 @@ void Game::Render()
 	float aspect = cameraController->aspectRatio;
 
 	Sprite backgroundSprite = Sprite(background, { 0,0 }, { 1,1 });
-	Renderer::DrawQuad(float3(cameraController->positionHighRes, -90.0f)-float3(aspect*zoom,zoom,0), 2.0f * float2(aspect*zoom,zoom), backgroundSprite, { 0,0,0,0 }, false, false); // Turn this into a dedicated function: RenderBackground(Sprite background)?
+	Renderer::DrawQuad(float3(cameraController->positionHighRes, -90.0f)-float3(aspect*zoom,zoom,0), 2.0f * float2(aspect*zoom,zoom), backgroundSprite); // Turn this into a dedicated function: RenderBackground(Sprite background)?
 	
 	if (renderGrid) RenderGrid();
 
