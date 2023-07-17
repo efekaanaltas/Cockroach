@@ -5,7 +5,7 @@
 namespace Entities
 {
 	Player::Player(int2 position, int2 hitboxMin, int2 hitboxMax)
-		: Dynamic(position, hitboxMin, hitboxMax)
+		: Dynamic(position, hitboxMin, hitboxMax, true, true)
 	{
 		walkingState = new WalkingState;
 		jumpingState = new JumpingState(50.0f, 140.0f, 0.0f);
@@ -109,7 +109,7 @@ namespace Entities
 		grounded = GetCollision(0, -1); //verticalCollision == -1;
 		if (grounded && dashRegainTimer.Finished() && !canDash) RegainDash();
 
-		if (grounded && !groundedAtStartOfFrame)
+		if (grounded && !groundedAtStartOfFrame && velocityLastFrame.y < -30.0f) // Use velocityLastFrame because y velocity is set to 0 on ground
 			renderSize.y = 0.6f;
 
 		renderSize.x = std::clamp(renderSize.x + 2 * dt, 0.0f, 1.0f);
@@ -127,10 +127,12 @@ namespace Entities
 		}
 	}
 
+#pragma warning (disable: 4244) // Lots of int->float conversions, no need for warnings.
+
 	// This function as a whole is just weird isn't it?
 	bool Player::OnCollide(Dynamic* other, int horizontal, int vertical)
 	{
-		bool blockCollisions = other ? other->isSolid : true;
+		bool blockCollisions = other ? other->solid : true;
 		if (blockCollisions)
 		{
 			// This code seems to be written very early into the entity system.
@@ -164,7 +166,20 @@ namespace Entities
 			}
 
 			if (vertical)
-				velocity.y = 0.0f;
+			{
+				if (vertical == 1)
+				{
+					int i = 0;
+					while (++i <= 4)
+						if (!GetCollision(faceDir * i, 1))
+						{
+							MoveX(faceDir*i);
+							break;
+						}
+				}
+				else
+					velocity.y = 0.0f;
+			}
 		}
 
 		return blockCollisions;

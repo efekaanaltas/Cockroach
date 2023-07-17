@@ -4,6 +4,11 @@
 
 using namespace Cockroach;
 
+#define CustomUpdate virtual void Update(float dt) override
+#define CustomRender virtual void Render() override
+#define CustomUI virtual void RenderInspectorUI() override
+#define CustomDefinition virtual EntityDefinition GenerateDefinition() override
+
 template<typename T>
 class State;
 class WalkingState;
@@ -34,17 +39,17 @@ namespace Entities
 	class Dynamic : public Entity
 	{
 	public:
-		Dynamic(int2 position, int2 hitboxMin, int2 hitboxMax)
-			: Entity(position)
+		Dynamic(int2 position, int2 hitboxMin, int2 hitboxMax, bool solid, bool carriable)
+			: Entity(position), solid(solid), carriable(carriable)
 		{
 			hitbox = Rect(hitboxMin, hitboxMax);
 		}
 
-		virtual void Update(float dt) override {}
+		CustomUpdate {}
 
 		Rect hitbox;
 		float xRemainder = 0.0f, yRemainder = 0.0f;
-		bool isSolid = true;
+		bool solid = true;
 		bool carriable = false;
 
 		int Left() const { return position.x + hitbox.min.x; }
@@ -60,7 +65,7 @@ namespace Entities
 
 		virtual void MoveX(float amount);
 		virtual void MoveY(float amount);
-		virtual bool OnCollide(Dynamic* other, int horizontal, int vertical) { return isSolid; }
+		virtual bool OnCollide(Dynamic* other, int horizontal, int vertical) { return solid; }
 
 		Dynamic* GetEntityCollision(int xForesense, int yForesense);
 		bool GetTilemapCollision(int xForesense, int yForesense);
@@ -72,7 +77,7 @@ namespace Entities
 	{
 	public:
 		Carrier(int2 position, int2 hitboxMin, int2 hitboxMax)
-			: Dynamic(position, hitboxMin, hitboxMax)
+			: Dynamic(position, hitboxMin, hitboxMax, true, false)
 		{}
 
 		virtual void MoveX(float amount) override;
@@ -85,14 +90,12 @@ namespace Entities
 	{
 	public:
 		Spike(int2 position, int2 hitboxMin, int2 hitboxMax, int2 direction)
-			: Dynamic(position, hitboxMin, hitboxMax), direction(direction)
-		{
-			isSolid = false;
-		}
+			: Dynamic(position, hitboxMin, hitboxMax, false, true), direction(direction)
+		{}
 
 		int2 direction;
 
-		virtual void Update(float dt) override;
+		CustomUpdate;
 	};
 
 	class OscillatorA : public Carrier
@@ -108,7 +111,7 @@ namespace Entities
 		int2 startPos;
 		int moveDir = 1;
 
-		virtual void Update(float dt) override;
+		CustomUpdate;
 	};
 
 	class Turbine : public Dynamic
@@ -121,8 +124,8 @@ namespace Entities
 		int span = 56;
 		Rect turbineRect;
 
-		virtual void Update(float dt) override;
-		virtual void Render() override;
+		CustomUpdate;
+		CustomRender;
 	};
 
 	class Essence : public Dynamic
@@ -134,10 +137,10 @@ namespace Entities
 		DashType dashType;
 		Timer refreshTimer = Timer(2.0f);
 
-		virtual void Update(float dt) override;
-		virtual void RenderInspectorUI() override;
+		CustomUpdate;
+		CustomUI;
 
-		virtual EntityDefinition GenerateDefinition() override;
+		CustomDefinition;
 
 		void Absorb();
 		void Refresh();
@@ -147,9 +150,8 @@ namespace Entities
 	{
 	public:
 		Attractor(int2 position, int2 hitboxMin, int2 hitboxMax)
-			: Dynamic(position, hitboxMin, hitboxMax)
+			: Dynamic(position, hitboxMin, hitboxMax, false, false)
 		{
-			isSolid = false;
 			dissolveTimer.remainingTime = 0;
 		}
 
@@ -160,7 +162,7 @@ namespace Entities
 		Timer dissolveTimer = Timer(0.5f);
 		Timer refreshTimer = Timer(2.0f);
 
-		virtual void Update(float dt) override;
+		CustomUpdate;
 
 		void Dissolve();
 		void Refresh();
@@ -170,27 +172,25 @@ namespace Entities
 	{
 	public:
 		Igniter(int2 position, int2 size)
-			: Dynamic(position, ZEROi, size)
+			: Dynamic(position, ZEROi, size, true, true)
 		{}
 
 		Timer igniteTimer = Timer(1.0f);
 		Timer flashTimer = Timer(0.3f);
 
-		virtual void Update(float dt) override;
-		virtual void Render() override;
+		CustomUpdate;
+		CustomRender;
 	};
 
 	class Propeller : public Dynamic
 	{
 	public:
 		Propeller(int2 position, int2 size)
-			: Dynamic(position, ZEROi, size)
-		{
-			isSolid = true;
-		}
+			: Dynamic(position, ZEROi, size, true, true)
+		{}
 
-		virtual void Update(float dt) override {};
-		virtual void Render() override;
+		CustomUpdate {};
+		CustomRender;
 	};
 
 	class MovingPlatform : public Carrier
@@ -203,24 +203,22 @@ namespace Entities
 		int2 startPosition;
 		int2 endPosition;
 
-		virtual void Update(float dt) override;
-		virtual void Render() override;
-		virtual void RenderInspectorUI() override;
+		CustomUpdate;
+		CustomRender;
+		CustomUI;
 		
-		virtual EntityDefinition GenerateDefinition() override;
+		CustomDefinition;
 	};
 
 	class Checkpoint : public Dynamic
 	{
 	public:
 		Checkpoint(int2 position, int2 size)
-			: Dynamic(position, ZEROi, size)
-		{
-			isSolid = false;
-		}
+			: Dynamic(position, ZEROi, size, false, false)
+		{}
 
-		virtual void Update(float dt) override;
-		virtual void Render() override { CR_CORE_INFO("hello"); } // Don't render
+		CustomUpdate;
+		CustomRender {} // Don't render
 	};
 
 	class CameraController : public Entity
@@ -232,7 +230,7 @@ namespace Entities
 			: camera(-aspectRatio * zoom, aspectRatio* zoom, -zoom, zoom)
 		{}
 
-		virtual void Update(float dt) override;
+		CustomUpdate;
 		void StartTransition();
 		void SetZoom(float zoom);
 
@@ -267,14 +265,14 @@ namespace Entities
 		int decorationIndex;
 		Rect hitbox;
 
-		virtual EntityDefinition GenerateDefinition() override
+		CustomDefinition
 		{
 			EntityDefinition definition = EntityDefinition(decorationIndex, true, position, size);
 			definition.z = z;
 			return definition;
 		}
 
-		virtual void Update(float dt) override {}
+		CustomUpdate {}
 
 		int Left() const { return position.x + hitbox.min.x; }
 		int Right() const { return position.x + hitbox.max.x; }

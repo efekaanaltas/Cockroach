@@ -13,6 +13,18 @@ using namespace Cockroach;
 
 namespace Entities
 {
+	#define CustomUpdate(ENTITY_TYPE) \
+	void ENTITY_TYPE::Update(float dt)
+
+	#define CustomRender(ENTITY_TYPE) \
+	void ENTITY_TYPE::Render()
+
+	#define CustomUI(ENTITY_TYPE) \
+	void ENTITY_TYPE::RenderInspectorUI()
+
+	#define CustomDefinition(ENTITY_TYPE) \
+	EntityDefinition ENTITY_TYPE::GenerateDefinition()
+
 	void RenderDynamicSizedEntity(Entity* entity, int2 texCoordOffset)
 	{
 		int w = entity->size.x / 8;
@@ -112,12 +124,12 @@ namespace Entities
 		for (auto& ent : Room::current->entities)
 		{
 			if (Dynamic* dyn = ent->As<Dynamic>())
-				if (dyn != this && OverlapsWith(dyn, xForesense, yForesense) && dyn->isSolid)
+				if (dyn != this && OverlapsWith(dyn, xForesense, yForesense) && dyn->solid)
 					return dyn;
 		}
 
 		// Also check for collisions with player
-		if (Game::player != this && OverlapsWith(Game::player, xForesense, yForesense) && Game::player->isSolid)
+		if (Game::player != this && OverlapsWith(Game::player, xForesense, yForesense) && Game::player->solid)
 			return Game::player;
 		return nullptr;
 	}
@@ -137,7 +149,7 @@ namespace Entities
 		return OverlapsWith(carrier, 1, 0) || OverlapsWith(carrier, -1, 0) || OverlapsWith(carrier, 0, -1);
 	}
 
-	void OscillatorA::Update(float dt)
+	CustomUpdate(OscillatorA)
 	{
 		int2 desiredPos = startPos + int2(10*std::cos(Game::Time()), 10*std::sin(Game::Time()));
 		float2 move = desiredPos - position;
@@ -145,7 +157,7 @@ namespace Entities
 		MoveY(move.y);
 	}
 
-	void CameraController::Update(float dt)
+	CustomUpdate(CameraController)
 	{
 		for (int i = CR_KEY_1; i <= CR_KEY_3; i++)
 			if (Input::IsDown(i))
@@ -218,7 +230,7 @@ namespace Entities
 	}
 
 	Turbine::Turbine(int2 position, int2 size, int horizontal, int vertical)
-	: Dynamic(position, int2(0, 0), size), horizontal(horizontal), vertical(vertical)
+	: Dynamic(position, int2(0, 0), size, true, true), horizontal(horizontal), vertical(vertical)
 	{
 		int xStart = std::min(position.x, position.x + horizontal * span);
 		int xEnd = std::max(position.x, position.x + horizontal * span) + size.x;
@@ -227,7 +239,7 @@ namespace Entities
 		turbineRect = Rect({ xStart, yStart }, { xEnd, yEnd });
 	}
 
-	void Turbine::Update(float dt)
+	CustomUpdate(Turbine)
 	{
 		if (!Game::player->grounded)
 		{
@@ -247,14 +259,14 @@ namespace Entities
 	}
 
 	Essence::Essence(int2 position, int2 hitboxMin, int2 hitboxMax, DashType dashType)
-		: Dynamic(position, hitboxMin, hitboxMax), dashType(dashType)
+		: Dynamic(position, hitboxMin, hitboxMax, false, false), dashType(dashType)
 	{
-		isSolid = false;
+		solid = false;
 		refreshTimer.remainingTime = 0;
 		overlayColor = WHITE;
 	}
 
-	void Essence::Update(float dt)
+	CustomUpdate(Essence)
 	{
 		if (!active && refreshTimer.Finished())
 			Refresh();
@@ -304,7 +316,9 @@ namespace Entities
 		active = true;
 	}
 
-	void Attractor::Update(float dt)
+#pragma warning (disable: 4244) // Lots of int->float conversions, no need for warnings.
+
+	CustomUpdate(Attractor)
 	{
 		if (!active && refreshTimer.Finished())
 			Refresh();
@@ -361,13 +375,11 @@ namespace Entities
 		active = true;
 	}
 
-	void Spike::Update(float dt)
+	CustomUpdate(Spike)
 	{
 		if(OverlapsWith(Game::player, 0, 0) && glm::dot((float2)direction, Game::player->velocity) <= 0.0f)
 			Game::player->Die();
 	}
-
-#pragma warning (disable: 4244) // Lots of int->float conversions, no need for warnings.
 
 	void Carrier::MoveX(float amount)
 	{
@@ -439,7 +451,7 @@ namespace Entities
 		return riders;
 	}
 
-	void Igniter::Update(float dt)
+	CustomUpdate(Igniter)
 	{
 		if (Game::player->IsRiding(this))
 			igniteTimer.Tick(dt);
@@ -470,7 +482,7 @@ namespace Entities
 		}
 	}
 
-	void MovingPlatform::Update(float dt)
+	CustomUpdate(MovingPlatform)
 	{
 		int2 desiredPos = lerp(startPosition, endPosition, std::abs(std::sin(Game::Time())));
 		int2 move = desiredPos - position;
@@ -479,27 +491,27 @@ namespace Entities
 		MoveY(move.y * dt);
 	}
 
-	void Turbine::Render()
+	CustomRender(Turbine)
 	{
 		RenderDynamicSizedEntity(this, { 23,2 });
 	}
 
-	void Igniter::Render()
+	CustomRender(Igniter)
 	{
 		RenderDynamicSizedEntity(this, { 11,2 });
 	}
 
-	void Propeller::Render()
+	CustomRender(Propeller)
 	{
 		RenderDynamicSizedEntity(this, { 15,2 });
 	}
 
-	void MovingPlatform::Render()
+	CustomRender(MovingPlatform)
 	{
 		RenderDynamicSizedEntity(this, { 15,2 });
 	}
 
-	void MovingPlatform::RenderInspectorUI()
+	CustomUI(MovingPlatform)
 	{
 		using namespace ImGui;
 		Begin("Inspector");
@@ -512,14 +524,14 @@ namespace Entities
 		End();
 	}
 
-	EntityDefinition MovingPlatform::GenerateDefinition()
+	CustomDefinition(MovingPlatform)
 	{
 		EntityDefinition definition = EntityDefinition(type, false, startPosition, size);
 		definition.altPosition = endPosition;
 		return definition;
 	}
 
-	void Essence::RenderInspectorUI()
+	CustomUI(Essence)
 	{
 		using namespace ImGui;
 		Begin("Inspector");
@@ -531,14 +543,14 @@ namespace Entities
 		End();
 	}
 
-	EntityDefinition Essence::GenerateDefinition()
+	CustomDefinition(Essence)
 	{
 		EntityDefinition definition = EntityDefinition(type, false, position, size);
 		definition.variant = (int)dashType;
 		return definition;
 	}
 
-	void Checkpoint::Update(float dt)
+	CustomUpdate(Checkpoint)
 	{
 		if (OverlapsWith(Game::player, 0, 0))
 		{
@@ -628,7 +640,6 @@ Cockroach::Entity* Cockroach::CreateEntity(const EntityDefinition& def)
 	{
 		Sprite& sprite = Game::decorationSprites[def.type];
 		e = new Decoration(def.position, def.z.value_or(0), def.type, sprite);
-		
 	}
 	return e;
 }

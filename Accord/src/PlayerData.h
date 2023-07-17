@@ -5,12 +5,14 @@ using namespace Cockroach;
 
 struct PlayerData
 {
+	int2 playerPosition = ZERO;
+	bool fullscreen = true;
+	bool muted = false;
+
 	PlayerData()
 	{
 		Load();
 	}
-
-	int2 playerPosition = ZERO;
 
 	void Save();
 	void Load();

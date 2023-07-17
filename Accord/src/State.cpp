@@ -265,7 +265,7 @@ namespace Entities
 	{
 		player->currentSheet = player->rollingSheet;
 		player->hitbox.min = { 6,  0 };
-		player->hitbox.max = { 10, 8 };
+		player->hitbox.max = { 10, 8 };	
 		player->velocity.x = 100.0f * (player->InputDirX() != 0 ? player->InputDirX() : player->faceDir);
 	}
 
@@ -284,7 +284,7 @@ namespace Entities
 
 		player->CreateDashTrail();
 
-		player->renderSize.y = 1.0f - 0.3f*(player->velocity.x/maxRollSpeed);
+		player->renderSize.y = 1.0f - 0.3f*(std::abs(player->velocity.x)/maxRollSpeed);
 
 		player->velocity.x += player->InputDirX() * (player->grounded ? groundRollAcceleration : airRollAcceleration) * dt;
 		player->velocity.x = std::clamp(player->velocity.x, -maxRollSpeed, maxRollSpeed);
@@ -319,5 +319,6 @@ namespace Entities
 	{
 		player->hitbox.min = { 6, 0 };
 		player->hitbox.max = { 10,12 };
+		player->renderSize.y = 0.5f;
 	}
 }

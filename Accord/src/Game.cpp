@@ -41,6 +41,9 @@ Game::Game()
 
 	LoadSprites();
 
+	Application::GetWindow().SetWindowMode(data.fullscreen);
+	Audio::ToggleSound(data.muted);
+
 	//for (int i = EntityType::SpikeLeft; i < EntityType::END; i++)
 	//{
 	//	Entity* e = CreateEntity(EntityDefinition(i, false, ZEROi, ONEi));
@@ -107,9 +110,17 @@ void Game::Update(float dt)
 	static bool muted = false;
 
 	if (Input::IsDown(CR_KEY_F))
+	{
 		Application::GetWindow().SetWindowMode(!Application::GetWindow().fullscreen);
+		data.fullscreen = Application::GetWindow().fullscreen;
+		data.Save();
+	}
 	if (Input::IsDown(CR_KEY_M))
+	{
 		Audio::ToggleSound(muted = !muted);
+		data.muted = muted;
+		data.Save();
+	}
 
 	if (Input::IsDown(CR_KEY_G)) renderGrid = !renderGrid;
 	if (Input::IsDown(CR_KEY_H)) renderHitboxes = !renderHitboxes;

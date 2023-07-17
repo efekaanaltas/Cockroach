@@ -26,6 +26,14 @@ namespace Cockroach
 			GLFWInitialized = true;
 		}
 
+		GLFWMonitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode* mode = glfwGetVideoMode(GLFWMonitor);
+
+		glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+		glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+		glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+		glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+
 		GLFWWindow = glfwCreateWindow((int)width, (int)height, title.c_str(), nullptr, nullptr);
 	
 		glfwMakeContextCurrent(GLFWWindow);
@@ -33,7 +41,6 @@ namespace Cockroach
 		CR_CORE_ASSERT(status, "Failed to initilalize Glad!");
 
 		glfwGetWindowPos(GLFWWindow, &pos.x, &pos.y);
-		GLFWMonitor = glfwGetPrimaryMonitor();
 		fullscreen = glfwGetWindowMonitor(GLFWWindow) != nullptr;
 
 		glfwSwapInterval(1);
@@ -76,8 +83,7 @@ namespace Cockroach
 			glfwGetWindowSize(GLFWWindow, &width, &height);
 
 			const GLFWvidmode* mode = glfwGetVideoMode(GLFWMonitor);
-
-			glfwSetWindowMonitor(GLFWWindow, GLFWMonitor, 0, 0, mode->width, mode->height, 0);
+			glfwSetWindowMonitor(GLFWWindow, GLFWMonitor, 0, 0, mode->width, mode->height, mode->refreshRate);
 		}
 		else // Using half the screen width and height when switching to windowed works well for now.
 			glfwSetWindowMonitor(GLFWWindow, nullptr, pos.x, pos.y, width/2, height/2, 0);
