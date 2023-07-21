@@ -415,13 +415,13 @@ void Game::RenderGrid()
 	for (int i = -80; i < 80; i++)
 	{
 		int xFloor = (int)cameraController->camera.GetPosition().x;
-		float xColor = ((i + xFloor) % 8 == 0) ? 0.3f : 0.15f;
+		float xColor = ((i + xFloor) % 8 == 0) ? 0.8f : 0.4f;
 
 		int yFloor = (int)cameraController->camera.GetPosition().y;
-		float yColor = (i + yFloor) % 8 == 0 ? 0.3f : 0.15f;
+		float yColor = ((i + yFloor) % 8 == 0) ? 0.8f : 0.4f;
 
-		Cockroach::Renderer::DrawLine({ i + xFloor, -80.0f + yFloor, -1.0f }, { i + xFloor, 79.0f + yFloor, -1.0f }, { xColor, xColor, xColor, 0.5f });
-		Cockroach::Renderer::DrawLine({ -80.0f + xFloor, i + yFloor, -1.0f }, { 79.0f + xFloor, i + yFloor, -1.0f }, { yColor, yColor, yColor, 0.5f });
+		Cockroach::Renderer::DrawLine({ i + xFloor, -80.0f + yFloor, 5.0f }, { i + xFloor, 79.0f + yFloor, 5.0f }, { xColor, xColor, xColor, 0.5f });
+		Cockroach::Renderer::DrawLine({ -80.0f + xFloor, i + yFloor, 5.0f }, { 79.0f + xFloor, i + yFloor, 5.0f }, { yColor, yColor, yColor, 0.5f });
 	}
 }
 

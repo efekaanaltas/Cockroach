@@ -146,7 +146,7 @@ namespace Entities
 
 	bool Dynamic::IsRiding(Dynamic* carrier)
 	{
-		return OverlapsWith(carrier, 1, 0) || OverlapsWith(carrier, -1, 0) || OverlapsWith(carrier, 0, -1);
+		return OverlapsWith(carrier, 1, 0) || OverlapsWith(carrier, -1, 0) || OverlapsWith(carrier, 0, -1) || OverlapsWith(carrier, 0, 1);
 	}
 
 	CustomUpdate(OscillatorA)
@@ -394,17 +394,17 @@ namespace Entities
 			xRemainder -= moveX;
 			position.x += moveX;
 
-			Game::player->xRemainder = 0;
-
-			if (OverlapsWith(Game::player, 0, 0))
+			for (auto& rider : riders)
 			{
-				if (moveX > 0)
-					Game::player->MoveX(Right() - Game::player->Left());
-				else
-					Game::player->MoveX(Left() - Game::player->Right());
+				if (OverlapsWith(rider, 0, 0))
+				{
+					if (moveX > 0)
+						rider->position.x += Right() - rider->Left();  // Regarding the following 4 lines of direct position changing:  (rider->position._ += ...) 
+					else											   // I whill probably add a "collidable" flag to the Dynamic struct in the future,
+						rider->position.x += Left() - rider->Right();  // so I can disable this carrier's collision when I want to push other dynamics out of it.
+				}													   // But this works well for now and I refuse to do it properly until edge cases show themselves.
+				else rider->MoveX(moveX);
 			}
-			else if (std::find(riders.begin(), riders.end(), Game::player) != riders.end()) // If riders contains this dynamic
-				Game::player->MoveX(moveX);
 		}
 	}
 
@@ -421,17 +421,17 @@ namespace Entities
 			yRemainder -= moveY;
 			position.y += moveY;
 
-			Game::player->yRemainder = 0;
-
-			if (OverlapsWith(Game::player, 0, 0))
+			for (auto& rider : riders)
 			{
-				if (moveY > 0)
-					Game::player->MoveY(Top() - Game::player->Bottom());
-				else
-					Game::player->MoveY(Bottom() - Game::player->Top());
+				if (OverlapsWith(rider, 0, 0))
+				{
+					if (moveY > 0)
+						rider->position.y += Top() - rider->Bottom();
+					else
+						rider->position.y += Bottom() - rider->Top();
+				}
+				else rider->MoveY(moveY);
 			}
-			else if (std::find(riders.begin(), riders.end(), Game::player) != riders.end()) // If riders contains this dynamic
-				Game::player->MoveY(moveY);
 		}
 	}
 
@@ -441,8 +441,8 @@ namespace Entities
 		for (auto& ent : Room::current->entities)
 		{
 			Dynamic* dyn = ent->As<Dynamic>();
-			if (dyn && dyn != this && dyn->carriable && dyn->IsRiding(this))
-				riders.push_back(this);
+			if (dyn && (dyn != this) && dyn->carriable && dyn->IsRiding(this))
+				riders.push_back(dyn);
 		}
 
 		if (Game::player->IsRiding(this))

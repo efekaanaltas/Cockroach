@@ -44,7 +44,7 @@ namespace Cockroach
 			if (backgroundTileUVs[i] != invalidUV)
 			{
 				Sprite sprite = Sprite::CreateFromCoords(tilemapTexture, backgroundTileUVs[i], { 8,8 });
-				Renderer::DrawQuad(float3(RoomToWorldPosition(roomPos), 0) - float3(4, 4, 0), { 8,8 }, sprite, WHITE, { 0,0,0,0 }, false, false);
+				Renderer::DrawQuad(float3(RoomToWorldPosition(roomPos), -5) - float3(4, 4, 0), { 8,8 }, sprite, WHITE, { 0,0,0,0 }, false, false);
 			}
 		}
 		for (int i = 0; i < entities.size(); i++)
@@ -72,9 +72,9 @@ namespace Cockroach
 		{
 			tiles[index] = tileType;
 
-			for (int y = -1; y <= 1; y++)
-				for (int x = -1; x <= 1; x++)
-					UpdateTileUV(roomPosition.x - x, roomPosition.y + y);
+			for (int y = 0; y <= 1; y++)
+				for (int x = 0; x <= 1; x++)
+					UpdateTileUV(roomPosition.x + x, roomPosition.y + y);
 
 			Save();
 		}
@@ -99,9 +99,9 @@ namespace Cockroach
 				{
 					tiles[index] = tileType;
 
-					for (int y = -1; y <= 1; y++)
-						for (int x = -1; x <= 1; x++)
-							UpdateTileUV(roomPosition.x - x, roomPosition.y + y);
+					for (int y = 0; y <= 1; y++)
+						for (int x = 0; x <= 1; x++)
+							UpdateTileUV(roomPosition.x + x, roomPosition.y + y);
 				}
 			}
 
@@ -167,12 +167,12 @@ namespace Cockroach
 		}
 
 		{
-			bool ld = IsFilled(x-1,y-1,	BackgroundBasic);
-			bool md = IsFilled(x,y-1,	BackgroundBasic);
-			bool lm = IsFilled(x-1,y,	BackgroundBasic);
-			bool mm = IsFilled(x,y,		BackgroundBasic);
+			bool ld = IsFilled(x-1,y-1,	BackgroundBasic) || IsFilled(x-1,y-1,	TileBasic);
+			bool md = IsFilled(x,y-1,	BackgroundBasic) || IsFilled(x,y-1,		TileBasic);
+			bool lm = IsFilled(x-1,y,	BackgroundBasic) || IsFilled(x-1,y,		TileBasic);
+			bool mm = IsFilled(x,y,		BackgroundBasic) || IsFilled(x,y,		TileBasic);
 
-			int indexNum = ld * 8 + md * 4 + lm * 2 + mm;
+			int indexNum = ld*8+md*4+lm*2+mm;
 			int UVStartY = 3 * random(0, 2);
 			int2 uv = indexNum > 0 ? int2(9, UVStartY) + uvOffsetLUT[indexNum] : invalidUV;
 			backgroundTileUVs[x + y * (width + 1)] = uv;
