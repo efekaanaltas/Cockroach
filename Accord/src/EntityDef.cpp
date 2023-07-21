@@ -484,11 +484,11 @@ namespace Entities
 
 	CustomUpdate(MovingPlatform)
 	{
-		int2 desiredPos = lerp(startPosition, endPosition, std::abs(std::sin(Game::Time())));
+		int2 desiredPos = lerp(startPosition, endPosition, (std::sin(Game::Time())+1)/2.0f );
 		int2 move = desiredPos - position;
 
-		MoveX(move.x * dt);
-		MoveY(move.y * dt);
+		MoveX(move.x);
+		MoveY(move.y);
 	}
 
 	CustomRender(Turbine)
@@ -508,6 +508,7 @@ namespace Entities
 
 	CustomRender(MovingPlatform)
 	{
+		Renderer::DrawLine(float3(startPosition, 20.0f), float3(endPosition, 20.0f), CYAN);
 		RenderDynamicSizedEntity(this, { 15,2 });
 	}
 
