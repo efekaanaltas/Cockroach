@@ -28,6 +28,7 @@ namespace Cockroach
 		int2* backgroundTileUVs;
 		std::vector<Entity*> entities;
 
+		void Reset();
 		void Update(float dt);
 		void Render(Ref<Texture2D> tilemapTexture);
 

@@ -105,10 +105,10 @@ namespace Entities
 		{
 			Game::particles->Add(Particle
 			(
-				Game::player->position + RIGHTi*8, { 3,0 },
-				{ -Game::player->velocity.x / 10.0f, 12.0f }, { 4.0f, 3.0f },
-				0.7f, 0.3f, 
-				WHITE, CLEAR)
+				Game::player->position + RIGHTi*5, Game::player->position + RIGHTi * 11,
+				{ 4.0f-Game::player->velocity.x / 10.0f, 9.0f }, { -4.0f-Game::player->velocity.x / 10.0f, 15.0f },
+				0.4f, 1.0f, 
+				WHITE, WHITE)
 			);
 		}
 	}
@@ -216,10 +216,10 @@ namespace Entities
 			{
 				Game::particles->Add(Particle
 				(
-					Game::player->position + ONEi*8, ONE*4.0f,
-					DOWN * 2.0f, { 0.4f, 5.0f },
-					0.3f, 0.2f,
-					RED, BLUE*0.3f)
+					Game::player->position + ONEi*4, Game::player->position + ONEi*12,
+					DOWN * 2.0f - float2(0.4f, 5.0f), DOWN * 2.0f + float2(0.4f, 5.0f),
+					0.1f, 0.5f,
+					RED, CLEAR)
 				);
 			}
 
@@ -275,10 +275,10 @@ namespace Entities
 		{
 			Game::particles->Add(Particle
 			(
-				Game::player->position + int2(8 + player->faceDir * 2, 0), { 3,0 },
-				{ -Game::player->velocity.x / 10.0f, 25.0f }, { 7.0f, 10.0f },
-				0.1f, 0.05f,
-				WHITE, CLEAR)
+				Game::player->position + int2(5 + player->faceDir * 2, 0), Game::player->position + int2(11 + player->faceDir * 2, 0),
+				{ -7.0f-Game::player->velocity.x / 10.0f, 15.0f }, { 7.0f-Game::player->velocity.x / 10.0f, 35.0f },
+				0.05f, 0.15f,
+				WHITE, WHITE)
 			);
 		}
 

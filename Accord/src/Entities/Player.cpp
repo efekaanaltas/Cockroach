@@ -225,6 +225,7 @@ namespace Entities
 			if (room != Room::current && room->OverlapsWith(WorldHitbox(), 0, 0))
 			{
 				Room::current = room;
+				Room::current->Reset();
 				Rect bounds = room->Bounds();
 				position = glm::clamp(position, bounds.min - hitbox.min, bounds.max - hitbox.max);
 				Game::cameraController->StartTransition();

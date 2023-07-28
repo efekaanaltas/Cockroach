@@ -56,13 +56,6 @@ Game::Game()
 	//}
 	//SaveSprites();
 
-	const std::filesystem::path roomDir{ "assets/rooms" };
-	for (auto& a : std::filesystem::directory_iterator(roomDir))
-	{
-		std::string name = a.path().string().substr(a.path().string().find_last_of("/\\") + 1);
-		rooms.push_back(Room::Load(name));
-	}
-
 	Game::player = new Entities::Player(data.playerPosition, {6,0}, {10,12});
 	player->type = EntityType::Payga;
 	player->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 3 }, { 16, 16 });
@@ -74,6 +67,13 @@ Game::Game()
 
 	Game::particles = new Entities::Particles();
 	particles->type = EntityType::Particles;
+
+	const std::filesystem::path roomDir{ "assets/rooms" };
+	for (auto& a : std::filesystem::directory_iterator(roomDir))
+	{
+		std::string name = a.path().string().substr(a.path().string().find_last_of("/\\") + 1);
+		rooms.push_back(Room::Load(name));
+	}
 
 	for (auto& room : rooms)
 		if (room->Contains(player->WorldHitbox()))

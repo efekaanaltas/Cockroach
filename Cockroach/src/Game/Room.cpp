@@ -25,6 +25,12 @@ namespace Cockroach
 		memset(backgroundTileUVs, 0, (width + 1) * (height + 1) * sizeof(int2));
 	}
 
+	void Room::Reset()
+	{
+		for (int i = 0; i < entities.size(); i++)
+			entities[i]->Reset();
+	}
+
 	void Room::Update(float dt)
 	{
 		for (int i = 0; i < entities.size(); i++)

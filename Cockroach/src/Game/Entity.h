@@ -42,6 +42,7 @@ namespace Cockroach
 		float overlayWeight = 0.0f;
 		bool flipX = false, flipY = false;
 
+		virtual void Reset() {};
 		virtual void Update(float dt) {}
 		virtual void Render();
 		virtual void RenderInspectorUI();

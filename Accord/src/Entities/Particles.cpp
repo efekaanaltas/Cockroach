@@ -9,17 +9,18 @@ namespace Entities
 		
 	}
 
-	Particle::Particle(float2 basePosition, float2 positionDev, float2 baseVelocity, float2 velocityDev, float baseDuration, float durationDev, float4 baseColor, float4 colorDev)
+	template<glm::length_t L, typename T, glm::qualifier Q>
+	glm::vec<L, T, Q> RandomBetweenValues(glm::vec<L, T, Q> a, glm::vec<L, T, Q> b)
 	{
-		position = { basePosition.x + random(-positionDev.x, positionDev.x), basePosition.y + random(-positionDev.y, positionDev.y) };
-		velocity = { baseVelocity.x + random(-velocityDev.x, velocityDev.x), baseVelocity.y + random(-velocityDev.y, velocityDev.y) };
+		return lerp(a, b, random(0.0f, 1.0f));
+	}
 
-		deathTime = Game::Time() + baseDuration + random(-durationDev, durationDev);
-
-		color.r = baseColor.r + random(-colorDev.r, colorDev.r);
-		color.g = baseColor.g + random(-colorDev.g, colorDev.g);
-		color.b = baseColor.b + random(-colorDev.b, colorDev.b);
-		color.a = baseColor.a + random(-colorDev.a, colorDev.a);
+	Particle::Particle(float2 positionA, float2 positionB, float2 velocityA, float2 velocityB, float durationA, float durationB, float4 colorA, float4 colorB)
+	{
+		position = RandomBetweenValues(positionA, positionB);
+		velocity = RandomBetweenValues(velocityA, velocityB);
+		deathTime = Game::Time() + random(std::min(durationA, durationB), std::max(durationA, durationB));
+		color = RandomBetweenValues(colorA, colorB);
 	}
 
 	Particles::Particles()
@@ -58,4 +59,43 @@ namespace Entities
 		std::sort(particles.begin(), particles.end(), compare);
 	}
 
+	ParticleSystem::ParticleSystem()
+		: particlesPerFrame(1), positionA(ZERO), positionB(ZERO), velocityA(ZERO), velocityB(ZERO), durationA(1.0f), durationB(1.0f), colorA(WHITE), colorB(WHITE)
+	{
+	}
+
+	ParticleSystem::ParticleSystem(int particlesPerFrame, float2 positionA, float2 positionB, float2 velocityA, float2 velocityB, float durationA, float durationB, float4 colorA, float4 colorB)
+		: particlesPerFrame(particlesPerFrame), positionA(positionA), positionB(positionB), velocityA(velocityA), velocityB(velocityB), durationA(durationA), durationB(durationB), colorA(colorA), colorB(colorB)
+	{
+	}
+
+	void ParticleSystem::Prewarm()
+	{
+		float maxDuration = std::max(durationA, durationB);
+
+		int simulationFrameCount = (int)(maxDuration * 60.0f);
+
+		for (float i = 0; i <= simulationFrameCount; i++)
+		{
+			for (int j = 0; j <= particlesPerFrame; j++)
+				Add(RandomBetweenValues(velocityA, velocityB)*i/60.0f, i/60.0f);
+		}
+	}
+
+	void ParticleSystem::Update()
+	{
+		for (int i = 0; i <= particlesPerFrame; i++)
+			Add(ZERO, 0.0f);
+	}
+
+	void ParticleSystem::Add(float2 accumulatedVelocity, float elapsedLifeTime)
+	{
+		Game::particles->Add(Particle
+		(
+			positionA + accumulatedVelocity, positionB + accumulatedVelocity,
+			velocityA, velocityB,
+			durationA - elapsedLifeTime, durationB - elapsedLifeTime,
+			colorA, colorB
+		));
+	}
 }

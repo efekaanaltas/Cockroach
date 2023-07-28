@@ -13,6 +13,9 @@ using namespace Cockroach;
 
 namespace Entities
 {
+	#define CustomReset(ENTITY_TYPE) \
+	void ENTITY_TYPE::Reset()
+
 	#define CustomUpdate(ENTITY_TYPE) \
 	void ENTITY_TYPE::Update(float dt)
 
@@ -237,6 +240,20 @@ namespace Entities
 		int yStart = std::min(position.y, position.y + vertical * span);
 		int yEnd = std::max(position.y, position.y + vertical * span) + size.y;
 		turbineRect = Rect({ xStart, yStart }, { xEnd, yEnd });
+
+		airParticles = ParticleSystem
+		(
+			1,
+			position, position+size,
+			24.0f*float2(horizontal, vertical), 26.0f * float2(horizontal, vertical),
+			1.0f, 1.3f,
+			WHITE, CLEAR
+		);
+	}
+
+	CustomReset(Turbine)
+	{
+		airParticles.Prewarm();
 	}
 
 	CustomUpdate(Turbine)
@@ -249,13 +266,7 @@ namespace Entities
 				Game::player->velocity.y += vertical * turbineAcceleration * dt;
 		}
 
-		Game::particles->Add(Particle
-		(
-			position + size / 2 + UPi*vertical*4, { size.x / 2, 0 },
-			UPi * vertical * 25, { 1.0f, 1.0f },
-			1.0f, 1.3f,
-			WHITE, BLACK)
-		);
+		airParticles.Update();
 	}
 
 	Essence::Essence(int2 position, int2 hitboxMin, int2 hitboxMax, DashType dashType)
@@ -294,10 +305,10 @@ namespace Entities
 			float2 randomDir = float2(std::cos(randomAngle), std::sin(randomAngle));
 			Game::particles->Add(Particle
 			(
-				(float2)position + randomDir, {-1.0f, 1.0f},
-				random(4.0f, 26.0f)*randomDir, ZERO,
+				(float2)position + randomDir, (float2)position + randomDir,
+				random(4.0f, 26.0f)*randomDir, random(4.0f, 26.0f) * randomDir,
 				0.2f, 0.4f,
-				RED + random(0.0f, 0.9f)*WHITE, CLEAR)
+				RED, WHITE)
 			);
 		}
 		refreshTimer.Reset();
@@ -482,9 +493,19 @@ namespace Entities
 		}
 	}
 
+	MovingPlatform::MovingPlatform(int2 position, int2 size, int2 altPosition)
+		: Carrier(position, ZEROi, size), startPosition(position), endPosition(altPosition), startTime(Game::Time())
+	{}
+
+	CustomReset(MovingPlatform)
+	{
+		startTime = Game::Time();
+	}
+
 	CustomUpdate(MovingPlatform)
 	{
-		int2 desiredPos = lerp(startPosition, endPosition, (std::sin(Game::Time())+1)/2.0f );
+		float elapsedTime = Game::Time() - startTime;
+ 		int2 desiredPos = lerp(startPosition, endPosition, (std::sin(elapsedTime)+1)/2.0f );
 		int2 move = desiredPos - position;
 
 		MoveX(move.x);

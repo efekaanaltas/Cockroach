@@ -4,17 +4,13 @@
 
 using namespace Cockroach;
 
+#include "Entities/Particles.h"
+
+#define CustomReset virtual void Reset() override
 #define CustomUpdate virtual void Update(float dt) override
 #define CustomRender virtual void Render() override
 #define CustomUI virtual void RenderInspectorUI() override
 #define CustomDefinition virtual EntityDefinition GenerateDefinition() override
-
-template<typename T>
-class State;
-class WalkingState;
-class JumpingState;
-class ClingingState;
-class DashingState;
 
 enum DashType;
 
@@ -123,7 +119,9 @@ namespace Entities
 		int horizontal = 1, vertical = 0;
 		int span = 56;
 		Rect turbineRect;
+		ParticleSystem airParticles;
 
+		CustomReset;
 		CustomUpdate;
 		CustomRender;
 	};
@@ -196,13 +194,14 @@ namespace Entities
 	class MovingPlatform : public Carrier
 	{
 	public:
-		MovingPlatform(int2 position, int2 size, int2 altPosition)
-			: Carrier(position, ZEROi, size), startPosition(position), endPosition(altPosition)
-		{}
+		MovingPlatform(int2 position, int2 size, int2 altPosition);
 		
+		float startTime;
+
 		int2 startPosition;
 		int2 endPosition;
 
+		CustomReset;
 		CustomUpdate;
 		CustomRender;
 		CustomUI;
