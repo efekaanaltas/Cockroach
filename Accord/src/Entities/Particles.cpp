@@ -90,11 +90,15 @@ namespace Entities
 
 	void ParticleSystem::Add(float2 accumulatedVelocity, float elapsedLifeTime)
 	{
+		float duration = random(std::min(durationA, durationB), std::max(durationA, durationB)) - elapsedLifeTime;
+		if (duration <= 0)
+			return;
+
 		Game::particles->Add(Particle
 		(
 			positionA + accumulatedVelocity, positionB + accumulatedVelocity,
 			velocityA, velocityB,
-			durationA - elapsedLifeTime, durationB - elapsedLifeTime,
+			duration, duration,
 			colorA, colorB
 		));
 	}

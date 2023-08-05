@@ -99,7 +99,7 @@ namespace Entities
 
 		player->currentSheet = player->jumpingSheet;
 		player->renderSize.x = 0.6f;
-		Audio::Play("assets/audio/Jump.wav");
+		player->jumpSound.Start();
 
 		for (int i = 0; i < 30; i++)
 		{
@@ -180,7 +180,7 @@ namespace Entities
 		else dashDir = { player->faceDir, 0.0f };
 
 		player->currentSheet = player->dashingSheet;
-		Audio::Play("assets/audio/Dash.wav");
+		player->dashSound.Start();
 
 		Game::Freeze(3);
 	}

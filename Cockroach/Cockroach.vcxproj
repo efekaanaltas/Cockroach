@@ -141,6 +141,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Audio\Audio.h" />
+    <ClInclude Include="src\Audio\Sound.h" />
     <ClInclude Include="src\Cockroach.h" />
     <ClInclude Include="src\Core\Application.h" />
     <ClInclude Include="src\Core\Core.h" />
@@ -581,6 +582,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Audio\Audio.cpp" />
+    <ClCompile Include="src\Audio\Sound.cpp" />
     <ClCompile Include="src\Core\Application.cpp" />
     <ClCompile Include="src\Core\Input.cpp" />
     <ClCompile Include="src\Core\Log.cpp" />

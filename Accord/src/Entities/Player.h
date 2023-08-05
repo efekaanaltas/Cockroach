@@ -103,6 +103,9 @@ namespace Entities
 		Timer gravityHaltTimer = Timer(10.0f);
 		Timer dashRegainTimer = Timer(4.0f);
 
+		Sound dashSound = Sound("assets/audio/Dash.wav");
+		Sound jumpSound = Sound("assets/audio/Jump.wav");
+
 		DashTrail dashTrail[DashTrail::count];
 		int lastDashTrailIndex = 0;
 

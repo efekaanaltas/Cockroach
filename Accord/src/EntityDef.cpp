@@ -210,6 +210,8 @@ namespace Entities
 
 			camera.SetPosition(float3(position.x, position.y, 0.0f));
 		}
+
+		Audio::SetListenerPosition(positionHighRes);
 	}
 
 	void CameraController::StartTransition()
@@ -293,12 +295,14 @@ namespace Entities
 				Absorb();
 			}
 		}
+
+		absorbSound.SetPosition(position);
 	}
 
 	void Essence::Absorb()
 	{
 		Game::Freeze(3);
-		Audio::Play("assets/audio/sound1_dontforgettochange.wav");
+		absorbSound.Start();
 		for (int i = 0; i < 500; i++)
 		{
 			float randomAngle = random(0.0f, 2*PI);
@@ -331,6 +335,8 @@ namespace Entities
 
 	CustomUpdate(Attractor)
 	{
+		dissolveSound.SetPosition(position);
+
 		if (!active && refreshTimer.Finished())
 			Refresh();
 		else refreshTimer.Tick(dt);
@@ -374,7 +380,7 @@ namespace Entities
 	{
 		refreshTimer.Reset();
 		sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 0,1 }, { 8,8 });
-		Audio::Play("assets/audio/sound2_dontforgettochange.wav");
+		dissolveSound.Start();
 		active = false;
 		dissolving = false;
 	}

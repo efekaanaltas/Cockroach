@@ -45,6 +45,9 @@
     <ClInclude Include="src\Audio\Audio.h">
       <Filter>src\Audio</Filter>
     </ClInclude>
+    <ClInclude Include="src\Audio\Sound.h">
+      <Filter>src\Audio</Filter>
+    </ClInclude>
     <ClInclude Include="src\Cockroach.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -1359,6 +1362,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Audio\Audio.cpp">
+      <Filter>src\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Audio\Sound.cpp">
       <Filter>src\Audio</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Application.cpp">

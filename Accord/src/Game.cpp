@@ -88,8 +88,11 @@ void Game::Update(float dt)
 		return;
 	}
 
-	cameraController->Update(dt);
-	if (cameraController->isTransitioning) return;
+	if (cameraController->isTransitioning) 
+	{
+		cameraController->Update(dt);
+		return;
+	}
 
 	if (!editMode)
 	{
@@ -98,6 +101,7 @@ void Game::Update(float dt)
 	}
 	
 	Room::current->Update(dt);
+	cameraController->Update(dt);
 
 	EditorCursor::Update(dt);
 

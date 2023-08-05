@@ -135,6 +135,8 @@ namespace Entities
 		DashType dashType;
 		Timer refreshTimer = Timer(2.0f);
 
+		Sound absorbSound = Sound("assets/audio/sound1_dontforgettochange.wav");
+
 		CustomUpdate;
 		CustomUI;
 
@@ -159,6 +161,8 @@ namespace Entities
 		float attraction = 200.0f;
 		Timer dissolveTimer = Timer(0.5f);
 		Timer refreshTimer = Timer(2.0f);
+
+		Sound dissolveSound = Sound("assets/audio/sound2_dontforgettochange.wav");
 
 		CustomUpdate;
 

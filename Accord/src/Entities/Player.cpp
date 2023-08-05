@@ -112,6 +112,9 @@ namespace Entities
 		if (grounded && !groundedAtStartOfFrame && velocityLastFrame.y < -30.0f) // Use velocityLastFrame because y velocity is set to 0 on ground
 			renderSize.y = 0.6f;
 
+		dashSound.SetPosition(position);
+		jumpSound.SetPosition(position);
+
 		renderSize.x = std::clamp(renderSize.x + 2 * dt, 0.0f, 1.0f);
 		renderSize.y = std::clamp(renderSize.y + 2 * dt, 0.0f, 1.0f);
 
