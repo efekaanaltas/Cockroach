@@ -1,4 +1,4 @@
-#include <Cockroach.h>
+﻿#include <Cockroach.h>
 #include <Core/EntryPoint.h>
 
 #include "imgui/imgui.h"
@@ -44,7 +44,7 @@ Game::Game()
 	Application::GetWindow().SetWindowMode(data.fullscreen);
 	Audio::ToggleSound(data.muted);
 
-	//for (int i = EntityType::SpikeLeft; i < EntityType::END; i++)
+	//for (int i = EntityType::Checkpoint; i < EntityType::END; i++)
 	//{
 	//	Entity* e = CreateEntity(EntityDefinition(i, false, ZEROi, ONEi));
 	//	if (entitySprites.size() < i + 1)
@@ -52,7 +52,7 @@ Game::Game()
 	//	if (e->sprite.texture)
 	//		entitySprites[i] = e->sprite;
 	//	else
-	//		entitySprites[i] = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 1 }, { 8,8 });
+	//		entitySprites[i] = Sprite::CreateFromCoords(baseSpriteSheet, { 4, 2 }, { 8,8 });
 	//}
 	//SaveSprites();
 
@@ -195,10 +195,46 @@ void Game::Render()
 	{
 		framebuffer->Unbind();
 		Renderer::BlitToScreen(framebuffer);
+
+		Application::ImGuiBegin();
+		ExampleGameUI();
+		Application::ImGuiEnd();
 	}
 
 	if(editMode)
 		ImGuiRender();
+}
+
+void Game::ExampleGameUI()
+{
+	using namespace ImGui;
+
+	ImGuiIO& io = ImGui::GetIO();
+	PushStyleColor(ImGuiCol_Border, ImColor(255, 255, 255, 255).Value);
+	PushStyleColor(ImGuiCol_FrameBg, ImColor(0, 0, 0, 0).Value);
+	PushStyleVar(ImGuiStyleVar_WindowBorderSize, 3.0f);
+	PushStyleVar(ImGuiStyleVar_WindowRounding, 6.0f);
+	SetNextWindowSizeConstraints({ 400,150 }, { 400,150 }, nullptr, nullptr);
+	Begin("Dialogue Box", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoScrollbar);
+
+	static int frame = 0;
+	frame++;
+
+	std::string strings[] = {u8"止クヨリ将末ワケシア国写3黒シ年示らとゃゆ国及謙紙む村満でょせ転百五トにゅ投譲セムケ人化ムミケ徽庭さお批会イセ意遅ム考32昨丞云みさげ。要メヤアク市89宜おせょば果誕んへドフ賞先らっ覚字あま省海倉ドフゃ占万のてっま裁動庭ラシイセ読合念じ歳左わスず通刊たさ後角べたか滑要エケカヨ資下の。",
+	u8"代ヨオルユ愛生タヒヌ障業われ勝布らばり懲撃だかぞ写聞残的ヤホ臓月モアヌス縦掲ゃる川込チタツユ索図眺語ぐレぶべ。用ゆ出所うゆち写戦イヌ雪疑部ぶ南21人カハケ仲解ぎげ下難えスそり歩社ヲ安農メワ初器みきごゆ造期ソスシ訪2廃うぞろ。本すごきに韓姿ヘウヒマ自綱ちの情荘備ねッ教併そ南91会ど転休夕ラスレエ質振てゅくリ供以熟ナマヒネ治和しンあを知85芸ヌムモヱ数済ネキテイ情質又娠ぴごや。",
+	u8"目ぞル村毒リエ的入ぐに新港ょがッね生要69来セオミ覧装ぼレ由藤紙ぎじべし載論ルツ患82敗案ス新治高第ルリ関災サソチ電塁ヱレヒ闘言集知ンっさ。梨ら様人リ略再ハミヘ言月ち上必ホ立削げろリ矢格こ護都リぼ宝明韓ヲカ謙権レ楽真とすぱ物止エウヒ表32道地テチトフ気日ぎ止性ぼほ院少ルヒヲ地愛鉄たう。",
+	u8"査ミムモタ米議ロ済都羅ぜな還詳されの訴結ほめ調強トカオ年敗ホ物石べ画主ど共書なきみず視8殉立シ廃支う。必づそク公広つはまフ博障セワエ会旅ラ北6予リをろれ図疑フゅ連会ケハオ台検づたク豊少かわきば一質進ルん日力ぴご真償ー。任トニオ個中ニエ変表28自第ヘ護5意ほ思自キワ師願うー生赤違ニ馬前ヌラサモ電横月ヘルヌヒ引見芸ぜひん淑進券企レうぽ。",
+	u8"負ラシ価科れぎつ教著けよせ水局岡ヌア経作れらのへ入観こがド改験スフソヌ古意ゅぎ秋空づ通表代段続メモユテ率幇だ満象ヨレコチ願減ごむさ利期見察棄銃ぽほえさ。故ヒマワ投作づぐれ部王イエマオ会48購活クフセ秋有の見15行ぎどぞル芸共12見ス感参ラチオヱ連設需誕へた。留ちとドッ囲注日ヨルミマ手供であリぽ歩徴スメヱ良代き日気ッ館業エ作分9属メ追9既杉トン。",
+	u8"契よ日6必せぽみ事進ずびが点解かスきフ薬営速ょよーひ暮存ヱト誇崎ツカム為争ハフ済6度せぐも更市コフム新丁ソエテ竹終ノヨコ児読テタソ雄録傑摯フ。論ノフ全状ヨリ怖理さゅ分79面わーぐ近団気つぶ国井ぴ備掲ろびめラ虹野フ踊負シ式37社マタ疑表カサセ前府レょ。際わルう手談済さず百不業ワシスム柄53突なぐぴと見食をすと堅典回叩奇さとフは宅浩ム空館ちろげ融難キチア板北競役人述イド。",
+	};
+
+	int arrSize = sizeof(strings) / sizeof(strings[0]);
+
+	TextWrapped(strings[(frame/6)%arrSize].c_str());
+
+	End();
+	PopStyleVar(2);
+	PopStyleColor(2);
 }
 
 void Game::ImGuiRender()
@@ -219,6 +255,8 @@ void Game::ImGuiRender()
 	Checkbox("Room Boundaries", &renderRoomBoundaries);
 
 	End();
+
+	ExampleGameUI();
 
 	Begin("Current Room");
 	static char nameBuffer[255];

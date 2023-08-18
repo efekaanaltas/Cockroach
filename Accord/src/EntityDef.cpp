@@ -122,6 +122,13 @@ namespace Entities
 		}
 	}
 
+	void Dynamic::MoveTo(int2 pos)
+	{
+		int2 delta = pos - this->position;
+		MoveX(delta.x);
+		MoveY(delta.y);
+	}
+
 	Dynamic* Dynamic::GetEntityCollision(int xForesense, int yForesense)
 	{	
 		for (auto& ent : Room::current->entities)
@@ -512,10 +519,38 @@ namespace Entities
 	{
 		float elapsedTime = Game::Time() - startTime;
  		int2 desiredPos = lerp(startPosition, endPosition, (std::sin(elapsedTime)+1)/2.0f );
-		int2 move = desiredPos - position;
+		MoveTo(desiredPos);
+	}
 
-		MoveX(move.x);
-		MoveY(move.y);
+	DashSwitchPlatform::DashSwitchPlatform(int2 position, int2 size, int2 altPosition)
+		: Carrier(position, ZEROi, size), startPosition(position), endPosition(altPosition), targetIsAltPos(false)
+	{}
+
+	CustomReset(DashSwitchPlatform)
+	{
+		targetIsAltPos = false;
+		MoveTo(startPosition);
+	}
+
+	CustomUpdate(DashSwitchPlatform)
+	{
+		static bool playerWasDashingLastFrame = false;
+		static bool playerIsDashingThisFrame = false;
+
+		playerIsDashingThisFrame = Game::player->currentState == Game::player->dashingState;
+
+		if (playerIsDashingThisFrame && !playerWasDashingLastFrame)
+		{
+			targetIsAltPos = !targetIsAltPos;
+			int2 target = targetIsAltPos ? endPosition : startPosition;
+			int2 start = targetIsAltPos ? startPosition : endPosition;
+			moveTween = Tween<int2>(start, target, 0.3f, TweenFunc::Quad);
+		}
+
+		if(!moveTween.Finished())
+			MoveTo(moveTween.Step(dt));
+
+		playerWasDashingLastFrame = playerIsDashingThisFrame;
 	}
 
 	CustomRender(Turbine)
@@ -535,7 +570,12 @@ namespace Entities
 
 	CustomRender(MovingPlatform)
 	{
-		Renderer::DrawLine(float3(startPosition, 20.0f), float3(endPosition, 20.0f), CYAN);
+		Renderer::DrawLine(float3(startPosition + hitbox.Center(), 20.0f), float3(endPosition + hitbox.Center(), 20.0f), CYAN);
+		RenderDynamicSizedEntity(this, { 15,2 });
+	}
+
+	CustomRender(DashSwitchPlatform)
+	{
 		RenderDynamicSizedEntity(this, { 15,2 });
 	}
 
@@ -552,7 +592,27 @@ namespace Entities
 		End();
 	}
 
+	CustomUI(DashSwitchPlatform)
+	{
+		using namespace ImGui;
+		Begin("Inspector");
+		InputInt("X", &startPosition.x, 8, 1);
+		InputInt("Y", &startPosition.y, 8, 1);
+		InputInt("X1", &endPosition.x, 8, 1);
+		InputInt("Y1", &endPosition.y, 8, 1);
+		InputInt("W", &size.x, 8, 8);
+		InputInt("H", &size.y, 8, 8);
+		End();
+	}
+
 	CustomDefinition(MovingPlatform)
+	{
+		EntityDefinition definition = EntityDefinition(type, false, startPosition, size);
+		definition.altPosition = endPosition;
+		return definition;
+	}
+
+	CustomDefinition(DashSwitchPlatform)
 	{
 		EntityDefinition definition = EntityDefinition(type, false, startPosition, size);
 		definition.altPosition = endPosition;
@@ -654,8 +714,9 @@ Cockroach::Entity* Cockroach::CreateEntity(const EntityDefinition& def)
 		break;
 		case EntityType::Checkpoint:
 			e = new Entities::Checkpoint(def.position, def.size);
-			e->sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 0,1 }, { 8,8 });
 		break;
+		case EntityType::DashSwitchPlatform:
+			e = new Entities::DashSwitchPlatform(def.position, def.size, def.altPosition.value_or(def.position));
 		}
 		if (e != nullptr)
 		{

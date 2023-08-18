@@ -108,6 +108,8 @@ namespace Cockroach
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
 
+		io.Fonts->AddFontFromFileTTF("assets/fonts/NotoSansCJKjp-Medium.otf", 17, nullptr, io.Fonts->GetGlyphRangesJapanese());
+
 		Application& app = Application::Get();
 		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GLFWWindow);
 

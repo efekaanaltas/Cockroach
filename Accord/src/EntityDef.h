@@ -61,6 +61,7 @@ namespace Entities
 
 		virtual void MoveX(float amount);
 		virtual void MoveY(float amount);
+		void MoveTo(int2 pos);
 		virtual bool OnCollide(Dynamic* other, int horizontal, int vertical) { return solid; }
 
 		Dynamic* GetEntityCollision(int xForesense, int yForesense);
@@ -210,6 +211,26 @@ namespace Entities
 		CustomRender;
 		CustomUI;
 		
+		CustomDefinition;
+	};
+
+	class DashSwitchPlatform : public Carrier
+	{
+	public:
+		DashSwitchPlatform(int2 position, int2 size, int2 altPosition);
+
+		bool targetIsAltPos;
+
+		int2 startPosition;
+		int2 endPosition;
+
+		Tween<int2> moveTween;
+
+		CustomReset;
+		CustomUpdate;
+		CustomRender;
+		CustomUI;
+
 		CustomDefinition;
 	};
 

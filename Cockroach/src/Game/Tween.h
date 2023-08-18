@@ -5,7 +5,8 @@ namespace Cockroach
 {
     enum TweenFunc
     {
-        Linear
+        Linear,
+        Quad
     };
 
     template<typename T>
@@ -38,6 +39,10 @@ namespace Cockroach
         case Linear:
         {
             return t;
+        }
+        case Quad:
+        {
+            return t * t;
         }
         }
         return t;
