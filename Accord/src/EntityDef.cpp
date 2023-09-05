@@ -54,13 +54,13 @@ namespace Entities
 			for (int x = 0; x < w; x++)
 			{
 				int xOffset = (x == 0) ? texCoordOffset.x - 3 : (x == w - 1) ? texCoordOffset.x - 1 : texCoordOffset.x - 2;
-				Renderer::DrawQuad(float3(entity->position, entity->z) + float3(8 * x, 0, 0), size, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,2 }, { 8,8 }), color, overlay, flipX, flipX);
+				Renderer::DrawQuad(float3(entity->position, entity->z) + float3(8 * x, 0, 0), size, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,texCoordOffset.y }, { 8,8 }), color, overlay, flipX, flipX);
 			}
 		else if (h > 1.0f)
 			for (int y = 0; y < h; y++)
 			{
 				int yOffset = (y == 0) ? texCoordOffset.y + 1 : (y == h - 1) ? texCoordOffset.y + 3 : texCoordOffset.y + 2;
-				Renderer::DrawQuad(float3(entity->position, entity->z) + float3(0, 8 * y, 0), size, Sprite::CreateFromCoords(Game::baseSpriteSheet, { 11,yOffset }, { 8,8 }), color, overlay, flipX, flipY);
+				Renderer::DrawQuad(float3(entity->position, entity->z) + float3(0, 8 * y, 0), size, Sprite::CreateFromCoords(Game::baseSpriteSheet, { texCoordOffset.x,yOffset }, { 8,8 }), color, overlay, flipX, flipY);
 			}
 		else
 			Renderer::DrawQuad(float3(entity->position, entity->z), size, Sprite::CreateFromCoords(Game::baseSpriteSheet, texCoordOffset, { 8,8 }), color, overlay, flipX, flipY);
@@ -466,11 +466,17 @@ namespace Entities
 		{
 			Dynamic* dyn = ent->As<Dynamic>();
 			if (dyn && (dyn != this) && dyn->carriable && dyn->IsRiding(this))
+			{
+				dyn->carrier = this;
 				riders.push_back(dyn);
+			}
 		}
 
 		if (Game::player->IsRiding(this))
+		{
+			Game::player->carrier = this;
 			riders.push_back(Game::player);
+		}
 
 		return riders;
 	}

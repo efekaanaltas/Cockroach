@@ -188,13 +188,51 @@ void Game::Render()
 	EditorCursor::Render();
 
 	Renderer::EndScene();
+
+	static Ref<Framebuffer> brightnessThreshold = CreateRef<Framebuffer>(framebuffer->width, framebuffer->height, true);
+	Renderer::BrightnessHighPass(framebuffer, brightnessThreshold, 0.7f);
+
+	static Ref<Framebuffer> copy1 = CreateRef<Framebuffer>(framebuffer->width / 2, framebuffer->height / 2, true);
+	Renderer::Copy(brightnessThreshold, copy1);
+
+	static Ref<Framebuffer> copy2 = CreateRef<Framebuffer>(copy1->width / 2, copy1->height / 2, true);
+	Renderer::Copy(copy1, copy2);
+
+	static Ref<Framebuffer> copy3 = CreateRef<Framebuffer>(copy2->width / 2, copy2->height / 2, true);
+	Renderer::Copy(copy2, copy3);
+
+	static Ref<Framebuffer> up1 = CreateRef<Framebuffer>(framebuffer->width, framebuffer->height, true);
+	Renderer::Add(copy3, copy2, up1);
+
+	static Ref<Framebuffer> up2 = CreateRef<Framebuffer>(framebuffer->width, framebuffer->height, true);
+	Renderer::Add(up1, copy1, up2);
+
+	static Ref<Framebuffer> up3 = CreateRef<Framebuffer>(framebuffer->width, framebuffer->height, true);
+	Renderer::Add(up2, framebuffer, up3);
+
 	Cockroach::Window& window = Application::Get().GetWindow();
 	Renderer::OnWindowResize(window.width, window.height);
 
+	static Ref<Framebuffer> displayBuf = up3;
+	if (Input::IsDown(CR_KEY_J))
+		displayBuf = up1;
+	if (Input::IsDown(CR_KEY_K))
+		displayBuf = up2;
+	if (Input::IsDown(CR_KEY_L))
+		displayBuf = up3;
+	if (Input::IsDown(CR_KEY_N))
+		displayBuf = framebuffer;
+	if (Input::IsDown(CR_KEY_Y))
+		displayBuf = copy1;
+	if (Input::IsDown(CR_KEY_U))
+		displayBuf = copy2;
+	if (Input::IsDown(CR_KEY_I))
+		displayBuf = copy3;
+
 	if (!editMode)
 	{
-		framebuffer->Unbind();
-		Renderer::BlitToScreen(framebuffer);
+		//framebuffer->Unbind();
+		Renderer::BlitToScreen(displayBuf);
 
 		Application::ImGuiBegin();
 		ExampleGameUI();

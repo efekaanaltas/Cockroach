@@ -47,6 +47,7 @@ namespace Entities
 		float xRemainder = 0.0f, yRemainder = 0.0f;
 		bool solid = true;
 		bool carriable = false;
+		Dynamic* carrier = nullptr;
 
 		int Left() const { return position.x + hitbox.min.x; }
 		int Right() const { return position.x + hitbox.max.x; }

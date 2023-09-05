@@ -57,5 +57,5 @@ void main()
         h_sum += texelFetch(u_Texture, ivec2(uv_x + (4.0 * bloom_spread), uv_y), 0);
         sum += h_sum / 9.0;
     }
-    color = texture(u_Texture, v_TexCoord) + ((sum/9.0) * bloom_intensity);
+    color = texture(u_Texture, v_TexCoord);//texture(u_Texture, v_TexCoord) + ((sum/9.0) * bloom_intensity);
 }

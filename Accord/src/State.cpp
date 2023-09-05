@@ -101,6 +101,9 @@ namespace Entities
 		player->renderSize.x = 0.6f;
 		player->jumpSound.Start();
 
+		if (player->carrier)
+			player->velocity.x *= 2;
+
 		for (int i = 0; i < 30; i++)
 		{
 			Game::particles->Add(Particle

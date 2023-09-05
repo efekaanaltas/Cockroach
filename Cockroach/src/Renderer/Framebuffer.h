@@ -5,7 +5,7 @@ namespace Cockroach
 	class Framebuffer
 	{
 	public:
-		Framebuffer(int width, int height);
+		Framebuffer(int width, int height, bool bilinear = false);
 		~Framebuffer();
 
 		void Bind();

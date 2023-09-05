@@ -44,6 +44,9 @@ namespace Cockroach
 		LineVertex* LineVBPtr = nullptr;
 
 		Ref<Shader> PostProcessingShader;
+		Ref<Shader> BrightnessHighPass;
+		Ref<Shader> CopyShader;
+		Ref<Shader> AddShader;
 
 		mat4 ViewProjectionMatrix;
 
@@ -70,7 +73,7 @@ namespace Cockroach
 			{ ShaderDataType::Float3, "a_Position"		},
 			{ ShaderDataType::Float2, "a_TexCoord"		},
 			{ ShaderDataType::Float,  "a_TexIndex"		},
-			{ ShaderDataType::Float4,  "a_Color"		},
+			{ ShaderDataType::Float4, "a_Color"			},
 			{ ShaderDataType::Float4, "a_OverlayColor"	}
 		};
 		data.QuadVA->AddVertexBuffer(data.QuadVB);
@@ -119,6 +122,9 @@ namespace Cockroach
 		data.LineShader = CreateRef<Shader>("assets/shaders/Line.glsl");
 
 		data.PostProcessingShader = CreateRef<Shader>("assets/shaders/PostProcessing.glsl");
+		data.BrightnessHighPass	  = CreateRef<Shader>("assets/shaders/BrightnessHighPass.glsl");
+		data.CopyShader			  = CreateRef<Shader>("assets/shaders/Copy.glsl");
+		data.AddShader			  = CreateRef<Shader>("assets/shaders/Add.glsl");
 	}
 
 	void Renderer::Shutdown()
@@ -153,6 +159,31 @@ namespace Cockroach
 	void Renderer::Clear()
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+	void Renderer::Copy(Ref<Framebuffer> src, Ref<Framebuffer> dst)
+	{
+		glDisable(GL_DEPTH_TEST);
+		dst->Bind();
+		glViewport(0, 0, dst->width, dst->height);
+		data.CopyShader->Bind();
+		glBindTexture(GL_TEXTURE_2D, src->colorAttachment);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		dst->Unbind();
+	}
+
+	void Renderer::Add(Ref<Framebuffer> src1, Ref<Framebuffer> src2, Ref<Framebuffer> dst)
+	{
+		glDisable(GL_DEPTH_TEST);
+		dst->Bind();
+		glViewport(0, 0, dst->width, dst->height);
+		data.AddShader->Bind();
+		int samplers[2] = { 0,1 };
+		data.AddShader->UploadUniformIntArray("u_Textures", samplers, 2);
+		glBindTextureUnit(0, src1->colorAttachment);
+		glBindTextureUnit(1, src2->colorAttachment);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		dst->Unbind();
 	}
 
 	void Renderer::BeginScene(Camera& camera)
@@ -215,6 +246,18 @@ namespace Cockroach
 		data.PostProcessingShader->Bind();
 		glBindTexture(GL_TEXTURE_2D, framebuffer->colorAttachment);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	}
+
+	void Renderer::BrightnessHighPass(Ref<Framebuffer> src, Ref<Framebuffer> dst, float threshold)
+	{
+		glDisable(GL_DEPTH_TEST);
+		dst->Bind();
+		glViewport(0, 0, dst->width, dst->height);
+		data.BrightnessHighPass->Bind();
+		data.BrightnessHighPass->UploadUniformFloat("brightnessThreshold", threshold);
+		glBindTexture(GL_TEXTURE_2D, src->colorAttachment);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		dst->Unbind();
 	}
 
 	void Renderer::DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture, const float2& min, const float2& max, const float4& color, const float4& overlayColor)

@@ -21,10 +21,14 @@ namespace Cockroach
 		static void OnWindowResize(int width, int height);
 		static void BeginScene(Camera& camera);
 		static void EndScene();
-		static void BlitToScreen(Ref<Framebuffer> framebuffer);
 
 		static void SetClearColor(const float4& color);
 		static void Clear();
+
+		static void BlitToScreen(Ref<Framebuffer> framebuffer);
+		static void BrightnessHighPass(Ref<Framebuffer> src, Ref<Framebuffer> dst, float threshold);
+		static void Copy(Ref<Framebuffer> src, Ref<Framebuffer> dst);
+		static void Add(Ref<Framebuffer> src1, Ref<Framebuffer> src2, Ref<Framebuffer> dst);
 
 		static void DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture, const float2& min, const float2& max, const float4& color = WHITE, const float4& overlayColor = CLEAR);
 		static void DrawQuad(const float3& position, const float2& size, const Sprite& sprite, const float4& color = WHITE, const float4& overlayColor = CLEAR, bool flipX = false, bool flipY = false);
