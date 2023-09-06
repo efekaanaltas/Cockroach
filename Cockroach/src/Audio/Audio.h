@@ -3,6 +3,12 @@
 
 namespace Cockroach
 {
+	#define MA_ASSERT(stmt, message) if(stmt != MA_SUCCESS) \
+		{ \
+			CR_CORE_WARN(message); \
+			return; \
+		}
+
 	class Audio
 	{
 	public:
@@ -13,7 +19,9 @@ namespace Cockroach
 		static void Init();
 		static void PlayOneShot(std::string filepath);
 		static void PlayOneShot(std::string filepath, ma_sound_group group);
-		static void ToggleSound(bool mute);
+		static void ToggleSoundMaster(bool mute);
+		static void ToggleSoundSFX(bool mute);
+		static void ToggleSoundMusic(bool mute);
 		static void SetListenerPosition(float2 pos);
 	};
 }

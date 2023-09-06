@@ -13,15 +13,9 @@ namespace Cockroach
 
 	void Audio::Init()
 	{
-        ma_result result;
-
-		result = ma_engine_init(NULL, &engine);
-		
-		if (result != MA_SUCCESS)
-		{
-			CR_CORE_WARN("Failed to initialize audio engine.");
-			return;
-		}
+		MA_ASSERT(ma_engine_init(NULL, &engine),						 "Failed to initialize audio engine");
+		MA_ASSERT(ma_sound_group_init(&engine, 0, nullptr, &sfxGroup),	 "Failed to initilize SFX sound group");
+		MA_ASSERT(ma_sound_group_init(&engine, 0, nullptr, &musicGroup), "Failed to initilize music sound group");
 	}
 
 	void Audio::PlayOneShot(std::string filepath)
@@ -34,9 +28,19 @@ namespace Cockroach
 		ma_engine_play_sound(&engine, filepath.c_str(), NULL);
 	}
 
-	void Audio::ToggleSound(bool mute)
+	void Audio::ToggleSoundMaster(bool mute)
 	{
 		ma_engine_set_volume(&engine, mute ? 0.0f : 1.0f);
+	}
+
+	void Audio::ToggleSoundSFX(bool mute)
+	{
+		ma_sound_group_set_volume(&sfxGroup, mute ? 0.0f : 1.0f);
+	}
+
+	void Audio::ToggleSoundMusic(bool mute)
+	{
+		ma_sound_group_set_volume(&musicGroup, mute ? 0.0f : 1.0f);
 	}
 
 	void Audio::SetListenerPosition(float2 pos)

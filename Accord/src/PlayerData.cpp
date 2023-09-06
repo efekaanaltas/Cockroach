@@ -9,7 +9,9 @@ void PlayerData::Save()
 	out << GenerateProperty("PlayerPosX", playerPosition.x);
 	out << GenerateProperty("PlayerPosY", playerPosition.y); out << '\n';
 	out << GenerateProperty("Fullscreen", fullscreen); out << '\n';
-	out << GenerateProperty("Muted", muted);
+	out << GenerateProperty("MutedMaster", mutedMaster);
+	out << GenerateProperty("MutedSFX", mutedSFX);
+	out << GenerateProperty("MutedMusic", mutedMusic);
 		
 	out.close();
 }
@@ -24,8 +26,10 @@ void PlayerData::Load()
 	stream << in.rdbuf();
 
 	playerPosition = { GetProperty<int>(stream, "PlayerPosX"), GetProperty<int>(stream, "PlayerPosY") };
-	fullscreen = GetProperty<bool>(stream, "Fullscreen");
-	muted = GetProperty<bool>(stream, "Muted");
+	fullscreen =	GetProperty<bool>(stream, "Fullscreen");
+	mutedMaster =	GetProperty<bool>(stream, "MutedMaster");
+	mutedSFX =		GetProperty<bool>(stream, "MutedSFX");
+	mutedMusic =	GetProperty<bool>(stream, "MutedMusic");
 
 	in.close();
 }

@@ -42,7 +42,9 @@ Game::Game()
 	LoadSprites();
 
 	Application::GetWindow().SetWindowMode(data.fullscreen);
-	Audio::ToggleSound(data.muted);
+	Audio::ToggleSoundMaster(data.mutedMaster);
+	Audio::ToggleSoundSFX(data.mutedSFX);
+	Audio::ToggleSoundMusic(data.mutedMusic);
 
 	//for (int i = EntityType::Checkpoint; i < EntityType::END; i++)
 	//{
@@ -78,6 +80,9 @@ Game::Game()
 	for (auto& room : rooms)
 		if (room->Contains(player->WorldHitbox()))
 			Room::current = room;
+
+	static Sound sound = Sound("assets/audio/SheerIceTorrent.wav", true);
+	sound.Start();
 }
 
 void Game::Update(float dt)
@@ -110,8 +115,6 @@ void Game::Update(float dt)
 		cameraController->SetZoom(90.0f);
 		editMode = !editMode;
 	}
-	
-	static bool muted = false;
 
 	if (Input::IsDown(CR_KEY_F))
 	{
@@ -121,8 +124,7 @@ void Game::Update(float dt)
 	}
 	if (Input::IsDown(CR_KEY_M))
 	{
-		Audio::ToggleSound(muted = !muted);
-		data.muted = muted;
+		Audio::ToggleSoundMaster(data.mutedMaster = !data.mutedMaster);
 		data.Save();
 	}
 
@@ -190,7 +192,7 @@ void Game::Render()
 	Renderer::EndScene();
 
 	static Ref<Framebuffer> brightnessThreshold = CreateRef<Framebuffer>(framebuffer->width, framebuffer->height, true);
-	Renderer::BrightnessHighPass(framebuffer, brightnessThreshold, 0.7f);
+	Renderer::BrightnessHighPass(framebuffer, brightnessThreshold, 0.8f);
 
 	static Ref<Framebuffer> copy1 = CreateRef<Framebuffer>(framebuffer->width / 2, framebuffer->height / 2, true);
 	Renderer::Copy(brightnessThreshold, copy1);
@@ -291,6 +293,18 @@ void Game::ImGuiRender()
 	Checkbox("Grid", &renderGrid);
 	Checkbox("Rooms", &renderAllRooms);
 	Checkbox("Room Boundaries", &renderRoomBoundaries);
+
+	bool modified = true;
+
+	if (Checkbox("Mute Master", &data.mutedMaster))
+		Audio::ToggleSoundMaster(data.mutedMaster);
+	else if (Checkbox("Mute SFX", &data.mutedSFX))
+		Audio::ToggleSoundSFX(data.mutedSFX);
+	else if (Checkbox("Mute Music", &data.mutedMusic))
+		Audio::ToggleSoundMusic(data.mutedMusic);
+	else modified = false;
+
+	if(modified) data.Save();
 
 	End();
 

@@ -7,7 +7,9 @@ struct PlayerData
 {
 	int2 playerPosition = ZERO;
 	bool fullscreen = true;
-	bool muted = false;
+	bool mutedMaster = false;
+	bool mutedSFX = false;
+	bool mutedMusic = false;
 
 	PlayerData()
 	{
