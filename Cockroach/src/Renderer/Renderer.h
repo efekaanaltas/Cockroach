@@ -26,9 +26,10 @@ namespace Cockroach
 		static void Clear();
 
 		static void BlitToScreen(Ref<Framebuffer> framebuffer);
-		static void BrightnessHighPass(Ref<Framebuffer> src, Ref<Framebuffer> dst, float threshold);
-		static void Copy(Ref<Framebuffer> src, Ref<Framebuffer> dst);
-		static void Add(Ref<Framebuffer> src1, Ref<Framebuffer> src2, Ref<Framebuffer> dst);
+		static void BloomPrefilter(Ref<Framebuffer> src, Ref<Framebuffer> dst, float threshold);
+		static void BloomDownsample(Ref<Framebuffer> src, Ref<Framebuffer> dst);
+		static void BloomUpsample(Ref<Framebuffer> src1, Ref<Framebuffer> src2, Ref<Framebuffer> dst);
+		static void Distortion(Ref<Framebuffer> colorSrc, Ref<Framebuffer> distortionSrc, Ref<Framebuffer> dst);
 
 		static void DrawQuad(const float3& position, const float2& size, const Ref<Texture2D>& texture, const float2& min, const float2& max, const float4& color = WHITE, const float4& overlayColor = CLEAR);
 		static void DrawQuad(const float3& position, const float2& size, const Sprite& sprite, const float4& color = WHITE, const float4& overlayColor = CLEAR, bool flipX = false, bool flipY = false);

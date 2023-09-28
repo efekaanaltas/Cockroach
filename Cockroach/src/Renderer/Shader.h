@@ -11,8 +11,7 @@ namespace Cockroach
 	class Shader
 	{
 	public:
-		Shader(const std::string& filepath);
-		Shader(const std::string& vertexSrc, const std::string& fragmentSrc);
+		Shader(const std::string& vertexFilename, const std::string& fragmentFilename);
 		~Shader();
 
 		void Bind() const;
@@ -30,7 +29,6 @@ namespace Cockroach
 		void UploadUniformMat4(const std::string& name, const mat4& matrix);
 	private:
 		std::string ReadFile(const std::string& filepath);
-		std::unordered_map<GLenum, std::string> PreProcess(const std::string& source);
 		void Compile(const std::unordered_map<GLenum, std::string>& shaderSources);
 	private:
 		u32 rendererID;

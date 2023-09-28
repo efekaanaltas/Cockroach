@@ -37,7 +37,7 @@ void EditorCursor::Update()
 						selectedEntity = ent;
 					}
 			if (!Input::IsPressed(CR_KEY_LEFT_CONTROL) && !entityOverCursor)
-				Room::current->AddEntity(CreateEntity(EntityDefinition(entityType, false, WorldPositionSnapped(), {1,1})));
+				Room::current->AddEntity(CreateEntity(EntityDefinition(entityType, false, WorldPositionSnapped(), {8,8})));
 			else if (Input::IsPressed(CR_KEY_LEFT_CONTROL) && entityOverCursor)
 				Room::current->RemoveEntity(entityOverCursor);
 			break;

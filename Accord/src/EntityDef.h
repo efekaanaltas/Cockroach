@@ -178,10 +178,9 @@ namespace Entities
 			: Dynamic(position, ZEROi, size, true, true)
 		{}
 
-		Timer igniteTimer = Timer(1.0f, seconds, false);
 		Timer flashTimer = Timer(0.3f, seconds, false);
 
-		float ignition;
+		float ignition = 0.0f;
 
 		CustomUpdate;
 		CustomRender;
@@ -272,7 +271,7 @@ namespace Entities
 
 		Tween<int2> transitionTween;
 
-		Rect Bounds() { return Rect((float2)camera.GetPosition() - float2(aspectRatio * zoom, zoom), { (float2)camera.GetPosition() + float2(aspectRatio * zoom, zoom) }); }
+		Rect Bounds(int enlarge = 0) { return Rect((float2)camera.GetPosition() - float2(aspectRatio * zoom, zoom), { (float2)camera.GetPosition() + float2(aspectRatio * zoom, zoom) }); }
 		int2 RoomBoundedPosition();
 	};
 

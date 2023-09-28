@@ -1,6 +1,7 @@
 #include "crpch.h"
 #include "Timer.h"
 #include "../Core/Application.h"
+#include "Cockroach.h"
 
 namespace Cockroach
 {
@@ -17,8 +18,11 @@ namespace Cockroach
 	{
 		switch (type)
 		{
-		case TimerType::seconds: return 0.0f;//Application::Get().time_;
+		case TimerType::seconds: return time;
+		case TimerType::frames: return frameCount;
+		case TimerType::secondsUnscaled: return timeUnscaled;
 		}
+		return 99999999999.9f;
 	}
 
 	bool Timer::Finished(bool autoReset) 

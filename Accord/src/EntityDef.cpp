@@ -489,14 +489,14 @@ namespace Entities
 			Game::player->Die();
 		}
 
+		color.a = 1.0f;
 		overlayColor = RED;
-		overlayWeight = lerp(0.0f, 1.0f, igniteTimer.Progress01());
+		overlayWeight = lerp(0.0f, 1.0f, ignition);
 		
-		if (igniteTimer.Progress01() > 0.7f)
+		if (ignition > 0.7f)
 		{
 			overlayWeight = fmod(time, 0.2f) < 0.15f ? 1.0f : 0.0f;
 		}
-
 
 		if (!flashTimer.Finished(false))
 		{

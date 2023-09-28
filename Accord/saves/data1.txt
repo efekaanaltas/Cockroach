@@ -1,3 +1,3 @@
 PlayerPosX: 281, PlayerPosY: 104, 
-Fullscreen: 0, 
+Fullscreen: 1, 
 MutedMaster: 1, MutedSFX: 1, MutedMusic: 1, 

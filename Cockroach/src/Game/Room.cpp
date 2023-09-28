@@ -42,21 +42,25 @@ namespace Cockroach
 		for (int i = 0; i < (width+1) * (height+1); i++)
 		{
 			int2 roomPos = { i % (width + 1), i / (width + 1) };
-			Rect tileRect = Rect(RoomToWorldPosition(roomPos)+4*LEFTi, RoomToWorldPosition(roomPos)+4*RIGHTi);
-			if (tileUVs[i] != invalidUV)
+			Rect tileRect = Rect(RoomToWorldPosition(roomPos)-4*ONEi, RoomToWorldPosition(roomPos)+4*ONEi);
+			if (tileUVs[i] != invalidUV && cameraBounds.OverlapsWith(tileRect))
 			{
 				Sprite sprite = Sprite::CreateFromCoords(tilemapTexture, tileUVs[i], {8,8});
 				Renderer::DrawQuad(float3(RoomToWorldPosition(roomPos), 0)-float3(4,4,0), {8,8}, sprite, WHITE, {0,0,0,0}, false, false);
 			}
-			if (backgroundTileUVs[i] != invalidUV)
+			if (backgroundTileUVs[i] != invalidUV && cameraBounds.OverlapsWith(tileRect))
 			{
 				Sprite sprite = Sprite::CreateFromCoords(tilemapTexture, backgroundTileUVs[i], { 8,8 });
 				Renderer::DrawQuad(float3(RoomToWorldPosition(roomPos), -5) - float3(4, 4, 0), { 8,8 }, sprite, WHITE, { 0,0,0,0 }, false, false);
 			}
 		}
 		for (int i = 0; i < entities.size(); i++)
-			//if(cameraBounds.OverlapsWith(entities[i]->SpriteBounds()))
+		{
+			Rect r = entities[i]->SpriteBounds();
+			//Renderer::DrawQuadOutline(r.min.x, r.max.x, r.min.y, r.max.y, CYAN);
+			if(cameraBounds.OverlapsWith(entities[i]->SpriteBounds()))
 				entities[i]->Render();
+		}
 	}
 
 	void Room::AddEntity(Entity* entity)

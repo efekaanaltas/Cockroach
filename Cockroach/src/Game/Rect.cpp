@@ -33,4 +33,9 @@ namespace Cockroach
 	{
 		return { (min.x + max.x) / 2, (min.y + max.y) / 2 };
 	}
+
+	Rect Rect::Extend(int amount)
+	{
+		return Rect(min - amount*ONEi, max + amount*ONEi);
+	}
 }

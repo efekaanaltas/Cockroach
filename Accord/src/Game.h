@@ -42,6 +42,7 @@ public:
 	static Entities::Particles* particles;
 
 	static Ref<Framebuffer> framebuffer;
+	static Ref<Framebuffer> distortionFramebuffer;
 	static Ref<Texture2D> baseSpriteSheet;
 	static Ref<Texture2D> tilemapSheet;
 	static Ref<Texture2D> background;
@@ -55,7 +56,7 @@ public:
 
 	static bool editMode;
 private:
-	static Timer freezeTimer;
+	Timer freezeTimer = Timer(0.0f, frames, true);
 
 	bool renderGrid = false;
 	bool renderHitboxes = false;

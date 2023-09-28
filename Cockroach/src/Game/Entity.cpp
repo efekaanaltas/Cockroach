@@ -45,7 +45,7 @@ namespace Cockroach
 
 	Rect Entity::SpriteBounds()
 	{
-		return Rect(position, position + int2(sprite.XSize(), sprite.YSize()));
+		return Rect(position, position + int2(sprite.XSize()*size.x/8, sprite.YSize()*size.y/8));
 	}
 
 	EntityDefinition::EntityDefinition(std::stringstream& definition)

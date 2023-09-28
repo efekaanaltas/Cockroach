@@ -18,6 +18,7 @@ Player* Game::player = nullptr;
 Entities::Particles* Game::particles = nullptr;
 
 Ref<Framebuffer> Game::framebuffer = nullptr;
+Ref<Framebuffer> Game::distortionFramebuffer = nullptr;
 Ref<Texture2D> Game::baseSpriteSheet = nullptr;
 Ref<Texture2D> Game::tilemapSheet = nullptr;
 Ref<Texture2D> Game::background = nullptr;
@@ -27,14 +28,13 @@ std::vector<Sprite> Game::decorationSprites;
 
 std::vector<Ref<Room>> Game::rooms;
 
-Timer Game::freezeTimer = Timer(0.0f);
-
 bool Game::editMode = true;
 
 Game::Game()
 	: Application()
 {
 	Game::framebuffer = CreateRef<Framebuffer>(320, 180);
+	Game::distortionFramebuffer = CreateRef<Framebuffer>(320, 180);
 	Game::background = CreateRef<Texture2D>("assets/textures/BG_RED.png");
 	Game::baseSpriteSheet = CreateRef<Texture2D>("assets/textures/SpriteSheet.png");
 	Game::tilemapSheet = CreateRef<Texture2D>("assets/textures/Tilemaps.png");
@@ -182,7 +182,8 @@ void Game::Render()
 	{
 		if (renderHitboxes && ent->type >= EntityType::TurbineLeft && ent->type <= EntityType::TurbineUp)
 		{
-			Renderer::DrawQuadOutline(ent->As<Turbine>()->turbineRect.min.x, ent->As<Turbine>()->turbineRect.max.x, ent->As<Turbine>()->turbineRect.min.y, ent->As<Turbine>()->turbineRect.max.y, GREEN);
+			Rect r = ent->As<Turbine>()->turbineRect;
+			Renderer::DrawQuadOutline(r.min.x, r.max.x, r.min.y, r.max.y, GREEN);
 		}
 	}
 
@@ -190,26 +191,23 @@ void Game::Render()
 
 	Renderer::EndScene();
 
-	static Ref<Framebuffer> brightnessThreshold = CreateRef<Framebuffer>(framebuffer->width, framebuffer->height, true);
-	Renderer::BrightnessHighPass(framebuffer, brightnessThreshold, 0.7f);
-
 	static Ref<Framebuffer> copy1 = CreateRef<Framebuffer>(framebuffer->width / 2, framebuffer->height / 2, true);
-	Renderer::Copy(brightnessThreshold, copy1);
+	Renderer::BloomPrefilter(framebuffer, copy1, 0.3f);
 
 	static Ref<Framebuffer> copy2 = CreateRef<Framebuffer>(copy1->width / 2, copy1->height / 2, true);
-	Renderer::Copy(copy1, copy2);
+	Renderer::BloomDownsample(copy1, copy2);
 
 	static Ref<Framebuffer> copy3 = CreateRef<Framebuffer>(copy2->width / 2, copy2->height / 2, true);
-	Renderer::Copy(copy2, copy3);
+	Renderer::BloomDownsample(copy2, copy3);
 
 	static Ref<Framebuffer> up1 = CreateRef<Framebuffer>(framebuffer->width, framebuffer->height, true);
-	Renderer::Add(copy3, copy2, up1);
+	Renderer::BloomUpsample(copy3, copy2, up1);
 
 	static Ref<Framebuffer> up2 = CreateRef<Framebuffer>(framebuffer->width, framebuffer->height, true);
-	Renderer::Add(up1, copy1, up2);
+	Renderer::BloomUpsample(up1, copy1, up2);
 
 	static Ref<Framebuffer> up3 = CreateRef<Framebuffer>(framebuffer->width, framebuffer->height, false);
-	Renderer::Add(up2, framebuffer, up3);
+	Renderer::BloomUpsample(up2, framebuffer, up3);
 
 	Cockroach::Window& window = Application::Get().GetWindow();
 	Renderer::OnWindowResize(window.width, window.height);
@@ -217,7 +215,9 @@ void Game::Render()
 	if (!editMode)
 	{
 		//framebuffer->Unbind();
-		Renderer::BlitToScreen(up3);
+		static Ref<Framebuffer> h = CreateRef<Framebuffer>(window.width, window.height, false);
+		Renderer::Distortion(up3, distortionFramebuffer, h);
+		Renderer::BlitToScreen(h);
 
 		Application::ImGuiBegin();
 		ExampleGameUI();
@@ -532,8 +532,8 @@ void Game::RenderHitboxes()
 }
 
 void Game::Freeze(int frames)
-{
-	freezeTimer = Timer(frames);
+{   // Find a better way to do this...
+	dynamic_cast<Game&>(Application::Get()).freezeTimer = Timer(frames, TimerType::frames);
 }
 
 void Game::SaveSprites()

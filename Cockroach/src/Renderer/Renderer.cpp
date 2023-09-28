@@ -44,9 +44,10 @@ namespace Cockroach
 		LineVertex* LineVBPtr = nullptr;
 
 		Ref<Shader> PostProcessingShader;
-		Ref<Shader> BrightnessHighPass;
-		Ref<Shader> CopyShader;
-		Ref<Shader> AddShader;
+		Ref<Shader> BloomPrefilter;
+		Ref<Shader> BloomDownsample;
+		Ref<Shader> BloomUpsample;
+		Ref<Shader> Distortion;
 
 		mat4 ViewProjectionMatrix;
 
@@ -55,6 +56,8 @@ namespace Cockroach
 	};
 
 	static RendererData data;
+
+
 
 	void Renderer::Init()
 	{
@@ -104,7 +107,7 @@ namespace Cockroach
 		for (int i = 0; i < data.MaxTextureSlots; i++)
 			samplers[i] = i;
 
-		data.QuadShader = CreateRef<Shader>("assets/shaders/Texture.glsl");
+		data.QuadShader = CreateRef<Shader>("Texture", "Texture");
 		data.QuadShader->UploadUniformIntArray("u_Textures", samplers, data.MaxTextureSlots);
 
 		// Lines
@@ -119,12 +122,13 @@ namespace Cockroach
 		data.LineVA->AddVertexBuffer(data.LineVB);
 		data.LineVBBase = new LineVertex[data.BatchVertexCount];
 
-		data.LineShader = CreateRef<Shader>("assets/shaders/Line.glsl");
+		data.LineShader = CreateRef<Shader>("Line", "Line");
 
-		data.PostProcessingShader = CreateRef<Shader>("assets/shaders/PostProcessing.glsl");
-		data.BrightnessHighPass	  = CreateRef<Shader>("assets/shaders/BrightnessHighPass.glsl");
-		data.CopyShader			  = CreateRef<Shader>("assets/shaders/Copy.glsl");
-		data.AddShader			  = CreateRef<Shader>("assets/shaders/Add.glsl");
+		data.PostProcessingShader = CreateRef<Shader>("Screen", "PostProcessing");
+		data.BloomPrefilter = CreateRef<Shader>("Screen", "Prefilter13Tap");
+		data.BloomDownsample = CreateRef<Shader>("Screen", "Downsample13Tap");
+		data.BloomUpsample = CreateRef<Shader>("Screen", "UpsampleTent");
+		data.Distortion = CreateRef<Shader>("Screen", "Distortion");
 	}
 
 	void Renderer::Shutdown()
@@ -160,27 +164,41 @@ namespace Cockroach
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-	void Renderer::Copy(Ref<Framebuffer> src, Ref<Framebuffer> dst)
+	void Renderer::BloomDownsample(Ref<Framebuffer> src, Ref<Framebuffer> dst)
 	{
 		glDisable(GL_DEPTH_TEST);
 		dst->Bind();
 		glViewport(0, 0, dst->width, dst->height);
-		data.CopyShader->Bind();
+		data.BloomDownsample->Bind();
 		glBindTexture(GL_TEXTURE_2D, src->colorAttachment);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		dst->Unbind();
 	}
 
-	void Renderer::Add(Ref<Framebuffer> src1, Ref<Framebuffer> src2, Ref<Framebuffer> dst)
+	void Renderer::BloomUpsample(Ref<Framebuffer> src1, Ref<Framebuffer> src2, Ref<Framebuffer> dst)
 	{
 		glDisable(GL_DEPTH_TEST);
 		dst->Bind();
 		glViewport(0, 0, dst->width, dst->height);
-		data.AddShader->Bind();
+		data.BloomUpsample->Bind();
 		int samplers[2] = { 0,1 };
-		data.AddShader->UploadUniformIntArray("u_Textures", samplers, 2);
+		data.BloomUpsample->UploadUniformIntArray("u_Textures", samplers, 2);
 		glBindTextureUnit(0, src1->colorAttachment);
 		glBindTextureUnit(1, src2->colorAttachment);
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		dst->Unbind();
+	}
+
+	void Renderer::Distortion(Ref<Framebuffer> colorSrc, Ref<Framebuffer> distortionSrc, Ref<Framebuffer> dst)
+	{
+		glDisable(GL_DEPTH_TEST);
+		dst->Bind();
+		glViewport(0, 0, dst->width, dst->height);
+		data.Distortion->Bind();
+		int samplers[2] = { 0,1 };
+		data.Distortion->UploadUniformIntArray("u_Textures", samplers, 2);
+		glBindTextureUnit(0, colorSrc->colorAttachment);
+		glBindTextureUnit(1, distortionSrc->colorAttachment);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		dst->Unbind();
 	}
@@ -247,13 +265,13 @@ namespace Cockroach
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	}
 
-	void Renderer::BrightnessHighPass(Ref<Framebuffer> src, Ref<Framebuffer> dst, float threshold)
+	void Renderer::BloomPrefilter(Ref<Framebuffer> src, Ref<Framebuffer> dst, float threshold)
 	{
 		glDisable(GL_DEPTH_TEST);
 		dst->Bind();
 		glViewport(0, 0, dst->width, dst->height);
-		data.BrightnessHighPass->Bind();
-		data.BrightnessHighPass->UploadUniformFloat("brightnessThreshold", threshold);
+		data.BloomPrefilter->Bind();
+		data.BloomPrefilter->UploadUniformFloat("brightnessThreshold", threshold);
 		glBindTexture(GL_TEXTURE_2D, src->colorAttachment);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		dst->Unbind();

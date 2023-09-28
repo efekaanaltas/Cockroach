@@ -19,5 +19,7 @@ namespace Cockroach
 		bool Contains(int2 coord) const;
 
 		int2 Center() const;
+
+		Rect Extend(int amount);
 	};
 }
