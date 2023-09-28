@@ -53,19 +53,21 @@ namespace Cockroach
 		{
 			const float frameTime = 1 / 60.0f;
 			static float accumulatedDelta = 0.0f;
-			float time = (float)glfwGetTime();
-			float dt = (time - lastFrameTime);
-			accumulatedDelta += dt;
-			lastFrameTime = time;
+			timeUnscaled_ = (float)glfwGetTime();
+			dtUnscaled_ = (timeUnscaled_ - lastFrameTime);
+			accumulatedDelta += dtUnscaled_;
+			lastFrameTime = timeUnscaled_;
 
 			if (!minimized)
 			{
-				if (accumulatedDelta > frameTime)
+				while (accumulatedDelta > frameTime)
 				{
 					accumulatedDelta -= frameTime;
-					dt = frameTime;
-					frameCount++;
-					Update(dt);
+					dtUnscaled_ = frameTime;
+					dt_ = dtUnscaled_ * timeScale;
+					time_ += dt_; // I know this is a bit crowded and messy at the moment, but all I want is results for now.
+					frameCount_++;
+					Update();
 					Input::Update();
 				}
 				Render();

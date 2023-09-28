@@ -22,7 +22,7 @@ class Game : public Cockroach::Application
 public:
 	Game();
 
-	virtual void Update(float dt) override;
+	virtual void Update() override;
 	virtual void Render() override;
 	void ImGuiRender();
 	void ExampleGameUI();

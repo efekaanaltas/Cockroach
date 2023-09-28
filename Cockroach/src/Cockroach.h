@@ -29,3 +29,9 @@
 #include "Game/Rect.h"
 #include "Game/Tween.h"
 // ----------------------------------------
+
+#define time Application::Get().time_
+#define timeUnscaled Application::Get().timeUnscaled_
+#define dt Application::Get().dt_
+#define dtUnscaled Application::Get().dtUnscaled_
+#define frameCount Application::Get().frameCount_

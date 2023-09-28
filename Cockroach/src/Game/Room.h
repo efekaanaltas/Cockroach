@@ -29,8 +29,8 @@ namespace Cockroach
 		std::vector<Entity*> entities;
 
 		void Reset();
-		void Update(float dt);
-		void Render(Ref<Texture2D> tilemapTexture);
+		void Update();
+		void Render(Ref<Texture2D> tilemapTexture, Rect cameraBounds);
 
 		void AddEntity(Entity* entity);
 		void RemoveEntity(Entity* entity);

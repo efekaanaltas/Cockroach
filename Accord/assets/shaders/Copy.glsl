@@ -33,10 +33,5 @@ uniform sampler2D u_Texture;
 
 void main()
 {
-	//ivec2 size = textureSize(u_Texture, 0);
-
-    //float uv_x = v_TexCoord.x * size.x;
-    //float uv_y = v_TexCoord.y * size.y;
-
     color = texture(u_Texture, v_TexCoord);
 }

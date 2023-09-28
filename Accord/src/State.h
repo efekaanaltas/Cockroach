@@ -15,7 +15,7 @@ namespace Entities
 	{
 	public:
 		virtual void Enter(T* obj) {};
-		virtual State<T>* Update(T* obj, float dt) { return nullptr; }
+		virtual State<T>* Update(T* obj) { return nullptr; }
 		virtual void Exit(T* obj) {};
 	};
 
@@ -26,7 +26,7 @@ namespace Entities
 		float maxWalkSpeed = 60.0f, acceleration = 400.0f, deceleration = 1000.0f, airDeceleration = 700.0f;
 
 		virtual void Enter(Player* player) override;
-		virtual State<Player>* Update(Player* player, float dt) override;
+		virtual State<Player>* Update(Player* player) override;
 	};
 
 	class JumpingState : public WalkingState
@@ -42,7 +42,7 @@ namespace Entities
 		{}
 
 		virtual void Enter(Player* player) override;
-		virtual State<Player>* Update(Player* player, float dt) override;
+		virtual State<Player>* Update(Player* player) override;
 	};
 
 	class ClingingState : public State<Player>
@@ -53,7 +53,7 @@ namespace Entities
 		float jumpExhaustionTime = 0.1f;
 
 		virtual void Enter(Player* player) override;
-		virtual State<Player>* Update(Player* player, float dt) override;
+		virtual State<Player>* Update(Player* player) override;
 	};
 
 	class DashingState : public State<Player>
@@ -68,7 +68,7 @@ namespace Entities
 		{}
 	
 		virtual void Enter(Player* player) override;
-		virtual State<Player>* Update(Player* player, float dt) override;
+		virtual State<Player>* Update(Player* player) override;
 		virtual void Exit(Player* player) override;
 	};
 
@@ -80,7 +80,7 @@ namespace Entities
 		float airRollAcceleration = 50.0f;
 
 		virtual void Enter(Player* player) override;
-		virtual State<Player>* Update(Player* player, float dt) override;
+		virtual State<Player>* Update(Player* player) override;
 		virtual void Exit(Player* player) override;
 	};
 }

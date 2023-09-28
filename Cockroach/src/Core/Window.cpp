@@ -89,5 +89,5 @@ namespace Cockroach
 			glfwSetWindowMonitor(GLFWWindow, nullptr, pos.x, pos.y, width/2, height/2, 0);
 
 		this->fullscreen = !this->fullscreen;
-	}	
+	}
 }

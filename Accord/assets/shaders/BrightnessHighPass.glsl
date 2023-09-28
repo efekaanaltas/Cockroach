@@ -40,8 +40,11 @@ float brightness(vec3 color)
 void main()
 {
     vec4 texCol = texture(u_Texture, v_TexCoord);
-    if(brightness(texCol.rgb) >= brightnessThreshold)
-        color = texCol;
-    else
-        color = vec4(0.0,0.0,0.0,1.0);
+
+    color = vec4(texCol.rgb*clamp(((brightness(texCol.rgb)-brightnessThreshold)/(1-brightnessThreshold)), 0.0, 1.0), texCol.a);
+
+    //if(brightness(texCol.rgb) >= brightnessThreshold)
+    //    color = texCol;
+    //else
+    //    color = vec4(0.0,0.0,0.0,1.0);
 }

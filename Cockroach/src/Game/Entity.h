@@ -3,6 +3,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include "Renderer/Texture.h"
+#include "Rect.h"
 
 namespace Cockroach
 {
@@ -43,7 +44,7 @@ namespace Cockroach
 		bool flipX = false, flipY = false;
 
 		virtual void Reset() {};
-		virtual void Update(float dt) {}
+		virtual void Update() {}
 		virtual void Render();
 		virtual void RenderInspectorUI();
 
@@ -51,6 +52,8 @@ namespace Cockroach
 
 		template<typename T>
 		T* As();
+
+		Rect SpriteBounds();
 
 		bool operator==(const Entity& other) { return ID == other.ID; }
 		bool operator!=(const Entity& other) { return ID != other.ID; }

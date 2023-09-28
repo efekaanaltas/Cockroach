@@ -31,17 +31,18 @@ namespace Cockroach
 			entities[i]->Reset();
 	}
 
-	void Room::Update(float dt)
+	void Room::Update()
 	{
 		for (int i = 0; i < entities.size(); i++)
-			entities[i]->Update(dt);
+			entities[i]->Update();
 	}
 
-	void Room::Render(Ref<Texture2D> tilemapTexture)
+	void Room::Render(Ref<Texture2D> tilemapTexture, Rect cameraBounds)
 	{
 		for (int i = 0; i < (width+1) * (height+1); i++)
 		{
 			int2 roomPos = { i % (width + 1), i / (width + 1) };
+			Rect tileRect = Rect(RoomToWorldPosition(roomPos)+4*LEFTi, RoomToWorldPosition(roomPos)+4*RIGHTi);
 			if (tileUVs[i] != invalidUV)
 			{
 				Sprite sprite = Sprite::CreateFromCoords(tilemapTexture, tileUVs[i], {8,8});
@@ -54,7 +55,8 @@ namespace Cockroach
 			}
 		}
 		for (int i = 0; i < entities.size(); i++)
-			entities[i]->Render();
+			//if(cameraBounds.OverlapsWith(entities[i]->SpriteBounds()))
+				entities[i]->Render();
 	}
 
 	void Room::AddEntity(Entity* entity)

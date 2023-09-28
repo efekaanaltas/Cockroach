@@ -1,20 +1,37 @@
 #include "crpch.h"
 #include "Timer.h"
+#include "../Core/Application.h"
 
 namespace Cockroach
 {
-	Timer::Timer(float duration)
-	: duration(duration), remainingTime(duration)
-	{}
-
-	void Timer::Tick(float dt)
+	Timer::Timer(float duration, TimerType type, bool initializeFinished)
+	: type(type), duration(duration)
 	{
-		if (Finished()) return;
-		remainingTime -= dt;
+		if (initializeFinished)
+			finishTime = Time();
+		else
+			finishTime = Time() + duration;
 	}
 
-	bool Timer::Finished() { return remainingTime <= 0; }
-	float Timer::ElapsedTime() { return duration - remainingTime; }
-	float Timer::Progress01() { return (duration - remainingTime) / duration; }
-	void Timer::Reset() { remainingTime = duration; }
+	float Timer::Time()
+	{
+		switch (type)
+		{
+		case TimerType::seconds: return 0.0f;//Application::Get().time_;
+		}
+	}
+
+	bool Timer::Finished(bool autoReset) 
+	{
+		if (Time() < finishTime) return false;
+		if (autoReset) Reset();
+
+		return true;
+	}
+
+	float Timer::RemainingTime() { return std::clamp(finishTime - Time(), 0.0f, duration); }
+	float Timer::ElapsedTime() { return duration - RemainingTime(); }
+	float Timer::Progress01() { return (duration - RemainingTime()) / duration; }
+	void Timer::Reset() { finishTime = Time() + duration; }
+	void Timer::ForceFinish() { finishTime = Time(); }
 }

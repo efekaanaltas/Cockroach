@@ -16,7 +16,7 @@ namespace Cockroach
 
 		void Run();
 		
-		virtual void Update(float dt) = 0;
+		virtual void Update() = 0;
 		virtual void Render() = 0;
 
 		void OnQuit();
@@ -30,9 +30,14 @@ namespace Cockroach
 		inline Window& GetWindow() { return *window; }
 		
 		inline static Application& Get() { return *s_Instance; }
-		inline static float Time() { return (float)glfwGetTime(); }
 		
-		int frameCount = 0;
+		float time_ = 0;
+		float dt_ = 0;
+		float timeUnscaled_ = 0;
+		float dtUnscaled_ = 0;
+		int frameCount_ = 0;
+
+		float timeScale = 1.0f;
 	private:
 		Window* window;
 		bool running = true;

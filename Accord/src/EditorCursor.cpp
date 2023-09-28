@@ -9,7 +9,7 @@ int EditorCursor::decorationType = 0;
 bool EditorCursor::isBoxPlacing = false;
 int2 EditorCursor::boxPlaceStartPos = { 0.0f, 0.0f };
 
-void EditorCursor::Update(float dt)
+void EditorCursor::Update()
 {
 	if (Input::IsPressed(CR_MOUSE_BUTTON_MIDDLE))
 	{

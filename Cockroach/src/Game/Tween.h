@@ -22,7 +22,7 @@ namespace Cockroach
         TweenFunc tweenFunc = Linear;
 
         float CalculateTween(float t);
-        T Step(float dt);
+        T Step();
         bool Finished();
     };
 
@@ -49,10 +49,8 @@ namespace Cockroach
     }
 
     template<typename T>
-    T Tween<T>::Step(float dt)
+    T Tween<T>::Step()
     {
-        timer.Tick(dt);
-
         if (timer.Finished())
             return end;
 

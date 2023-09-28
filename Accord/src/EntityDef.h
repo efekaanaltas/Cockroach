@@ -7,7 +7,7 @@ using namespace Cockroach;
 #include "Entities/Particles.h"
 
 #define CustomReset virtual void Reset() override
-#define CustomUpdate virtual void Update(float dt) override
+#define CustomUpdate virtual void Update() override
 #define CustomRender virtual void Render() override
 #define CustomUI virtual void RenderInspectorUI() override
 #define CustomDefinition virtual EntityDefinition GenerateDefinition() override
@@ -23,7 +23,7 @@ struct Sheet
 
 	Sprite CurrentSprite()
 	{
-		int index = (int)std::fmodf(Application::Get().frameCount * framePerSecond / 60.0f, (float)sheet.size());
+		int index = (int)std::fmodf(Application::Get().frameCount_ * framePerSecond / 60.0f, (float)sheet.size());
 		return sheet[index];
 	}
 };
@@ -135,7 +135,7 @@ namespace Entities
 
 		bool active = true;
 		DashType dashType;
-		Timer refreshTimer = Timer(2.0f);
+		Timer refreshTimer = Timer(2.0f, seconds, true);
 
 		Sound absorbSound = Sound("assets/audio/sound1_dontforgettochange.wav");
 
@@ -154,15 +154,14 @@ namespace Entities
 		Attractor(int2 position, int2 hitboxMin, int2 hitboxMax)
 			: Dynamic(position, hitboxMin, hitboxMax, false, false)
 		{
-			dissolveTimer.remainingTime = 0;
 		}
 
 		bool active = true;
 		bool dissolving = false;
 		float attractionRadius = 15.0f;
 		float attraction = 200.0f;
-		Timer dissolveTimer = Timer(0.5f);
-		Timer refreshTimer = Timer(2.0f);
+		Timer dissolveTimer = Timer(0.5f, seconds, false);
+		Timer refreshTimer = Timer(2.0f, seconds, true);
 
 		Sound dissolveSound = Sound("assets/audio/sound2_dontforgettochange.wav");
 
@@ -179,8 +178,10 @@ namespace Entities
 			: Dynamic(position, ZEROi, size, true, true)
 		{}
 
-		Timer igniteTimer = Timer(1.0f);
-		Timer flashTimer = Timer(0.3f);
+		Timer igniteTimer = Timer(1.0f, seconds, false);
+		Timer flashTimer = Timer(0.3f, seconds, false);
+
+		float ignition;
 
 		CustomUpdate;
 		CustomRender;

@@ -2,19 +2,23 @@
 
 namespace Cockroach
 {
+	enum TimerType { seconds, secondsUnscaled, frames };
+
 	class Timer
 	{
 	public:
+		TimerType type;
+		float duration, finishTime;
 
-		float duration, remainingTime;
+		Timer(float duration, TimerType type = TimerType::seconds, bool initializeFinished = false);
 
-		Timer(float duration);
+		float Time();
 
-		void Tick(float dt);
-
-		bool Finished();
+		bool Finished(bool autoReset = false);
+		float RemainingTime();
 		float ElapsedTime();
 		float Progress01();
 		void Reset();
+		void ForceFinish();
 	};
 }

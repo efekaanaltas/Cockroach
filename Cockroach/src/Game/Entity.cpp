@@ -5,6 +5,7 @@
 #include "Renderer/Renderer.h"
 
 #include "imgui.h"
+#include "Rect.h"
 
 namespace Cockroach
 {
@@ -40,6 +41,11 @@ namespace Cockroach
 	{
 		EntityDefinition definition = EntityDefinition(type, false, position, size);
 		return definition;
+	}
+
+	Rect Entity::SpriteBounds()
+	{
+		return Rect(position, position + int2(sprite.XSize(), sprite.YSize()));
 	}
 
 	EntityDefinition::EntityDefinition(std::stringstream& definition)
@@ -80,4 +86,5 @@ namespace Cockroach
 		definition += "\n";
 		return definition;
 	}
+
 }

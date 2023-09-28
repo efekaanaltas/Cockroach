@@ -17,7 +17,7 @@ namespace Entities
 	void ENTITY_TYPE::Reset()
 
 	#define CustomUpdate(ENTITY_TYPE) \
-	void ENTITY_TYPE::Update(float dt)
+	void ENTITY_TYPE::Update()
 
 	#define CustomRender(ENTITY_TYPE) \
 	void ENTITY_TYPE::Render()
@@ -161,7 +161,7 @@ namespace Entities
 
 	CustomUpdate(OscillatorA)
 	{
-		int2 desiredPos = startPos + int2(10*std::cos(Game::Time()), 10*std::sin(Game::Time()));
+		int2 desiredPos = startPos + int2(10*std::cos(time), 10*std::sin(time));
 		float2 move = desiredPos - position;
 		MoveX(move.x);
 		MoveY(move.y);
@@ -203,7 +203,7 @@ namespace Entities
 		{
 			if (isTransitioning)
 			{
-				position = transitionTween.Step(dt);
+				position = transitionTween.Step();
 				if (transitionTween.Finished())
 					isTransitioning = false;
 			}
@@ -282,15 +282,13 @@ namespace Entities
 		: Dynamic(position, hitboxMin, hitboxMax, false, false), dashType(dashType)
 	{
 		solid = false;
-		refreshTimer.remainingTime = 0;
 		overlayColor = WHITE;
 	}
 
 	CustomUpdate(Essence)
 	{
-		if (!active && refreshTimer.Finished())
+		if (!active && refreshTimer.Finished(false))
 			Refresh();
-		else refreshTimer.Tick(dt);
 
 		if (active)
 		{
@@ -344,9 +342,8 @@ namespace Entities
 	{
 		dissolveSound.SetPosition(position);
 
-		if (!active && refreshTimer.Finished())
+		if (!active && refreshTimer.Finished(false))
 			Refresh();
-		else refreshTimer.Tick(dt);
 
 		if (active)
 		{
@@ -369,17 +366,13 @@ namespace Entities
 
 				if (Input::IsDown(CR_KEY_LEFT_SHIFT))
 				{
-					dissolveTimer.remainingTime = 0;
+					dissolveTimer.ForceFinish();
 					Dissolve();
 				}
 			}
 			
-			if (!dissolveTimer.Finished())
-			{
-				dissolveTimer.Tick(dt);
-				if (dissolveTimer.Finished())
-					Dissolve();
-			}
+			if (dissolveTimer.Finished(false))
+				Dissolve();
 		}
 	}
 
@@ -484,14 +477,14 @@ namespace Entities
 	CustomUpdate(Igniter)
 	{
 		if (Game::player->IsRiding(this))
-			igniteTimer.Tick(dt);
+			ignition += dt;
 		else
-			igniteTimer.Tick(-dt);
-		igniteTimer.remainingTime = std::min(igniteTimer.remainingTime, igniteTimer.duration);
+			ignition -= dt;
+		ignition = std::clamp(ignition, 0.0f, 1.0f);
 
-		if (igniteTimer.Finished())
+		if (ignition == 1.0f)
 		{
-			igniteTimer.Reset();
+			ignition = 0.0f;
 			flashTimer.Reset();
 			Game::player->Die();
 		}
@@ -501,29 +494,29 @@ namespace Entities
 		
 		if (igniteTimer.Progress01() > 0.7f)
 		{
-			overlayWeight = fmod(Game::Time(), 0.2f) < 0.15f ? 1.0f : 0.0f;
+			overlayWeight = fmod(time, 0.2f) < 0.15f ? 1.0f : 0.0f;
 		}
 
-		if (!flashTimer.Finished())
+
+		if (!flashTimer.Finished(false))
 		{
-			flashTimer.Tick(dt);
 			overlayColor = WHITE;
 			overlayWeight = lerp(1.0f, 0.0f, flashTimer.Progress01());
 		}
 	}
 
 	MovingPlatform::MovingPlatform(int2 position, int2 size, int2 altPosition)
-		: Carrier(position, ZEROi, size), startPosition(position), endPosition(altPosition), startTime(Game::Time())
+		: Carrier(position, ZEROi, size), startPosition(position), endPosition(altPosition), startTime(time)
 	{}
 
 	CustomReset(MovingPlatform)
 	{
-		startTime = Game::Time();
+		startTime = time;
 	}
 
 	CustomUpdate(MovingPlatform)
 	{
-		float elapsedTime = Game::Time() - startTime;
+		float elapsedTime = time - startTime;
  		int2 desiredPos = lerp(startPosition, endPosition, (std::sin(elapsedTime)+1)/2.0f );
 		MoveTo(desiredPos);
 	}
@@ -554,7 +547,7 @@ namespace Entities
 		}
 
 		if(!moveTween.Finished())
-			MoveTo(moveTween.Step(dt));
+			MoveTo(moveTween.Step());
 
 		playerWasDashingLastFrame = playerIsDashingThisFrame;
 	}

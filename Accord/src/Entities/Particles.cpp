@@ -4,7 +4,7 @@
 namespace Entities
 {
 	Particle::Particle(float2 position, float2 velocity, float duration, float4 color)
-		: position(position), velocity(velocity), deathTime(Game::Time()+duration), color(color)
+		: position(position), velocity(velocity), deathTime(time+duration), color(color)
 	{
 		
 	}
@@ -19,7 +19,7 @@ namespace Entities
 	{
 		position = RandomBetweenValues(positionA, positionB);
 		velocity = RandomBetweenValues(velocityA, velocityB);
-		deathTime = Game::Time() + random(std::min(durationA, durationB), std::max(durationA, durationB));
+		deathTime = time + random(std::min(durationA, durationB), std::max(durationA, durationB));
 		color = RandomBetweenValues(colorA, colorB);
 	}
 
@@ -28,11 +28,11 @@ namespace Entities
 		pixel = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 2,0 }, { 1,1 }); // The second pixel in the base texture is pure white so let's just use that
 	}
 
-	void Particles::Update(float dt)
+	void Particles::Update()
 	{
 		for (auto& particle : particles)
 		{
-			if (Game::Time() < particle.deathTime)
+			if (time < particle.deathTime)
 				particle.position += particle.velocity * dt;
 			else break;
 		}
@@ -42,7 +42,9 @@ namespace Entities
 	{
 		for (auto& particle : particles)
 		{
-			if (Game::Time() < particle.deathTime)
+			Rect pixelRect = Rect(particle.position, (int2)particle.position + RIGHTi);
+			if(Game::cameraController->Bounds().OverlapsWith(pixelRect)) continue;
+			if (time < particle.deathTime)
 				Renderer::DrawQuad(glm::floor(float3(particle.position.x, particle.position.y, 10.0f)), { 1,1 }, pixel.texture, pixel.min, pixel.max, particle.color);
 			else break;
 		}
@@ -50,7 +52,7 @@ namespace Entities
 
 	void Particles::Add(const Particle& particle)
 	{
-		if (particles.empty() || particles.back().deathTime > Game::Time())
+		if (particles.empty() || particles.back().deathTime > time)
 			particles.push_back(particle);
 		else
 			particles.back() = particle;

@@ -3,11 +3,12 @@
 
 namespace Cockroach
 {
-	#define MA_ASSERT(stmt, message) if(stmt != MA_SUCCESS) \
+	#define MA_ASSERT(stmt, message) {ma_result result = stmt; \
+		if(result != MA_SUCCESS) \
 		{ \
 			CR_CORE_WARN(message); \
 			return; \
-		}
+		}}
 
 	class Audio
 	{

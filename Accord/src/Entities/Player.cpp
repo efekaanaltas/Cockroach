@@ -52,7 +52,6 @@ namespace Entities
 
 		bufferedJumpInput.Cancel();
 		bufferedDashInput.Cancel();
-		gravityHaltTimer.remainingTime = 0.0f;
 
 		checkpointPosition = position;
 
@@ -74,7 +73,7 @@ namespace Entities
 		Renderer::DrawQuadWithOutline(float3(adjustedPosition.x, adjustedPosition.y, 10), adjustedSize, sprite, color, { overlayColor , overlayWeight }, BLACK, flipX, flipY);
 	}
 
-	void Player::Update(float dt)
+	void Player::Update()
 	{
 		bool groundedAtStartOfFrame = grounded;
 		velocityLastFrame = velocity;
@@ -83,13 +82,8 @@ namespace Entities
 		bufferedDashInput.Update();
 
 		if (grounded) coyoteTimer.Reset();
-		else		  coyoteTimer.Tick(1.0f);
 
-		dashRegainTimer.Tick(1.0f);
-		gravityHaltTimer.Tick(1.0f);
-		flashTimer.Tick(1.0f);
-
-		TrySwitchState(currentState->Update(this, dt));
+		TrySwitchState(currentState->Update(this));
 
 		if (lookingForCheckpoint && grounded)
 		{
@@ -107,7 +101,7 @@ namespace Entities
 		MoveY((velocityLastFrame.y + velocity.y) * 0.5f * dt);
 
 		grounded = GetCollision(0, -1); //verticalCollision == -1;
-		if (grounded && dashRegainTimer.Finished() && !canDash) RegainDash();
+		if (grounded && dashRegainTimer.Finished(false) && !canDash) RegainDash();
 
 		if (grounded && !groundedAtStartOfFrame && velocityLastFrame.y < -30.0f) // Use velocityLastFrame because y velocity is set to 0 on ground
 			renderSize.y = 0.6f;

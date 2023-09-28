@@ -7,7 +7,7 @@ class EditorCursor
 public:
 	enum BrushMode { Tile, Entity, Decoration, Room };
 
-	static void Update(float dt);
+	static void Update();
 	static void Render();
 
 	static int2 WorldPosition();

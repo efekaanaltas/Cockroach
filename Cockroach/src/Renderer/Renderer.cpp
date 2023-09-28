@@ -148,7 +148,6 @@ namespace Cockroach
 			float originY = (height - targetHeight) / 2.0f;
 			glViewport(0, originY, width, targetHeight);
 		}
-		glOrtho(-160, 160, -90, 90, -100, 100);
 	}
 
 	void Renderer::SetClearColor(const float4& color)

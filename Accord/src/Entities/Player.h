@@ -13,7 +13,7 @@ class RollingState;
 struct BufferedInput
 {
 	BufferedInput(u16 keycode, int bufferFrames)
-		: keycode(keycode), bufferFramesTimer((float)bufferFrames)
+		: keycode(keycode), bufferFramesTimer((float)bufferFrames, frames, false)
 	{
 	};
 
@@ -24,12 +24,10 @@ struct BufferedInput
 	{
 		if (Input::IsDown(keycode))
 			bufferFramesTimer.Reset();
-		else
-			bufferFramesTimer.Tick(1.0f);
 	}
 
-	void Cancel() { bufferFramesTimer.remainingTime = 0.0f; }
-	bool Active() { return !bufferFramesTimer.Finished(); }
+	void Cancel() { bufferFramesTimer.ForceFinish(); }
+	bool Active() { return !bufferFramesTimer.Finished(false); }
 };
 
 struct DashTrail
@@ -62,7 +60,7 @@ namespace Entities
 	public:
 		Player(int2 position, int2 hitboxMin, int2 hitboxMax);
 
-		virtual void Update(float dt) override;
+		virtual void Update() override;
 		virtual void Render() override;
 
 		int faceDir = 1;
@@ -98,10 +96,10 @@ namespace Entities
 		BufferedInput bufferedJumpInput = BufferedInput(CR_KEY_SPACE, 6);
 		BufferedInput bufferedDashInput = BufferedInput(CR_KEY_LEFT_SHIFT, 20);// 15);
 
-		Timer coyoteTimer = Timer(10.0f);
-		Timer flashTimer = Timer(5.0f);
-		Timer gravityHaltTimer = Timer(10.0f);
-		Timer dashRegainTimer = Timer(4.0f);
+		Timer coyoteTimer = Timer(10.0f, frames);
+		Timer flashTimer = Timer(5.0f, frames);
+		Timer gravityHaltTimer = Timer(10.0f, frames, true);
+		Timer dashRegainTimer = Timer(4.0f, frames);
 
 		Sound dashSound = Sound("assets/audio/Dash.wav");
 		Sound jumpSound = Sound("assets/audio/Jump.wav");

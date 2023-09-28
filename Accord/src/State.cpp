@@ -33,11 +33,11 @@ namespace Entities
 
 	void WalkingState::Enter(Player* player)
 	{
-		player->coyoteTimer.remainingTime = 0.0f;
+		player->coyoteTimer.ForceFinish();
 		player->bufferedJumpInput.Cancel();
 	}
 
-	State<Player>* WalkingState::Update(Player* player, float dt)
+	State<Player>* WalkingState::Update(Player* player)
 	{
 		player->currentSheet = GetWalkingStateSheet(player);
 
@@ -116,16 +116,16 @@ namespace Entities
 		}
 	}
 
-	State<Player>* JumpingState::Update(Player* player, float dt)
+	State<Player>* JumpingState::Update(Player* player)
 	{
-		player->coyoteTimer.remainingTime = 0;
+		player->coyoteTimer.ForceFinish();
 
 		if (Input::IsUp(CR_KEY_SPACE))
 			player->velocity.y = std::min(player->velocity.y, minJumpSpeed);
 		else if (player->velocity.y <= 0)
 			return player->walkingState;
 
-		return WalkingState::Update(player, dt);
+		return WalkingState::Update(player);
 	}
 
 	void ClingingState::Enter(Player* player)
@@ -135,7 +135,7 @@ namespace Entities
 		player->currentSheet = player->clingingSheet;
 	}
 
-	State<Player>* ClingingState::Update(Player* player, float dt)
+	State<Player>* ClingingState::Update(Player* player)
 	{
 		if (!player->WallDir())
 			return player->walkingState;
@@ -188,7 +188,7 @@ namespace Entities
 		Game::Freeze(3);
 	}
 
-	State<Player>* DashingState::Update(Player* player, float dt)
+	State<Player>* DashingState::Update(Player* player)
 	{
 		if (player->bufferedJumpInput.Active() && player->GetCollision(0, -1))
 		{
@@ -207,7 +207,6 @@ namespace Entities
 			return player->walkingState;
 		else
 		{
-			dashTimer.Tick(dt);
 			player->velocity = dashSpeed * dashDir;
 
 			if ((player->currentDashType == Drift) && Input::IsDown(CR_KEY_LEFT_SHIFT))
@@ -272,7 +271,7 @@ namespace Entities
 		player->velocity.x = 100.0f * (player->InputDirX() != 0 ? player->InputDirX() : player->faceDir);
 	}
 
-	State<Player>* RollingState::Update(Player* player, float dt)
+	State<Player>* RollingState::Update(Player* player)
 	{
 		for (int i = 0; i < (player->grounded ? 20 : 5); i++)
 		{

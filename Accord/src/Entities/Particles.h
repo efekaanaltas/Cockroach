@@ -24,7 +24,7 @@ namespace Entities
 	public:
 		Particles();
 
-		virtual void Update(float dt) override;
+		virtual void Update() override;
 		virtual void Render() override;
 
 		void Add(const Particle& particle);

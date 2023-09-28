@@ -85,30 +85,29 @@ Game::Game()
 	sound.Start();
 }
 
-void Game::Update(float dt)
+void Game::Update()
 {
 	if (!freezeTimer.Finished())
 	{
-		freezeTimer.Tick(1.0f);
 		return;
 	}
 
 	if (cameraController->isTransitioning) 
 	{
-		cameraController->Update(dt);
+		cameraController->Update();
 		return;
 	}
 
 	if (!editMode)
 	{
-		player->Update(dt);
-		particles->Update(dt);
+		player->Update();
+		particles->Update();
 	}
 	
-	Room::current->Update(dt);
-	cameraController->Update(dt);
+	Room::current->Update();
+	cameraController->Update();
 
-	EditorCursor::Update(dt);
+	EditorCursor::Update();
 
 	if (Input::IsDown(CR_KEY_TAB))
 	{
@@ -164,7 +163,7 @@ void Game::Render()
 		bool roomVisible = rooms[i]->OverlapsWith(cameraController->Bounds(), 0, 0);
 		if (rooms[i] == Room::current || renderAllRooms || (renderAllVisibleRooms && roomVisible))
 		{
-			rooms[i]->Render(Game::tilemapSheet);
+			rooms[i]->Render(Game::tilemapSheet, cameraController->Bounds());
 
 			if (renderRoomBoundaries)
 			{
@@ -192,7 +191,7 @@ void Game::Render()
 	Renderer::EndScene();
 
 	static Ref<Framebuffer> brightnessThreshold = CreateRef<Framebuffer>(framebuffer->width, framebuffer->height, true);
-	Renderer::BrightnessHighPass(framebuffer, brightnessThreshold, 0.8f);
+	Renderer::BrightnessHighPass(framebuffer, brightnessThreshold, 0.7f);
 
 	static Ref<Framebuffer> copy1 = CreateRef<Framebuffer>(framebuffer->width / 2, framebuffer->height / 2, true);
 	Renderer::Copy(brightnessThreshold, copy1);
@@ -209,32 +208,16 @@ void Game::Render()
 	static Ref<Framebuffer> up2 = CreateRef<Framebuffer>(framebuffer->width, framebuffer->height, true);
 	Renderer::Add(up1, copy1, up2);
 
-	static Ref<Framebuffer> up3 = CreateRef<Framebuffer>(framebuffer->width, framebuffer->height, true);
+	static Ref<Framebuffer> up3 = CreateRef<Framebuffer>(framebuffer->width, framebuffer->height, false);
 	Renderer::Add(up2, framebuffer, up3);
 
 	Cockroach::Window& window = Application::Get().GetWindow();
 	Renderer::OnWindowResize(window.width, window.height);
 
-	static Ref<Framebuffer> displayBuf = up3;
-	if (Input::IsDown(CR_KEY_J))
-		displayBuf = up1;
-	if (Input::IsDown(CR_KEY_K))
-		displayBuf = up2;
-	if (Input::IsDown(CR_KEY_L))
-		displayBuf = up3;
-	if (Input::IsDown(CR_KEY_N))
-		displayBuf = framebuffer;
-	if (Input::IsDown(CR_KEY_Y))
-		displayBuf = copy1;
-	if (Input::IsDown(CR_KEY_U))
-		displayBuf = copy2;
-	if (Input::IsDown(CR_KEY_I))
-		displayBuf = copy3;
-
 	if (!editMode)
 	{
 		//framebuffer->Unbind();
-		Renderer::BlitToScreen(displayBuf);
+		Renderer::BlitToScreen(up3);
 
 		Application::ImGuiBegin();
 		ExampleGameUI();
@@ -270,7 +253,9 @@ void Game::ExampleGameUI()
 
 	int arrSize = sizeof(strings) / sizeof(strings[0]);
 
+	Text("%.3f ms (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
 	TextWrapped(strings[(frame/6)%arrSize].c_str());
+
 
 	End();
 	PopStyleVar(2);
