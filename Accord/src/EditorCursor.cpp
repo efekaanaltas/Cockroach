@@ -60,7 +60,7 @@ void EditorCursor::Update()
 			Room::current->RemoveEntity(decorationOverCursor);
 		else if (!Input::IsPressed(CR_KEY_LEFT_CONTROL))
 		{
-			EntityDefinition decorationDef{ decorationType, true, WorldPosition(), 8 * ONEi };
+			EntityDefinition decorationDef{ decorationType, true, WorldPosition(), ONEi };
 			decorationDef.z = z;
 			Room::current->AddEntity(CreateEntity(decorationDef));
 		}

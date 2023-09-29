@@ -43,7 +43,7 @@ namespace Entities
 		for (auto& particle : particles)
 		{
 			Rect pixelRect = Rect(particle.position, (int2)particle.position + RIGHTi);
-			if(Game::cameraController->Bounds().OverlapsWith(pixelRect)) continue;
+			if(!Game::cameraController->Bounds().OverlapsWith(pixelRect)) continue;
 			if (time < particle.deathTime)
 				Renderer::DrawQuad(glm::floor(float3(particle.position.x, particle.position.y, 10.0f)), { 1,1 }, pixel.texture, pixel.min, pixel.max, particle.color);
 			else break;

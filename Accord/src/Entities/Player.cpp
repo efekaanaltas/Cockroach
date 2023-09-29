@@ -63,17 +63,20 @@ namespace Entities
 
 	void Player::Render()
 	{
-		Renderer::EndScene();
-		Renderer::BeginScene(Game::cameraController->camera);
-;		Game::distortionFramebuffer->Bind();
-		Renderer::Clear();
-		for (int i = 0; i < DashTrail::count; i++)
+		if (!Game::editMode)
 		{
-			Renderer::DrawQuad(float3((float2)dashTrail[i].position, 9), 16.0f * ONE, dashTrail[i].sprite, float4(1.0f, 1.0f, 1.0f, std::pow(dashTrail[i].strength, 3.0f)), float4(-velocity, 0.0f, 0.0f), dashTrail[i].flipX, false);
+			Renderer::EndScene();
+			Renderer::BeginScene(Game::cameraController->camera);
+	;		Game::distortionFramebuffer->Bind();
+			Renderer::Clear();
+			for (int i = 0; i < DashTrail::count; i++)
+			{
+				Renderer::DrawQuad(float3((float2)dashTrail[i].position, 9), 16.0f * ONE, dashTrail[i].sprite, float4(1.0f, 1.0f, 1.0f, std::pow(dashTrail[i].strength, 3.0f)), float4((ONE-glm::normalize(velocity))/2.0f, 0.0f, 1.0f), dashTrail[i].flipX, false);
+			}
+			Renderer::EndScene();
+			Game::framebuffer->Bind();
+			Renderer::BeginScene(Game::cameraController->camera);
 		}
-		Renderer::EndScene();
-		Game::framebuffer->Bind();
-		Renderer::BeginScene(Game::cameraController->camera);
 
 		float2 adjustedPosition = (float2)position + (float2(1, 1) - renderSize) * float2(sprite.XSize() / 2, 0);
 		float2 adjustedSize = { sprite.XSize() * renderSize.x, sprite.YSize() * renderSize.y };

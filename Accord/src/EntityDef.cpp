@@ -354,41 +354,51 @@ namespace Entities
 
 			if (distanceSqr <= attractionRadius*attractionRadius)
 			{
+				dissolve += dt;
 				Game::player->velocity = ZERO;
 				if (delta.x != 0) Game::player->MoveX((delta.x > 0 ? 1 : -1));
 				if (delta.y != 0) Game::player->MoveY((delta.y > 0 ? 1 : -1));
 
 				if (!dissolving)
 				{
-					dissolveTimer.Reset();
+					dissolve = 0.0f;
 					dissolving = true;
 				}
 
-				if (Input::IsDown(CR_KEY_LEFT_SHIFT))
+				if (dissolve > 1.0f || Input::IsDown(CR_KEY_LEFT_SHIFT))
 				{
-					dissolveTimer.ForceFinish();
 					Dissolve();
 				}
 			}
-			
-			if (dissolveTimer.Finished(false))
-				Dissolve();
 		}
 	}
 
 	void Attractor::Dissolve()
 	{
 		refreshTimer.Reset();
-		sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 0,1 }, { 8,8 });
+		color.a = 0.0f;
 		dissolveSound.Start();
 		active = false;
 		dissolving = false;
+
+		for (int i = 0; i < 20; i++)
+		{
+			float randomAngle = random(0.0f, 2 * PI);
+			float2 randomDir = float2(std::cos(randomAngle), std::sin(randomAngle));
+			Game::particles->Add(Particle
+			(
+				(float2)position + randomDir, (float2)position + randomDir,
+				random(50.0f, 70.0f) * randomDir, random(50.0f, 70.0f) * randomDir,
+				0.2f, 0.4f,
+				RED, WHITE)
+			);
+		}
 	}
 
 	void Attractor::Refresh()
 	{
 		overlayWeight = 1.0f;
-		sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 0,0 }, { 8,8 });
+		color.a = 1.0f;
 		active = true;
 	}
 

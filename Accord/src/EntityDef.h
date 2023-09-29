@@ -138,7 +138,7 @@ namespace Entities
 		Timer refreshTimer = Timer(2.0f, seconds, true);
 
 		Sound absorbSound = Sound("assets/audio/sound1_dontforgettochange.wav");
-
+		
 		CustomUpdate;
 		CustomUI;
 
@@ -160,8 +160,9 @@ namespace Entities
 		bool dissolving = false;
 		float attractionRadius = 15.0f;
 		float attraction = 200.0f;
-		Timer dissolveTimer = Timer(0.5f, seconds, false);
+		float dissolve = 0.0f;
 		Timer refreshTimer = Timer(2.0f, seconds, true);
+		ParticleSystem dissolveParticles;
 
 		Sound dissolveSound = Sound("assets/audio/sound2_dontforgettochange.wav");
 
@@ -281,7 +282,7 @@ namespace Entities
 		Decoration(int2 position, int z, int decorationIndex, Sprite sprite)
 			: Entity(position), hitbox(ZEROi, { sprite.XSize(), sprite.YSize() }), decorationIndex(decorationIndex)
 		{
-			size = { sprite.XSize(), sprite.YSize() };
+			//size = { sprite.XSize(), sprite.YSize() };
 			type = -1;
 			this->z = z;
 			this->sprite = sprite;
