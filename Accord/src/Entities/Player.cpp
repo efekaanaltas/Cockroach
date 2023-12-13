@@ -12,7 +12,7 @@ namespace Entities
 		superjumpingState = new JumpingState(90.0f, 135.0f, 200.0f);
 		rolljumpingState = new JumpingState(80.0f, 150.0f, 200.0f);
 		walljumpingState = new JumpingState(90.0f, 100.0f, -180.0);
-		ledgeJumpingState = new JumpingState(80.0f, 80.0f, 0.0f);
+		ledgeJumpingState = new JumpingState(100.0f, 100.0f, 0.0f);
 		clingingState = new ClingingState;
 		dashingState = new DashingState(150.0f, 0.2f);
 		driftingState = new DashingState(150.0f, 100.0f);
@@ -80,7 +80,7 @@ namespace Entities
 
 		float2 adjustedPosition = (float2)position + (float2(1, 1) - renderSize) * float2(sprite.XSize() / 2, 0);
 		float2 adjustedSize = { sprite.XSize() * renderSize.x, sprite.YSize() * renderSize.y };
-		Renderer::DrawQuadWithOutline(float3(adjustedPosition.x, adjustedPosition.y, 10), adjustedSize, sprite, color, { overlayColor , overlayWeight }, BLACK, flipX, flipY);
+		Renderer::DrawQuadWithOutline(float3(adjustedPosition.x, adjustedPosition.y, 10), adjustedSize, sprite, color, { overlayColor , overlayWeight }, BLACK, HasFlag(FlipX), HasFlag(FlipY));
 	}
 
 	void Player::Update()
@@ -123,7 +123,7 @@ namespace Entities
 		renderSize.y = std::clamp(renderSize.y + 2 * dt, 0.0f, 1.0f);
 
 		sprite = currentSheet.CurrentSprite();
-		flipX = faceDir == -1;
+		SetFlag(FlipX, faceDir == -1);
 		float flashProgress = flashTimer.Progress01();
 		overlayColor = WHITE;
 		overlayWeight = std::clamp(-flashProgress * flashProgress + 1, 0.0f, 1.0f);
@@ -139,7 +139,7 @@ namespace Entities
 	// This function as a whole is just weird isn't it?
 	bool Player::OnCollide(Dynamic* other, int horizontal, int vertical)
 	{
-		bool blockCollisions = other ? other->solid : true;
+		bool blockCollisions = other ? other->HasFlag(IsSolid) : true;
 		if (blockCollisions)
 		{
 			// This code seems to be written very early into the entity system.

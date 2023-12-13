@@ -103,6 +103,12 @@ void Game::Update()
 		player->Update();
 		particles->Update();
 	}
+
+	if (Input::IsDown(CR_KEY_O))
+		timeScale += 1;
+	if (Input::IsDown(CR_KEY_P))
+		timeScale -= 1;
+	timeScale = std::max(0.0f, timeScale);
 	
 	Room::current->Update();
 	cameraController->Update();

@@ -7,6 +7,17 @@
 
 namespace Cockroach
 {
+	enum EntityFlags
+	{
+		IsDecoration	= 1<<0,
+		IsCollidable	= 1<<1,
+		IsSolid			= 1<<2,
+		IsCarriable		= 1<<3,
+		FlipX			= 1<<4,
+		FlipY			= 1<<5
+	};
+	DEFINE_ENUM_FLAG_OPERATORS(EntityFlags)
+
 	struct EntityDefinition
 	{
 		int type = 0;
@@ -33,6 +44,8 @@ namespace Cockroach
 		int ID = 0;
 		int type = -1;
 
+		EntityFlags flags = {};
+
 		int2 position;
 		int z = 0;
 		int2 size = { 8, 8 };
@@ -41,12 +54,16 @@ namespace Cockroach
 		float4 color = WHITE;
 		float3 overlayColor = CLEAR;
 		float overlayWeight = 0.0f;
-		bool flipX = false, flipY = false;
 
 		virtual void Reset() {};
 		virtual void Update() {}
 		virtual void Render();
 		virtual void RenderInspectorUI();
+
+		bool HasFlag(EntityFlags flag);
+		void AddFlag(EntityFlags flag);
+		void RemoveFlag(EntityFlags flag);
+		void SetFlag(EntityFlags flag, bool set);
 
 		virtual EntityDefinition GenerateDefinition();
 

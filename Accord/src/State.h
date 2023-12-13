@@ -51,6 +51,7 @@ namespace Entities
 		float reducedGravity = 100.0f;
 		float fallSpeed = 50.0f;
 		float jumpExhaustionTime = 0.1f;
+		float impactSpeed;
 
 		virtual void Enter(Player* player) override;
 		virtual State<Player>* Update(Player* player) override;

@@ -14,7 +14,7 @@ namespace Cockroach
 		coreLogger = spdlog::stdout_color_mt("COCKROACH");
 		coreLogger->set_level(spdlog::level::trace);
 
-		clientLogger = spdlog::stdout_color_mt("APP");
+		clientLogger = spdlog::stdout_color_mt("ACCORD");
 		clientLogger->set_level(spdlog::level::trace);
 	}
 }

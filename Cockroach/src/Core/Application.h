@@ -37,7 +37,7 @@ namespace Cockroach
 		float dtUnscaled_ = 0;
 		int frameCount_ = 0;
 
-		float timeScale = 1.0f;
+		float timeScale_ = 1.0f;
 	private:
 		Window* window;
 		bool running = true;

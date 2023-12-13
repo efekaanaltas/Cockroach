@@ -130,6 +130,8 @@ namespace Entities
 
 	void ClingingState::Enter(Player* player)
 	{
+		impactSpeed = std::abs(player->velocity.x);
+		player->velocity.x = 0;
 		player->velocity.y = 0;
 
 		player->currentSheet = player->clingingSheet;
@@ -147,6 +149,12 @@ namespace Entities
 		{
 			if (player->InputDirY() != -1)
 			{
+				if (impactSpeed > player->walkingState->maxWalkSpeed)
+				{
+					impactSpeed = 0.0f;
+					return player->ledgeJumpingState;
+				}
+
 				int height = 0;
 				while (++height < 8)
 					if (!player->GetCollision(player->faceDir, height) && player->InputDirX() == player->WallDir())
@@ -157,8 +165,13 @@ namespace Entities
 			return player->walljumpingState;
 		}
 
-		player->velocity.y -= reducedGravity * dt;
-		player->velocity.y = std::clamp(player->velocity.y, -fallSpeed/2.0f, 0.0f);
+		if (player->InputDirX() == player->faceDir)
+			player->velocity.y = 0.0f;
+		else
+		{
+			player->velocity.y -= reducedGravity * dt;
+			player->velocity.y = std::clamp(player->velocity.y, -fallSpeed/2.0f, 0.0f);
+		}
 
 		if (player->InputDirX() == -player->faceDir || player->InputDirY() == -1 || player->grounded)
 			return player->walkingState;

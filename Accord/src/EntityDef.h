@@ -36,17 +36,17 @@ namespace Entities
 	{
 	public:
 		Dynamic(int2 position, int2 hitboxMin, int2 hitboxMax, bool solid, bool carriable)
-			: Entity(position), solid(solid), carriable(carriable)
+			: Entity(position)
 		{
 			hitbox = Rect(hitboxMin, hitboxMax);
+			SetFlag(IsSolid, solid);
+			SetFlag(IsCarriable, carriable);
 		}
 
 		CustomUpdate {}
 
 		Rect hitbox;
 		float xRemainder = 0.0f, yRemainder = 0.0f;
-		bool solid = true;
-		bool carriable = false;
 		Dynamic* carrier = nullptr;
 
 		int Left() const { return position.x + hitbox.min.x; }
@@ -63,7 +63,7 @@ namespace Entities
 		virtual void MoveX(float amount);
 		virtual void MoveY(float amount);
 		void MoveTo(int2 pos);
-		virtual bool OnCollide(Dynamic* other, int horizontal, int vertical) { return solid; }
+		virtual bool OnCollide(Dynamic* other, int horizontal, int vertical) { return HasFlag(IsSolid); }
 
 		Dynamic* GetEntityCollision(int xForesense, int yForesense);
 		bool GetTilemapCollision(int xForesense, int yForesense);
@@ -76,7 +76,8 @@ namespace Entities
 	public:
 		Carrier(int2 position, int2 hitboxMin, int2 hitboxMax)
 			: Dynamic(position, hitboxMin, hitboxMax, true, false)
-		{}
+		{
+		}
 
 		virtual void MoveX(float amount) override;
 		virtual void MoveY(float amount) override;

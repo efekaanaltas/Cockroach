@@ -56,8 +56,6 @@ namespace Cockroach
 		}
 		for (int i = 0; i < entities.size(); i++)
 		{
-			Rect r = entities[i]->SpriteBounds();
-			Renderer::DrawQuadOutline(r.min.x, r.max.x, r.min.y, r.max.y, CYAN);
 			if(cameraBounds.OverlapsWith(entities[i]->SpriteBounds()))
 				entities[i]->Render();
 		}

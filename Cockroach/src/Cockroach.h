@@ -35,3 +35,4 @@
 #define dt Application::Get().dt_
 #define dtUnscaled Application::Get().dtUnscaled_
 #define frameCount Application::Get().frameCount_
+#define timeScale Application::Get().timeScale_

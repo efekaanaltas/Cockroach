@@ -64,7 +64,7 @@ namespace Cockroach
 				{
 					accumulatedDelta -= frameTime;
 					dtUnscaled_ = frameTime;
-					dt_ = dtUnscaled_ * timeScale;
+					dt_ = dtUnscaled_ * timeScale_;
 					time_ += dt_; // I know this is a bit crowded and messy at the moment, but all I want is results for now.
 					frameCount_++;
 					Update();

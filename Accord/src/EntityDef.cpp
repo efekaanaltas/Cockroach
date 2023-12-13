@@ -36,34 +36,33 @@ namespace Entities
 		float2 size = { entity->sprite.XSize(), entity->sprite.YSize() };
 		float4 color = entity->color;
 		float4 overlay = { entity->overlayColor, entity->overlayWeight };
-		bool flipX = entity->flipX;
-		bool flipY = entity->flipY;
+		bool flipX = entity->HasFlag(FlipX);
+		bool flipY = entity->HasFlag(FlipY);
 
 		if (w > 1.0f && h > 1.0f)
+		for (int x = 0; x < w; x++)
+		for (int y = 0; y < h; y++)
 		{
-			for (int x = 0; x < w; x++)
-				for (int y = 0; y < h; y++)
-				{
-					int xOffset = (x == 0) ? texCoordOffset.x - 3 : (x == w - 1) ? texCoordOffset.x - 1 : texCoordOffset.x - 2;
-					int yOffset = (y == 0) ? texCoordOffset.y + 1 : (y == h - 1) ? texCoordOffset.y + 3 : texCoordOffset.y + 2;
-					Renderer::DrawQuad(float3(entity->position, entity->z) + float3(8 * x, 8 * y, 0), size, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,yOffset }, { 8,8 }), color, overlay, flipX, flipY);
-				}
-
+			int xOffset = (x == 0) ? texCoordOffset.x - 3 : (x == w - 1) ? texCoordOffset.x - 1 : texCoordOffset.x - 2;
+			int yOffset = (y == 0) ? texCoordOffset.y + 1 : (y == h - 1) ? texCoordOffset.y + 3 : texCoordOffset.y + 2;
+			Renderer::DrawQuad(float3(entity->position, entity->z) + float3(8 * x, 8 * y, 0), size, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,yOffset }, { 8,8 }), color, overlay, flipX, flipY);
 		}
-		else if (w > 1.0f)
-			for (int x = 0; x < w; x++)
-			{
-				int xOffset = (x == 0) ? texCoordOffset.x - 3 : (x == w - 1) ? texCoordOffset.x - 1 : texCoordOffset.x - 2;
-				Renderer::DrawQuad(float3(entity->position, entity->z) + float3(8 * x, 0, 0), size, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,texCoordOffset.y }, { 8,8 }), color, overlay, flipX, flipX);
-			}
+		else if (w > 1.0f) 
+		for (int x = 0; x < w; x++)
+		{
+			int xOffset = (x == 0) ? texCoordOffset.x - 3 : (x == w - 1) ? texCoordOffset.x - 1 : texCoordOffset.x - 2;
+			Renderer::DrawQuad(float3(entity->position, entity->z) + float3(8 * x, 0, 0), size, Sprite::CreateFromCoords(Game::baseSpriteSheet, { xOffset,texCoordOffset.y }, { 8,8 }), color, overlay, flipX, flipX);
+		}
 		else if (h > 1.0f)
-			for (int y = 0; y < h; y++)
-			{
-				int yOffset = (y == 0) ? texCoordOffset.y + 1 : (y == h - 1) ? texCoordOffset.y + 3 : texCoordOffset.y + 2;
-				Renderer::DrawQuad(float3(entity->position, entity->z) + float3(0, 8 * y, 0), size, Sprite::CreateFromCoords(Game::baseSpriteSheet, { texCoordOffset.x,yOffset }, { 8,8 }), color, overlay, flipX, flipY);
-			}
+		for (int y = 0; y < h; y++)
+		{
+			int yOffset = (y == 0) ? texCoordOffset.y + 1 : (y == h - 1) ? texCoordOffset.y + 3 : texCoordOffset.y + 2;
+			Renderer::DrawQuad(float3(entity->position, entity->z) + float3(0, 8 * y, 0), size, Sprite::CreateFromCoords(Game::baseSpriteSheet, { texCoordOffset.x,yOffset }, { 8,8 }), color, overlay, flipX, flipY);
+		}
 		else
+		{
 			Renderer::DrawQuad(float3(entity->position, entity->z), size, Sprite::CreateFromCoords(Game::baseSpriteSheet, texCoordOffset, { 8,8 }), color, overlay, flipX, flipY);
+		}
 	}
 
 	void Dynamic::MoveX(float amount)
@@ -134,12 +133,12 @@ namespace Entities
 		for (auto& ent : Room::current->entities)
 		{
 			if (Dynamic* dyn = ent->As<Dynamic>())
-				if (dyn != this && OverlapsWith(dyn, xForesense, yForesense) && dyn->solid)
+				if (dyn != this && OverlapsWith(dyn, xForesense, yForesense) && dyn->HasFlag(IsSolid))
 					return dyn;
 		}
 
 		// Also check for collisions with player
-		if (Game::player != this && OverlapsWith(Game::player, xForesense, yForesense) && Game::player->solid)
+		if (Game::player != this && OverlapsWith(Game::player, xForesense, yForesense) && Game::player->HasFlag(IsSolid))
 			return Game::player;
 		return nullptr;
 	}
@@ -281,7 +280,7 @@ namespace Entities
 	Essence::Essence(int2 position, int2 hitboxMin, int2 hitboxMax, DashType dashType)
 		: Dynamic(position, hitboxMin, hitboxMax, false, false), dashType(dashType)
 	{
-		solid = false;
+		RemoveFlag(IsSolid);
 		overlayColor = WHITE;
 	}
 
@@ -468,7 +467,7 @@ namespace Entities
 		for (auto& ent : Room::current->entities)
 		{
 			Dynamic* dyn = ent->As<Dynamic>();
-			if (dyn && (dyn != this) && dyn->carriable && dyn->IsRiding(this))
+			if (dyn && (dyn != this) && dyn->HasFlag(IsCarriable) && dyn->IsRiding(this))
 			{
 				dyn->carrier = this;
 				riders.push_back(dyn);
@@ -479,6 +478,7 @@ namespace Entities
 		{
 			Game::player->carrier = this;
 			riders.push_back(Game::player);
+			position.x = 3;
 		}
 
 		return riders;
@@ -579,7 +579,6 @@ namespace Entities
 
 	CustomRender(MovingPlatform)
 	{
-		Renderer::DrawLine(float3(startPosition + hitbox.Center(), 20.0f), float3(endPosition + hitbox.Center(), 20.0f), CYAN);
 		RenderDynamicSizedEntity(this, { 15,2 });
 	}
 

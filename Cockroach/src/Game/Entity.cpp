@@ -23,7 +23,7 @@ namespace Cockroach
 
 	void Entity::Render()
 	{
-		Renderer::DrawQuad(float3(position, z), { sprite.XSize(), sprite.YSize() }, sprite, color, { overlayColor, overlayWeight }, flipX, flipY);
+		Renderer::DrawQuad(float3(position, z), { sprite.XSize(), sprite.YSize() }, sprite, color, { overlayColor, overlayWeight }, HasFlag(FlipX), HasFlag(FlipY));
 	}
 
 	void Entity::RenderInspectorUI()
@@ -35,6 +35,29 @@ namespace Cockroach
 		InputInt("W", &size.x, 8, 8);
 		InputInt("H", &size.y, 8, 8);
 		End();
+	}
+
+	bool Entity::HasFlag(EntityFlags flag)
+	{
+		return flags & flag;
+	}
+
+	void Entity::AddFlag(EntityFlags flag)
+	{
+		flags |= flag;
+	}
+
+	void Entity::RemoveFlag(EntityFlags flag)
+	{
+		flags &= ~flag;
+	}
+
+	void Entity::SetFlag(EntityFlags flag, bool set)
+	{
+		if (set)
+			AddFlag(flag);
+		else
+			RemoveFlag(flag);
 	}
 
 	EntityDefinition Entity::GenerateDefinition()
