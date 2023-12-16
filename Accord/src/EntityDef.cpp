@@ -160,7 +160,7 @@ namespace Entities
 
 	CustomUpdate(OscillatorA)
 	{
-		int2 desiredPos = startPos + int2(10*std::cos(time), 10*std::sin(time));
+		int2 desiredPos = startPos + int2(10*cos(time), 10*sin(time));
 		float2 move = desiredPos - position;
 		MoveX(move.x);
 		MoveY(move.y);
@@ -170,7 +170,7 @@ namespace Entities
 	{
 		for (int i = CR_KEY_1; i <= CR_KEY_3; i++)
 			if (Input::IsDown(i))
-				SetZoom(std::powf(10.0f, (float)(i - CR_KEY_1 + 1)));
+				SetZoom(pow(10.0f, (float)(i - CR_KEY_1 + 1)));
 
 		if (Game::editMode)
 		{			
@@ -190,7 +190,7 @@ namespace Entities
 			speed = zoom; // Change speed according to zoom level
 
 			zoom -= Input::scroll * 0.1f * zoom;
-			zoom = std::clamp(zoom, 5.0f, 1000.0f);
+			zoom = clamp(zoom, 5.0f, 1000.0f);
 
 			//float newAspect = (float)Application::Get().GetWindow//().width / (float)Application::Get().GetWindow().height;
 			//if (aspectRatio != newAspect)
@@ -243,10 +243,10 @@ namespace Entities
 	Turbine::Turbine(int2 position, int2 size, int horizontal, int vertical)
 	: Dynamic(position, int2(0, 0), size, true, true), horizontal(horizontal), vertical(vertical)
 	{
-		int xStart = std::min(position.x, position.x + horizontal * span);
-		int xEnd = std::max(position.x, position.x + horizontal * span) + size.x;
-		int yStart = std::min(position.y, position.y + vertical * span);
-		int yEnd = std::max(position.y, position.y + vertical * span) + size.y;
+		int xStart = min(position.x, position.x + horizontal * span);
+		int xEnd = max(position.x, position.x + horizontal * span) + size.x;
+		int yStart = min(position.y, position.y + vertical * span);
+		int yEnd = max(position.y, position.y + vertical * span) + size.y;
 		turbineRect = Rect({ xStart, yStart }, { xEnd, yEnd });
 
 		airParticles = ParticleSystem
@@ -291,7 +291,7 @@ namespace Entities
 
 		if (active)
 		{
-			overlayWeight = std::clamp(overlayWeight - 4 * dt, 0.0f, 1.0f);
+			overlayWeight = clamp(overlayWeight - 4 * dt, 0.0f, 1.0f);
 
 			if (OverlapsWith(Game::player, 0, 0) && (!Game::player->canDash || dashType != Game::player->currentDashType))
 			{
@@ -310,7 +310,7 @@ namespace Entities
 		for (int i = 0; i < 500; i++)
 		{
 			float randomAngle = random(0.0f, 2*PI);
-			float2 randomDir = float2(std::cos(randomAngle), std::sin(randomAngle));
+			float2 randomDir = float2(cos(randomAngle), sin(randomAngle));
 			Game::particles->Add(Particle
 			(
 				(float2)position + randomDir, (float2)position + randomDir,
@@ -346,7 +346,7 @@ namespace Entities
 
 		if (active)
 		{
-			overlayWeight = std::clamp(overlayWeight - 4 * dt, 0.0f, 1.0f);
+			overlayWeight = clamp(overlayWeight - 4 * dt, 0.0f, 1.0f);
 
 			float2 delta = WorldHitbox().Center() - Game::player->WorldHitbox().Center();
 			float distanceSqr = delta.x*delta.x+delta.y*delta.y;
@@ -383,7 +383,7 @@ namespace Entities
 		for (int i = 0; i < 20; i++)
 		{
 			float randomAngle = random(0.0f, 2 * PI);
-			float2 randomDir = float2(std::cos(randomAngle), std::sin(randomAngle));
+			float2 randomDir = float2(cos(randomAngle), sin(randomAngle));
 			Game::particles->Add(Particle
 			(
 				(float2)position + randomDir, (float2)position + randomDir,
@@ -415,7 +415,7 @@ namespace Entities
 		
 		if (moveX != 0)
 		{
-			std::vector<Dynamic*> riders = GetRiders();
+			vector<Dynamic*> riders = GetRiders();
 
 			xRemainder -= moveX;
 			position.x += moveX;
@@ -442,7 +442,7 @@ namespace Entities
 
 		if (moveY != 0)
 		{
-			std::vector<Dynamic*> riders = GetRiders();
+			vector<Dynamic*> riders = GetRiders();
 
 			yRemainder -= moveY;
 			position.y += moveY;
@@ -461,9 +461,9 @@ namespace Entities
 		}
 	}
 
-	std::vector<Dynamic*> Carrier::GetRiders()
+	vector<Dynamic*> Carrier::GetRiders()
 	{
-		std::vector<Dynamic*> riders;
+		vector<Dynamic*> riders;
 		for (auto& ent : Room::current->entities)
 		{
 			Dynamic* dyn = ent->As<Dynamic>();
@@ -490,7 +490,7 @@ namespace Entities
 			ignition += dt;
 		else
 			ignition -= dt;
-		ignition = std::clamp(ignition, 0.0f, 1.0f);
+		ignition = clamp(ignition, 0.0f, 1.0f);
 
 		if (ignition == 1.0f)
 		{
@@ -527,7 +527,7 @@ namespace Entities
 	CustomUpdate(MovingPlatform)
 	{
 		float elapsedTime = time - startTime;
- 		int2 desiredPos = lerp(startPosition, endPosition, (std::sin(elapsedTime)+1)/2.0f );
+ 		int2 desiredPos = lerp(startPosition, endPosition, (sin(elapsedTime)+1)/2.0f );
 		MoveTo(desiredPos);
 	}
 
@@ -660,9 +660,9 @@ namespace Entities
 
 Cockroach::Entity* Cockroach::CreateEntity(const EntityDefinition& def)
 {
-	auto GetPositionFunc = [](std::stringstream& def) { return int2(GetProperty<int>(def, "X"), GetProperty<int>(def, "Y")); };
-	auto GetSizeFunc = [](std::stringstream& def) { return int2(GetProperty<int>(def, "W"), GetProperty<int>(def, "H")); };
-	auto GetAltPositionFunc = [](std::stringstream& def) { return int2(GetProperty<int>(def, "X1"), GetProperty<int>(def, "Y1")); };
+	auto GetPositionFunc = [](stringstream& def) { return int2(GetProperty<int>(def, "X"), GetProperty<int>(def, "Y")); };
+	auto GetSizeFunc = [](stringstream& def) { return int2(GetProperty<int>(def, "W"), GetProperty<int>(def, "H")); };
+	auto GetAltPositionFunc = [](stringstream& def) { return int2(GetProperty<int>(def, "X1"), GetProperty<int>(def, "Y1")); };
 
 	Entity* e = nullptr;
 	if (!def.isDecoration)

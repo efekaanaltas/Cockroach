@@ -16,14 +16,14 @@ enum DashType;
 
 struct Sheet
 {
-	std::vector<Sprite> sheet;
+	vector<Sprite> sheet;
 	int framePerSecond = 4;
 
 	void Add(const Sprite& sprite) { sheet.push_back(sprite); }
 
 	Sprite CurrentSprite()
 	{
-		int index = (int)std::fmodf(Application::Get().frameCount_ * framePerSecond / 60.0f, (float)sheet.size());
+		int index = (int)fmodf(Application::Get().frameCount_ * framePerSecond / 60.0f, (float)sheet.size());
 		return sheet[index];
 	}
 };
@@ -82,7 +82,7 @@ namespace Entities
 		virtual void MoveX(float amount) override;
 		virtual void MoveY(float amount) override;
 
-		std::vector<Dynamic*> GetRiders();
+		vector<Dynamic*> GetRiders();
 	};
 
 	class Spike : public Dynamic

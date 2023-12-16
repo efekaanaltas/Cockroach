@@ -19,7 +19,7 @@ namespace Entities
 	{
 		position = RandomBetweenValues(positionA, positionB);
 		velocity = RandomBetweenValues(velocityA, velocityB);
-		deathTime = time + random(std::min(durationA, durationB), std::max(durationA, durationB));
+		deathTime = time + random(min(durationA, durationB), max(durationA, durationB));
 		color = RandomBetweenValues(colorA, colorB);
 	}
 
@@ -73,7 +73,7 @@ namespace Entities
 
 	void ParticleSystem::Prewarm()
 	{
-		float maxDuration = std::max(durationA, durationB);
+		float maxDuration = max(durationA, durationB);
 
 		int simulationFrameCount = (int)(maxDuration * 60.0f);
 
@@ -92,7 +92,7 @@ namespace Entities
 
 	void ParticleSystem::Add(float2 accumulatedVelocity, float elapsedLifeTime)
 	{
-		float duration = random(std::min(durationA, durationB), std::max(durationA, durationB)) - elapsedLifeTime;
+		float duration = random(min(durationA, durationB), max(durationA, durationB)) - elapsedLifeTime;
 		if (duration <= 0)
 			return;
 

@@ -36,6 +36,12 @@
 #define mat3 glm::mat3
 #define mat4 glm::mat4
 
+template<typename T>
+using vector = std::vector<T>;
+
+using string = std::string;
+using stringstream = std::stringstream;
+
 #define PI glm::pi<float>()
 
 #define ONE			float2(1.0f, 1.0f)

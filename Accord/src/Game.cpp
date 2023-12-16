@@ -23,10 +23,10 @@ Ref<Texture2D> Game::baseSpriteSheet = nullptr;
 Ref<Texture2D> Game::tilemapSheet = nullptr;
 Ref<Texture2D> Game::background = nullptr;
 
-std::vector<Sprite> Game::entitySprites;
-std::vector<Sprite> Game::decorationSprites;
+vector<Sprite> Game::entitySprites;
+vector<Sprite> Game::decorationSprites;
 
-std::vector<Ref<Room>> Game::rooms;
+vector<Ref<Room>> Game::rooms;
 
 bool Game::editMode = true;
 
@@ -73,7 +73,7 @@ Game::Game()
 	const std::filesystem::path roomDir{ "assets/rooms" };
 	for (auto& a : std::filesystem::directory_iterator(roomDir))
 	{
-		std::string name = a.path().string().substr(a.path().string().find_last_of("/\\") + 1);
+		string name = a.path().string().substr(a.path().string().find_last_of("/\\") + 1);
 		rooms.push_back(Room::Load(name));
 	}
 
@@ -108,7 +108,7 @@ void Game::Update()
 		timeScale += 1;
 	if (Input::IsDown(CR_KEY_P))
 		timeScale -= 1;
-	timeScale = std::max(0.0f, timeScale);
+	timeScale = max(0.0f, timeScale);
 	
 	Room::current->Update();
 	cameraController->Update();
@@ -249,7 +249,7 @@ void Game::ExampleGameUI()
 	static int frame = 0;
 	frame++;
 
-	std::string strings[] = {u8"止クヨリ将末ワケシア国写3黒シ年示らとゃゆ国及謙紙む村満でょせ転百五トにゅ投譲セムケ人化ムミケ徽庭さお批会イセ意遅ム考32昨丞云みさげ。要メヤアク市89宜おせょば果誕んへドフ賞先らっ覚字あま省海倉ドフゃ占万のてっま裁動庭ラシイセ読合念じ歳左わスず通刊たさ後角べたか滑要エケカヨ資下の。",
+	string strings[] = {u8"止クヨリ将末ワケシア国写3黒シ年示らとゃゆ国及謙紙む村満でょせ転百五トにゅ投譲セムケ人化ムミケ徽庭さお批会イセ意遅ム考32昨丞云みさげ。要メヤアク市89宜おせょば果誕んへドフ賞先らっ覚字あま省海倉ドフゃ占万のてっま裁動庭ラシイセ読合念じ歳左わスず通刊たさ後角べたか滑要エケカヨ資下の。",
 	u8"代ヨオルユ愛生タヒヌ障業われ勝布らばり懲撃だかぞ写聞残的ヤホ臓月モアヌス縦掲ゃる川込チタツユ索図眺語ぐレぶべ。用ゆ出所うゆち写戦イヌ雪疑部ぶ南21人カハケ仲解ぎげ下難えスそり歩社ヲ安農メワ初器みきごゆ造期ソスシ訪2廃うぞろ。本すごきに韓姿ヘウヒマ自綱ちの情荘備ねッ教併そ南91会ど転休夕ラスレエ質振てゅくリ供以熟ナマヒネ治和しンあを知85芸ヌムモヱ数済ネキテイ情質又娠ぴごや。",
 	u8"目ぞル村毒リエ的入ぐに新港ょがッね生要69来セオミ覧装ぼレ由藤紙ぎじべし載論ルツ患82敗案ス新治高第ルリ関災サソチ電塁ヱレヒ闘言集知ンっさ。梨ら様人リ略再ハミヘ言月ち上必ホ立削げろリ矢格こ護都リぼ宝明韓ヲカ謙権レ楽真とすぱ物止エウヒ表32道地テチトフ気日ぎ止性ぼほ院少ルヒヲ地愛鉄たう。",
 	u8"査ミムモタ米議ロ済都羅ぜな還詳されの訴結ほめ調強トカオ年敗ホ物石べ画主ど共書なきみず視8殉立シ廃支う。必づそク公広つはまフ博障セワエ会旅ラ北6予リをろれ図疑フゅ連会ケハオ台検づたク豊少かわきば一質進ルん日力ぴご真償ー。任トニオ個中ニエ変表28自第ヘ護5意ほ思自キワ師願うー生赤違ニ馬前ヌラサモ電横月ヘルヌヒ引見芸ぜひん淑進券企レうぽ。",
@@ -464,8 +464,8 @@ void Game::ShowSpriteEditor(bool* open)
 			boxSelecting = false;
 		if (rectStart - rectEnd != ZERO)
 		{
-			float2 rectMin = { std::min(rectStart.x, rectEnd.x), std::min(rectStart.y, rectEnd.y) };
-			float2 rectMax = { std::max(rectStart.x, rectEnd.x), std::max(rectStart.y, rectEnd.y) };
+			float2 rectMin = { min(rectStart.x, rectEnd.x), min(rectStart.y, rectEnd.y) };
+			float2 rectMax = { max(rectStart.x, rectEnd.x), max(rectStart.y, rectEnd.y) };
 
 			float2 uvStart = float2(rectMin.x / canvasScale, texture->height - (rectMax.y / canvasScale)) / float2(texture->width, texture->height);
 			float2 uvEnd = float2(rectMax.x / canvasScale, texture->height - (rectMin.y / canvasScale)) / float2(texture->width, texture->height);
@@ -544,7 +544,7 @@ void Game::Freeze(int frames)
 
 void Game::SaveSprites()
 {
-	std::string filepath = "assets/textures/sprites.txt";
+	string filepath = "assets/textures/sprites.txt";
 	std::fstream out(filepath, std::ios::out | std::ios::binary | std::ios::trunc);
 	if (!out) CR_CORE_ERROR("Could not open file '{0}'", filepath);
 	
@@ -572,15 +572,15 @@ void Game::SaveSprites()
 
 void Game::LoadSprites()
 {
-	std::string filepath = "assets/textures/sprites.txt";
+	string filepath = "assets/textures/sprites.txt";
 	std::fstream in(filepath, std::ios::in || std::ios::binary);
 	if (!in) CR_CORE_ERROR("Could not open file '{0}'", filepath);
 
-	std::string line;
+	string line;
 
 	while (std::getline(in, line))
 	{
-		std::stringstream stream(line);
+		stringstream stream(line);
 		int type;
 
 		float2 min = { GetProperty<float>(stream, "X0"), GetProperty<float>(stream, "Y0") };

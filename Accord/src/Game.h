@@ -11,7 +11,7 @@ using namespace Entities;
 // We use a macro that generates the corresponding string list given the enum definition.
 #define DECLARE_ENTITY_TYPE_ENUM(ENUM_NAME, ...)  \
 	enum ENUM_NAME{ __VA_ARGS__ }; \
-	static std::vector<std::string> entityTypeNames = Cockroach::Split( #__VA_ARGS__ );
+	static vector<string> entityTypeNames = Cockroach::Split( #__VA_ARGS__ );
 
 DECLARE_ENTITY_TYPE_ENUM(EntityType, Payga, Camera, Particles, SpikeLeft, SpikeRight, SpikeDown, SpikeUp, Oscillator,
 						 TurbineLeft, TurbineRight, TurbineDown, TurbineUp, Essence, Igniter, Propeller, MovingPlatform,
@@ -47,10 +47,10 @@ public:
 	static Ref<Texture2D> tilemapSheet;
 	static Ref<Texture2D> background;
 
-	static std::vector<Sprite> entitySprites;
-	static std::vector<Sprite> decorationSprites;
+	static vector<Sprite> entitySprites;
+	static vector<Sprite> decorationSprites;
 
-	static std::vector<Ref<Room>> rooms;
+	static vector<Ref<Room>> rooms;
 
 	static void Freeze(int frames);
 

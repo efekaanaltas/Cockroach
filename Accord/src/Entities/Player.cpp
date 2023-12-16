@@ -71,7 +71,8 @@ namespace Entities
 			Renderer::Clear();
 			for (int i = 0; i < DashTrail::count; i++)
 			{
-				Renderer::DrawQuad(float3((float2)dashTrail[i].position, 9), 16.0f * ONE, dashTrail[i].sprite, float4(1.0f, 1.0f, 1.0f, std::pow(dashTrail[i].strength, 3.0f)), float4((ONE-glm::normalize(velocity))/2.0f, 0.0f, 1.0f), dashTrail[i].flipX, false);
+				
+				Renderer::DrawQuad(float3((float2)dashTrail[i].position, 9), 16.0f * ONE, dashTrail[i].sprite, float4(1.0f, 1.0f, 1.0f, pow(dashTrail[i].strength, 3.0f)), float4((ONE-glm::normalize(velocity))/2.0f, 0.0f, 1.0f), dashTrail[i].flipX, false);
 			}
 			Renderer::EndScene();
 			Game::framebuffer->Bind();
@@ -119,18 +120,18 @@ namespace Entities
 		dashSound.SetPosition(position);
 		jumpSound.SetPosition(position);
 
-		renderSize.x = std::clamp(renderSize.x + 2 * dt, 0.0f, 1.0f);
-		renderSize.y = std::clamp(renderSize.y + 2 * dt, 0.0f, 1.0f);
+		renderSize.x = clamp(renderSize.x + 2 * dt, 0.0f, 1.0f);
+		renderSize.y = clamp(renderSize.y + 2 * dt, 0.0f, 1.0f);
 
 		sprite = currentSheet.CurrentSprite();
 		SetFlag(FlipX, faceDir == -1);
 		float flashProgress = flashTimer.Progress01();
 		overlayColor = WHITE;
-		overlayWeight = std::clamp(-flashProgress * flashProgress + 1, 0.0f, 1.0f);
+		overlayWeight = clamp(-flashProgress * flashProgress + 1, 0.0f, 1.0f);
 
 		for (int i = 0; i < DashTrail::count; i++)
 		{
-			dashTrail[i].strength = std::max(dashTrail[i].strength - 1/20.0f, 0.0f);
+			dashTrail[i].strength = max(dashTrail[i].strength - 1/20.0f, 0.0f);
 		}
 	}
 

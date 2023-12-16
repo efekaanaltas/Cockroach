@@ -72,12 +72,12 @@ namespace Entities
 				player->velocity.y -= gravity * 0.2f * dt;
 		}
 	
-		player->velocity.y = std::max(player->velocity.y, -maxFallSpeed);
+		player->velocity.y = max(player->velocity.y, -maxFallSpeed);
 
-		if (player->InputDirX() != 0 && (std::abs(player->velocity.x) <= maxWalkSpeed))
+		if (player->InputDirX() != 0 && (abs(player->velocity.x) <= maxWalkSpeed))
 		{
 			player->velocity.x += player->InputDirX() * acceleration * dt;
-			player->velocity.x = std::clamp(player->velocity.x, -maxWalkSpeed, maxWalkSpeed);
+			player->velocity.x = clamp(player->velocity.x, -maxWalkSpeed, maxWalkSpeed);
 		}
 		else
 		{
@@ -121,7 +121,7 @@ namespace Entities
 		player->coyoteTimer.ForceFinish();
 
 		if (Input::IsUp(CR_KEY_SPACE))
-			player->velocity.y = std::min(player->velocity.y, minJumpSpeed);
+			player->velocity.y = min(player->velocity.y, minJumpSpeed);
 		else if (player->velocity.y <= 0)
 			return player->walkingState;
 
@@ -130,7 +130,7 @@ namespace Entities
 
 	void ClingingState::Enter(Player* player)
 	{
-		impactSpeed = std::abs(player->velocity.x);
+		impactSpeed = abs(player->velocity.x);
 		player->velocity.x = 0;
 		player->velocity.y = 0;
 
@@ -170,7 +170,7 @@ namespace Entities
 		else
 		{
 			player->velocity.y -= reducedGravity * dt;
-			player->velocity.y = std::clamp(player->velocity.y, -fallSpeed/2.0f, 0.0f);
+			player->velocity.y = clamp(player->velocity.y, -fallSpeed/2.0f, 0.0f);
 		}
 
 		if (player->InputDirX() == -player->faceDir || player->InputDirY() == -1 || player->grounded)
@@ -299,10 +299,10 @@ namespace Entities
 
 		player->CreateDashTrail();
 
-		player->renderSize.y = 1.0f - 0.3f*(std::abs(player->velocity.x)/maxRollSpeed);
+		player->renderSize.y = 1.0f - 0.3f*(abs(player->velocity.x)/maxRollSpeed);
 
 		player->velocity.x += player->InputDirX() * (player->grounded ? groundRollAcceleration : airRollAcceleration) * dt;
-		player->velocity.x = std::clamp(player->velocity.x, -maxRollSpeed, maxRollSpeed);
+		player->velocity.x = clamp(player->velocity.x, -maxRollSpeed, maxRollSpeed);
 		
 		if (!player->grounded)
 			player->velocity.y -= player->walkingState->gravity * dt;
@@ -318,7 +318,7 @@ namespace Entities
 				}
 		}
 
-		if (std::abs(player->velocity.x) < 10.0f)
+		if (abs(player->velocity.x) < 10.0f)
 			return player->walkingState;
 		if (player->bufferedJumpInput.Active() && !player->coyoteTimer.Finished())
 			return player->rolljumpingState;

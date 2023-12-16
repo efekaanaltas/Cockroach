@@ -31,7 +31,7 @@ namespace Entities
 
 		Sprite pixel;
 	private:
-		std::vector<Particle> particles;
+		vector<Particle> particles;
 	};
 
 	class ParticleSystem

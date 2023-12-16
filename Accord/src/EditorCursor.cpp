@@ -76,8 +76,8 @@ void EditorCursor::Update()
 	{
 		isBoxPlacing = false;
 		int2 boxPlaceEndPos = WorldPositionSnapped();
-		int2 minPos = { std::min(boxPlaceStartPos.x, boxPlaceEndPos.x), std::min(boxPlaceStartPos.y, boxPlaceEndPos.y) };
-		int2 maxPos = { std::max(boxPlaceStartPos.x, boxPlaceEndPos.x), std::max(boxPlaceStartPos.y, boxPlaceEndPos.y) };
+		int2 minPos = { min(boxPlaceStartPos.x, boxPlaceEndPos.x), min(boxPlaceStartPos.y, boxPlaceEndPos.y) };
+		int2 maxPos = { max(boxPlaceStartPos.x, boxPlaceEndPos.x), max(boxPlaceStartPos.y, boxPlaceEndPos.y) };
 		switch (brushMode)
 		{
 		case BrushMode::Tile:
@@ -117,8 +117,8 @@ void EditorCursor::Render()
 	if (!isBoxPlacing)
 		boxPlaceStartPos = brushMode == Decoration ? WorldPosition() : WorldPositionSnapped();
 	int2 boxPlaceEndPos = brushMode == Decoration ? WorldPosition() : WorldPositionSnapped();
-	float2 start = { std::min(boxPlaceStartPos.x, boxPlaceEndPos.x), std::min(boxPlaceStartPos.y, boxPlaceEndPos.y) };
-	float2 end = { std::max(boxPlaceStartPos.x, boxPlaceEndPos.x) + 8.0f, std::max(boxPlaceStartPos.y, boxPlaceEndPos.y) + 8.0f };
+	float2 start = { min(boxPlaceStartPos.x, boxPlaceEndPos.x), min(boxPlaceStartPos.y, boxPlaceEndPos.y) };
+	float2 end = { max(boxPlaceStartPos.x, boxPlaceEndPos.x) + 8.0f, max(boxPlaceStartPos.y, boxPlaceEndPos.y) + 8.0f };
 	Renderer::DrawQuadOutline(start.x, end.x, start.y, end.y, Input::IsPressed(CR_KEY_LEFT_CONTROL) ? RED : YELLOW);
 }
 
@@ -130,5 +130,5 @@ int2 EditorCursor::WorldPosition()
 int2 EditorCursor::WorldPositionSnapped()
 {
 	float2 worldCoord = Game::cameraController->camera.ScreenToWorldPosition(Input::MousePosition());
-	return float2(std::floor(worldCoord.x / 8) * 8, std::floor(worldCoord.y / 8) * 8);
+	return float2(floor(worldCoord.x / 8) * 8, floor(worldCoord.y / 8) * 8);
 }
