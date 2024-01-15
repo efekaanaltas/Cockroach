@@ -5,7 +5,7 @@ namespace Cockroach
 {
 	Sound::Sound(const std::string& filepath, bool isMusic)
 	{
-		MA_ASSERT(ma_sound_init_from_file(&Audio::engine, filepath.c_str(), MA_SOUND_FLAG_NO_SPATIALIZATION, isMusic ? &Audio::musicGroup : &Audio::sfxGroup, nullptr, &sound),
+		MA_CHECK(ma_sound_init_from_file(&Audio::engine, filepath.c_str(), MA_SOUND_FLAG_NO_SPATIALIZATION, isMusic ? &Audio::musicGroup : &Audio::sfxGroup, nullptr, &sound),
 				  "Sound could not be loaded.");
 	}
 

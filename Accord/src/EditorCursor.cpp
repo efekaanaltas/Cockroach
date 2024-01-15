@@ -1,5 +1,8 @@
 #include "EditorCursor.h"
 #include "Game.h"
+#include "EntityDef.h"
+
+using namespace Entities;
 
 EditorCursor::BrushMode EditorCursor::brushMode = BrushMode::Tile;
 Cockroach::Entity* EditorCursor::selectedEntity = nullptr;

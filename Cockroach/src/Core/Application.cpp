@@ -110,7 +110,16 @@ namespace Cockroach
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
 
-		io.Fonts->AddFontFromFileTTF("assets/fonts/NotoSansCJKjp-Medium.otf", 17, nullptr, io.Fonts->GetGlyphRangesJapanese());
+		ImVector<ImWchar> ranges;
+		ImFontGlyphRangesBuilder builder;
+		builder.AddRanges(io.Fonts->GetGlyphRangesDefault());
+		builder.AddRanges(io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+		builder.AddRanges(io.Fonts->GetGlyphRangesJapanese());
+		builder.AddRanges(io.Fonts->GetGlyphRangesKorean());
+		builder.BuildRanges(&ranges);
+
+		io.Fonts->AddFontFromFileTTF("assets/fonts/NotoSansCJKjp-Medium.otf", 17.0f, nullptr, ranges.Data);
+		io.Fonts->Build();
 
 		Application& app = Application::Get();
 		GLFWwindow* window = static_cast<GLFWwindow*>(app.GetWindow().GLFWWindow);

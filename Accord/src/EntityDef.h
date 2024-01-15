@@ -6,6 +6,16 @@ using namespace Cockroach;
 
 #include "Entities/Particles.h"
 
+// As far as I'm aware, C++ doesn't have a simple way to get the name of an enum value, and having to manually update a string array when adding a new entity is cumbersome.
+// We use a macro that generates the corresponding string list given the enum definition.
+#define DECLARE_ENTITY_TYPE_ENUM(ENUM_NAME, ...)  \
+	enum ENUM_NAME{ __VA_ARGS__ }; \
+	static vector<string> entityTypeNames = Cockroach::Split( #__VA_ARGS__ );
+
+DECLARE_ENTITY_TYPE_ENUM(EntityType, Payga, Camera, Particles, SpikeLeft, SpikeRight, SpikeDown, SpikeUp, Oscillator,
+	TurbineLeft, TurbineRight, TurbineDown, TurbineUp, Essence, Igniter, Propeller, MovingPlatform,
+	Attractor, Checkpoint, DashSwitchPlatform, END);
+
 #define CustomReset virtual void Reset() override
 #define CustomUpdate virtual void Update() override
 #define CustomRender virtual void Render() override
@@ -35,8 +45,8 @@ namespace Entities
 	class Dynamic : public Entity
 	{
 	public:
-		Dynamic(int2 position, int2 hitboxMin, int2 hitboxMax, bool solid, bool carriable)
-			: Entity(position)
+		Dynamic(const EntityDefinition& def, int2 hitboxMin, int2 hitboxMax, bool solid, bool carriable)
+			: Entity(def)
 		{
 			hitbox = Rect(hitboxMin, hitboxMax);
 			SetFlag(IsSolid, solid);
@@ -74,8 +84,8 @@ namespace Entities
 	class Carrier : public Dynamic
 	{
 	public:
-		Carrier(int2 position, int2 hitboxMin, int2 hitboxMax)
-			: Dynamic(position, hitboxMin, hitboxMax, true, false)
+		Carrier(EntityDefinition def, int2 hitboxMin, int2 hitboxMax)
+			: Dynamic(def, hitboxMin, hitboxMax, true, false)
 		{
 		}
 
@@ -88,9 +98,30 @@ namespace Entities
 	class Spike : public Dynamic
 	{
 	public:
-		Spike(int2 position, int2 hitboxMin, int2 hitboxMax, int2 direction)
-			: Dynamic(position, hitboxMin, hitboxMax, false, true), direction(direction)
-		{}
+		Spike(EntityDefinition def)
+			: Dynamic(def, ZERO, ZERO, false, true), direction(ZERO)
+		{
+			int2 hitboxMin = ZERO;
+			int2 hitboxMax = ZERO;
+
+			switch (def.type)
+			{
+			case EntityType::SpikeLeft:
+				hitboxMin = { 4,0 }, hitboxMax = { 8,8 }, direction = LEFTi;
+			break;
+			case EntityType::SpikeRight:
+				hitboxMin = { 0,0 }, hitboxMax = { 4,8 }, direction = RIGHTi;
+			break;
+			case EntityType::SpikeDown:
+				hitboxMin = { 0,4 }, hitboxMax = { 8,8 }, direction = DOWNi;
+			break;
+			case EntityType::SpikeUp:
+				hitboxMin = { 0,0 }, hitboxMax = { 8,4 }, direction = UPi;
+			break;
+			}
+
+			hitbox = Rect(hitboxMin, hitboxMax);
+		}
 
 		int2 direction;
 
@@ -100,8 +131,8 @@ namespace Entities
 	class OscillatorA : public Carrier
 	{
 	public:
-		OscillatorA(int2 position, int2 hitboxMin, int2 hitboxMax)
-			: Carrier(position, hitboxMin, hitboxMax), startPos(position)
+		OscillatorA(EntityDefinition def)
+			: Carrier(def, {0,0}, {8,8}), startPos(position)
 		{
 			overlayWeight = 0.5f;
 			overlayColor = GREEN;
@@ -116,7 +147,7 @@ namespace Entities
 	class Turbine : public Dynamic
 	{
 	public:
-		Turbine(int2 position, int2 size, int horizontal, int vertical);
+		Turbine(EntityDefinition def);
 
 		float turbineAcceleration = 300.0f;
 		int horizontal = 1, vertical = 0;
@@ -132,13 +163,13 @@ namespace Entities
 	class Essence : public Dynamic
 	{
 	public:
-		Essence(int2 position, int2 hitboxMin, int2 hitboxMax, DashType dashType);
+		Essence(EntityDefinition def);
 
 		bool active = true;
 		DashType dashType;
 		Timer refreshTimer = Timer(2.0f, seconds, true);
 
-		Sound absorbSound = Sound("assets/audio/sound1_dontforgettochange.wav");
+		Sound absorbSound = Sound("assets/audio/sound1_dontforgettochange.mp3");
 		
 		CustomUpdate;
 		CustomUI;
@@ -152,8 +183,8 @@ namespace Entities
 	class Attractor : public Dynamic
 	{
 	public:
-		Attractor(int2 position, int2 hitboxMin, int2 hitboxMax)
-			: Dynamic(position, hitboxMin, hitboxMax, false, false)
+		Attractor(EntityDefinition def)
+			: Dynamic(def, {1,1}, {7,7}, false, false)
 		{
 		}
 
@@ -165,7 +196,7 @@ namespace Entities
 		Timer refreshTimer = Timer(2.0f, seconds, true);
 		ParticleSystem dissolveParticles;
 
-		Sound dissolveSound = Sound("assets/audio/sound2_dontforgettochange.wav");
+		Sound dissolveSound = Sound("assets/audio/sound2_dontforgettochange.mp3");
 
 		CustomUpdate;
 
@@ -176,8 +207,8 @@ namespace Entities
 	class Igniter : public Dynamic
 	{
 	public:
-		Igniter(int2 position, int2 size)
-			: Dynamic(position, ZEROi, size, true, true)
+		Igniter(EntityDefinition def)
+			: Dynamic(def, ZEROi, def.size, true, true)
 		{}
 
 		Timer flashTimer = Timer(0.3f, seconds, false);
@@ -191,8 +222,8 @@ namespace Entities
 	class Propeller : public Dynamic
 	{
 	public:
-		Propeller(int2 position, int2 size)
-			: Dynamic(position, ZEROi, size, true, true)
+		Propeller(EntityDefinition def)
+			: Dynamic(def, ZEROi, def.size, true, true)
 		{}
 
 		CustomUpdate {};
@@ -202,7 +233,7 @@ namespace Entities
 	class MovingPlatform : public Carrier
 	{
 	public:
-		MovingPlatform(int2 position, int2 size, int2 altPosition);
+		MovingPlatform(EntityDefinition def);
 		
 		float startTime;
 
@@ -220,7 +251,7 @@ namespace Entities
 	class DashSwitchPlatform : public Carrier
 	{
 	public:
-		DashSwitchPlatform(int2 position, int2 size, int2 altPosition);
+		DashSwitchPlatform(EntityDefinition def);
 
 		bool targetIsAltPos;
 
@@ -240,8 +271,8 @@ namespace Entities
 	class Checkpoint : public Dynamic
 	{
 	public:
-		Checkpoint(int2 position, int2 size)
-			: Dynamic(position, ZEROi, size, false, false)
+		Checkpoint(EntityDefinition def)
+			: Dynamic(def, ZEROi, def.size, false, false)
 		{}
 
 		CustomUpdate;

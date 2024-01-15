@@ -240,9 +240,25 @@ namespace Entities
 		camera.SetZoom(-aspectRatio * zoom, aspectRatio * zoom, -zoom, zoom);
 	}
 
-	Turbine::Turbine(int2 position, int2 size, int horizontal, int vertical)
-	: Dynamic(position, int2(0, 0), size, true, true), horizontal(horizontal), vertical(vertical)
+	Turbine::Turbine(EntityDefinition def)
+	: Dynamic(def, int2(0, 0), def.size, true, true), horizontal(0), vertical(0)
 	{
+		switch (def.type)
+		{
+		case EntityType::TurbineLeft:
+			horizontal = -1;
+		break;
+		case EntityType::TurbineRight:
+			horizontal = +1;
+		break;
+		case EntityType::TurbineDown:
+			vertical = -1;
+		break;
+		case EntityType::TurbineUp:
+			vertical = +1;
+		break;
+		}
+
 		int xStart = min(position.x, position.x + horizontal * span);
 		int xEnd = max(position.x, position.x + horizontal * span) + size.x;
 		int yStart = min(position.y, position.y + vertical * span);
@@ -277,8 +293,8 @@ namespace Entities
 		airParticles.Update();
 	}
 
-	Essence::Essence(int2 position, int2 hitboxMin, int2 hitboxMax, DashType dashType)
-		: Dynamic(position, hitboxMin, hitboxMax, false, false), dashType(dashType)
+	Essence::Essence(EntityDefinition def)
+		: Dynamic(def, {1,1}, {7,7}, false, false), dashType((DashType)def.variant.value_or(0))
 	{
 		RemoveFlag(IsSolid);
 		overlayColor = WHITE;
@@ -478,7 +494,6 @@ namespace Entities
 		{
 			Game::player->carrier = this;
 			riders.push_back(Game::player);
-			position.x = 3;
 		}
 
 		return riders;
@@ -515,8 +530,8 @@ namespace Entities
 		}
 	}
 
-	MovingPlatform::MovingPlatform(int2 position, int2 size, int2 altPosition)
-		: Carrier(position, ZEROi, size), startPosition(position), endPosition(altPosition), startTime(time)
+	MovingPlatform::MovingPlatform(EntityDefinition def)
+		: Carrier(def, ZEROi, def.size), startPosition(def.position), endPosition(def.altPosition.value_or(def.position)), startTime(time)
 	{}
 
 	CustomReset(MovingPlatform)
@@ -527,12 +542,12 @@ namespace Entities
 	CustomUpdate(MovingPlatform)
 	{
 		float elapsedTime = time - startTime;
- 		int2 desiredPos = lerp(startPosition, endPosition, (sin(elapsedTime)+1)/2.0f );
+		int2 desiredPos = lerp(startPosition, endPosition, (sin(elapsedTime)+1)/2.0f );
 		MoveTo(desiredPos);
 	}
 
-	DashSwitchPlatform::DashSwitchPlatform(int2 position, int2 size, int2 altPosition)
-		: Carrier(position, ZEROi, size), startPosition(position), endPosition(altPosition), targetIsAltPos(false)
+	DashSwitchPlatform::DashSwitchPlatform(EntityDefinition def)
+		: Carrier(def, ZEROi, def.size), startPosition(position), endPosition(def.altPosition.value_or(def.position)), targetIsAltPos(false)
 	{}
 
 	CustomReset(DashSwitchPlatform)
@@ -658,6 +673,8 @@ namespace Entities
 
 }
 
+#define CREATE(Type) e = new Entities::Type(def)
+
 Cockroach::Entity* Cockroach::CreateEntity(const EntityDefinition& def)
 {
 	auto GetPositionFunc = [](stringstream& def) { return int2(GetProperty<int>(def, "X"), GetProperty<int>(def, "Y")); };
@@ -679,58 +696,45 @@ Cockroach::Entity* Cockroach::CreateEntity(const EntityDefinition& def)
 			CR_WARN("Do not create an instance of Particles");
 		break;
 		case EntityType::SpikeLeft:
-			e = new Spike(def.position, { 4,0 }, { 8,8 }, LEFTi);
-		break;
 		case EntityType::SpikeRight:
-			e = new Spike(def.position, { 0,0 }, { 4,8 }, RIGHTi);
-		break;
 		case EntityType::SpikeDown:
-			e = new Spike(def.position, { 0,4 }, { 8,8 }, DOWNi);
-		break;
 		case EntityType::SpikeUp:
-			e = new Spike(def.position, { 0,0 }, { 8,4 }, UPi);
+			CREATE(Spike);
 		break;
 		case EntityType::Oscillator:
-			e = new OscillatorA(def.position, { 0, 0 }, { 8, 8 });
+			CREATE(OscillatorA);
 		break;
 		case EntityType::TurbineLeft:
-			e = new Turbine(def.position, def.size, -1, 0);
-		break;
 		case EntityType::TurbineRight:
-			e = new Turbine(def.position, def.size, 1, 0);
-		break;
 		case EntityType::TurbineDown:
-			e = new Turbine(def.position, def.size, 0, -1);
-		break;
 		case EntityType::TurbineUp:
-			e = new Turbine(def.position, def.size, 0, 1);
+			CREATE(Turbine);
 		break;
 		case EntityType::Essence:
-			e = new Entities::Essence(def.position, { 1,1 }, { 7,7 }, (DashType)def.variant.value_or(0));
+			CREATE(Essence);
 		break;
 		case EntityType::Igniter:
-			e = new Entities::Igniter(def.position, def.size);
+			CREATE(Igniter);
 		break;
 		case EntityType::Propeller:
-			e = new Entities::Propeller(def.position, def.size);
+			CREATE(Propeller);
 		break;
 		case EntityType::MovingPlatform:
-			e = new Entities::MovingPlatform(def.position, def.size, def.altPosition.value_or(def.position));
+			CREATE(MovingPlatform);
 		break;
 		case EntityType::Attractor:
-			e = new Entities::Attractor(def.position, { 1,1 }, { 7,7 });
+			CREATE(Attractor);
 		break;
 		case EntityType::Checkpoint:
-			e = new Entities::Checkpoint(def.position, def.size);
+			CREATE(Checkpoint);
 		break;
 		case EntityType::DashSwitchPlatform:
-			e = new Entities::DashSwitchPlatform(def.position, def.size, def.altPosition.value_or(def.position));
+			CREATE(DashSwitchPlatform);
+		break;
 		}
 		if (e != nullptr)
 		{
 			e->sprite = Game::entitySprites[def.type];
-			e->type = def.type;
-			e->size = def.size;
 		}
 	}
 	else

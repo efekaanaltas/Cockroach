@@ -13,9 +13,9 @@ namespace Cockroach
 
 	void Audio::Init()
 	{
-		MA_ASSERT(ma_engine_init(NULL, &engine),						 "Failed to initialize audio engine");
-		MA_ASSERT(ma_sound_group_init(&engine, 0, nullptr, &sfxGroup),	 "Failed to initilize SFX sound group");
-		MA_ASSERT(ma_sound_group_init(&engine, 0, nullptr, &musicGroup), "Failed to initilize music sound group");
+		MA_CHECK(ma_engine_init(NULL, &engine),						 "Failed to initialize audio engine");
+		MA_CHECK(ma_sound_group_init(&engine, 0, nullptr, &sfxGroup),	 "Failed to initilize SFX sound group");
+		MA_CHECK(ma_sound_group_init(&engine, 0, nullptr, &musicGroup), "Failed to initilize music sound group");
 	}
 
 	void Audio::PlayOneShot(std::string filepath)

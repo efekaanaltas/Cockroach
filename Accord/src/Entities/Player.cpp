@@ -1,11 +1,11 @@
 #include "Player.h"
-
+#include "EntityDef.h"
 #include "Game.h"
 
 namespace Entities
 {
-	Player::Player(int2 position, int2 hitboxMin, int2 hitboxMax)
-		: Dynamic(position, hitboxMin, hitboxMax, true, true)
+	Player::Player(int2 position)
+		: Dynamic(EntityDefinition(EntityType::Payga, false, position, 8*ONEi), {6,0}, {10,12}, true, true)
 	{
 		walkingState = new WalkingState;
 		jumpingState = new JumpingState(50.0f, 140.0f, 0.0f);

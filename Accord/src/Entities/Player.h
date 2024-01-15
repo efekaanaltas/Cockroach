@@ -58,7 +58,7 @@ namespace Entities
 	class Player : public Dynamic
 	{
 	public:
-		Player(int2 position, int2 hitboxMin, int2 hitboxMax);
+		Player(int2 position);
 
 		virtual void Update() override;
 		virtual void Render() override;
@@ -101,8 +101,8 @@ namespace Entities
 		Timer gravityHaltTimer = Timer(10.0f, frames, true);
 		Timer dashRegainTimer = Timer(4.0f, frames);
 
-		Sound dashSound = Sound("assets/audio/Dash.wav");
-		Sound jumpSound = Sound("assets/audio/Jump.wav");
+		Sound dashSound = Sound("assets/audio/Dash.mp3");
+		Sound jumpSound = Sound("assets/audio/Jump.mp3");
 
 		DashTrail dashTrail[DashTrail::count];
 		int lastDashTrailIndex = 0;

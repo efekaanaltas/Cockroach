@@ -15,10 +15,19 @@ namespace Cockroach
 		: Entity({ 0,0 })
 	{}
 
-	Entity::Entity(const int2& position)
+	Entity::Entity(int2 position)
 	{
 		this->position = position;
 		ID = lastID++;
+	}
+
+	Entity::Entity(EntityDefinition definition)
+	{
+		type = definition.type;
+		AddFlag(IsDecoration);
+		position = definition.position;
+		size = definition.size;
+		z = definition.z.value_or(0);
 	}
 
 	void Entity::Render()

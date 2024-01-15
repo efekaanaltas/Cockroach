@@ -38,7 +38,8 @@ namespace Cockroach
 	{
 	public:
 		Entity();
-		Entity(const int2& position);
+		Entity(int2 position);
+		Entity(EntityDefinition definition);
 
 		static int lastID;
 		int ID = 0;

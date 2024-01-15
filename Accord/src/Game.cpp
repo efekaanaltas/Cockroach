@@ -7,9 +7,12 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "EntityDef.h"
+#include "Entities/Player.h"
 #include "EditorCursor.h"
 
 #include "Game.h"
+
+using namespace Entities;
 
 PlayerData Game::data;
 
@@ -58,7 +61,7 @@ Game::Game()
 	//}
 	//SaveSprites();
 
-	Game::player = new Entities::Player(data.playerPosition, {6,0}, {10,12});
+	Game::player = new Player(data.playerPosition);
 	player->type = EntityType::Payga;
 	player->sprite = Sprite::CreateFromCoords(baseSpriteSheet, { 0, 3 }, { 16, 16 });
 
@@ -81,7 +84,7 @@ Game::Game()
 		if (room->Contains(player->WorldHitbox()))
 			Room::current = room;
 
-	static Sound sound = Sound("assets/audio/SheerIceTorrent.wav", true);
+	static Sound sound = Sound("assets/audio/SheerIceTorrent.mp3", true);
 	sound.Start();
 }
 
@@ -255,12 +258,14 @@ void Game::ExampleGameUI()
 	u8"査ミムモタ米議ロ済都羅ぜな還詳されの訴結ほめ調強トカオ年敗ホ物石べ画主ど共書なきみず視8殉立シ廃支う。必づそク公広つはまフ博障セワエ会旅ラ北6予リをろれ図疑フゅ連会ケハオ台検づたク豊少かわきば一質進ルん日力ぴご真償ー。任トニオ個中ニエ変表28自第ヘ護5意ほ思自キワ師願うー生赤違ニ馬前ヌラサモ電横月ヘルヌヒ引見芸ぜひん淑進券企レうぽ。",
 	u8"負ラシ価科れぎつ教著けよせ水局岡ヌア経作れらのへ入観こがド改験スフソヌ古意ゅぎ秋空づ通表代段続メモユテ率幇だ満象ヨレコチ願減ごむさ利期見察棄銃ぽほえさ。故ヒマワ投作づぐれ部王イエマオ会48購活クフセ秋有の見15行ぎどぞル芸共12見ス感参ラチオヱ連設需誕へた。留ちとドッ囲注日ヨルミマ手供であリぽ歩徴スメヱ良代き日気ッ館業エ作分9属メ追9既杉トン。",
 	u8"契よ日6必せぽみ事進ずびが点解かスきフ薬営速ょよーひ暮存ヱト誇崎ツカム為争ハフ済6度せぐも更市コフム新丁ソエテ竹終ノヨコ児読テタソ雄録傑摯フ。論ノフ全状ヨリ怖理さゅ分79面わーぐ近団気つぶ国井ぴ備掲ろびめラ虹野フ踊負シ式37社マタ疑表カサセ前府レょ。際わルう手談済さず百不業ワシスム柄53突なぐぴと見食をすと堅典回叩奇さとフは宅浩ム空館ちろげ融難キチア板北競役人述イド。",
+	u8"注政図見現携芸育潟風行生授行救。別今会薄一稿童難人紙会必生熱定己。松分事勢姿優馬住月農銅始末資。石向票将共質画際日究可書回人権神方。主王人半試一的九悪役文転上行定。金円裁今効候業合講受聖妹臨購注属迎感図。作計席訃周携学総社松国樹権火次治。員参工投亡村申総愛章康資送件承場方。敬悩体障効億第話犯芸歌腕裏禁。",
+	u8"국회의원은 그 지위를 남용하여 국가·공공단체 또는 기업체와의 계약이나 그 처분에 의하여 재산상의 권리·이익 또는 직위를 취득하거나 타인을 위하여 그 취득을 알선할 수 없다. 모든 국민은 자기의 행위가 아닌 친족의 행위로 인하여 불이익한 처우를 받지 아니한다.국회는 정부의 동의없이 정부가 제출한 지출예산 각항의 금액을 증가하거나 새 비목을 설치할 수 없다."
 	};
 
 	int arrSize = sizeof(strings) / sizeof(strings[0]);
 
 	Text("%.3f ms (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-	TextWrapped(strings[(frame/6)%arrSize].c_str());
+	TextWrapped(strings[(frame/165)%arrSize].c_str());
 
 
 	End();

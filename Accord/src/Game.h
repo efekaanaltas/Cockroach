@@ -1,21 +1,11 @@
 #pragma once
 #include <Cockroach.h>
-
+#include "EntityDef.h"
 #include "Entities/Player.h"
 #include "Entities/Particles.h"
 #include "PlayerData.h"
 
 using namespace Entities;
-
-// As far as I'm aware, C++ doesn't have a simple way to get the name of an enum value, and having to manually update a string array when adding a new entity is cumbersome.
-// We use a macro that generates the corresponding string list given the enum definition.
-#define DECLARE_ENTITY_TYPE_ENUM(ENUM_NAME, ...)  \
-	enum ENUM_NAME{ __VA_ARGS__ }; \
-	static vector<string> entityTypeNames = Cockroach::Split( #__VA_ARGS__ );
-
-DECLARE_ENTITY_TYPE_ENUM(EntityType, Payga, Camera, Particles, SpikeLeft, SpikeRight, SpikeDown, SpikeUp, Oscillator,
-						 TurbineLeft, TurbineRight, TurbineDown, TurbineUp, Essence, Igniter, Propeller, MovingPlatform,
-						 Attractor, Checkpoint, DashSwitchPlatform, END);
 
 class Game : public Cockroach::Application
 {

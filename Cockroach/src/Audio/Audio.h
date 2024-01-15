@@ -3,7 +3,7 @@
 
 namespace Cockroach
 {
-	#define MA_ASSERT(stmt, message) {ma_result result = stmt; \
+	#define MA_CHECK(stmt, message) {ma_result result = stmt; \
 		if(result != MA_SUCCESS) \
 		{ \
 			CR_CORE_WARN(message); \
