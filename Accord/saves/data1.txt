@@ -1,3 +1,4 @@
 PlayerPosX: 281, PlayerPosY: 104, 
 Fullscreen: 0, 
 MutedMaster: 1, MutedSFX: 1, MutedMusic: 1, 
+LeftKey: 65, RightKey: 68, DownKey: 87, UpKey: 83, JumpKey: 32, DashKey: 340, 

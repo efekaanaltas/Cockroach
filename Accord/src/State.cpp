@@ -25,8 +25,8 @@ namespace Entities
 	{
 		switch (player->currentDashType)
 		{
-		case Dash:	return player->dashingState;
-		case Drift: return player->driftingState;
+		case DashType::BasicDash:	return player->dashingState;
+		case DashType::Drift: return player->driftingState;
 		}
 		return player->dashingState;
 	}
@@ -41,7 +41,7 @@ namespace Entities
 	{
 		player->currentSheet = GetWalkingStateSheet(player);
 
-		if (Input::IsDown(CR_KEY_SPACE) && !player->grounded && player->WallDir())
+		if (Input::IsDown(Jump) && !player->grounded && player->WallDir())
 		{
 			player->faceDir = player->WallDir();
 
@@ -74,16 +74,19 @@ namespace Entities
 	
 		player->velocity.y = max(player->velocity.y, -maxFallSpeed);
 
-		if (player->InputDirX() != 0 && (abs(player->velocity.x) <= maxWalkSpeed))
-		{
+		if(abs(player->velocity.x) < maxWalkSpeed)
 			player->velocity.x += player->InputDirX() * acceleration * dt;
-			player->velocity.x = clamp(player->velocity.x, -maxWalkSpeed, maxWalkSpeed);
-		}
-		else
+
 		{
-			player->velocity.x -= player->faceDir * (player->grounded ? deceleration : airDeceleration) * dt;
-			if (player->faceDir * player->velocity.x < 0.0f) player->velocity.x = 0.0f;
+			float signBefore = sign(player->velocity.x);
+			player->velocity.x -= sign(player->velocity.x) * (player->grounded ? deceleration : airDeceleration) * dt;
+			float signAfter = sign(player->velocity.x);
+
+			if (signBefore == -signAfter) // Opposite signs
+				player->velocity.x = 0.0f;
 		}
+
+		//player->velocity.x = clamp(player->velocity.x, -maxWalkSpeed, maxWalkSpeed);
 
 		return nullptr;
 	}
@@ -102,7 +105,10 @@ namespace Entities
 		player->jumpSound.Start();
 
 		if (player->carrier)
-			player->velocity.x *= 2;
+		{
+			player->velocity.x *= 5;
+			player->carrier = nullptr;
+		}
 
 		for (int i = 0; i < 30; i++)
 		{
@@ -120,7 +126,7 @@ namespace Entities
 	{
 		player->coyoteTimer.ForceFinish();
 
-		if (Input::IsUp(CR_KEY_SPACE))
+		if (Input::IsUp(Jump))
 			player->velocity.y = min(player->velocity.y, minJumpSpeed);
 		else if (player->velocity.y <= 0)
 			return player->walkingState;
@@ -222,7 +228,7 @@ namespace Entities
 		{
 			player->velocity = dashSpeed * dashDir;
 
-			if ((player->currentDashType == Drift) && Input::IsDown(CR_KEY_LEFT_SHIFT))
+			if ((player->currentDashType == Drift) && Input::IsDown(Dash))
 				return player->walkingState;
 
 			player->CreateDashTrail();
@@ -268,7 +274,7 @@ namespace Entities
 
 	void DashingState::Exit(Player* player)
 	{
-		player->currentDashType = Dash;
+		player->currentDashType = DashType::BasicDash;
 		if (dashDir.y > 0.0f)
 		{
 			player->gravityHaltTimer.Reset();

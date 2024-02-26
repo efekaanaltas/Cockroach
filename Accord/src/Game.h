@@ -25,6 +25,8 @@ public:
 	void SaveSprites();
 	void LoadSprites();
 
+	void BeginKeyRebind(InputAction action);
+
 	static PlayerData data;
 
 	static CameraController* cameraController;

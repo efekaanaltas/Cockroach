@@ -90,4 +90,10 @@ namespace Cockroach
 
 		this->fullscreen = !this->fullscreen;
 	}
+
+	void Window::ResetKeyCallback()
+	{
+		glfwSetKeyCallback(GLFWWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+		{ Application::Get().OnInputCallback(key, action == GLFW_PRESS || action == GLFW_REPEAT); });
+	}
 }

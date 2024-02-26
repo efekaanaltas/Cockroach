@@ -282,13 +282,10 @@ namespace Entities
 
 	CustomUpdate(Turbine)
 	{
-		if (!Game::player->grounded)
-		{
-			if (horizontal && turbineRect.OverlapsWith(Game::player->WorldHitbox(), 0, 0))
-				Game::player->velocity.x += horizontal * turbineAcceleration * dt;
-			if (vertical && turbineRect.OverlapsWith(Game::player->WorldHitbox(), 0, 0))
-				Game::player->velocity.y += vertical * turbineAcceleration * dt;
-		}
+		if (horizontal && turbineRect.OverlapsWith(Game::player->WorldHitbox(), 0, 0))
+			Game::player->velocity.x += horizontal * turbineAcceleration * dt;
+		if (vertical && turbineRect.OverlapsWith(Game::player->WorldHitbox(), 0, 0))
+			Game::player->velocity.y += vertical * turbineAcceleration * dt;
 
 		airParticles.Update();
 	}
@@ -344,8 +341,8 @@ namespace Entities
 	{
 		switch (dashType)
 		{
-		case Dash: sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 1,0 }, { 8,8 }); break;
-		case Drift: sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 2,0 }, { 8,8 }); break;
+		case DashType::BasicDash: sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 1,0 }, { 8,8 }); break;
+		case DashType::Drift: sprite = Sprite::CreateFromCoords(Game::baseSpriteSheet, { 2,0 }, { 8,8 }); break;
 		}
 		overlayWeight = 1.0f;
 		active = true;
@@ -380,7 +377,7 @@ namespace Entities
 					dissolving = true;
 				}
 
-				if (dissolve > 1.0f || Input::IsDown(CR_KEY_LEFT_SHIFT))
+				if (dissolve > 1.0f || Input::IsDown(Dash))
 				{
 					Dissolve();
 				}

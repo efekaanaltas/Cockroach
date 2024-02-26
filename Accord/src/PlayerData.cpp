@@ -11,7 +11,13 @@ void PlayerData::Save()
 	out << GenerateProperty("Fullscreen", fullscreen); out << '\n';
 	out << GenerateProperty("MutedMaster", mutedMaster);
 	out << GenerateProperty("MutedSFX", mutedSFX);
-	out << GenerateProperty("MutedMusic", mutedMusic);
+	out << GenerateProperty("MutedMusic", mutedMusic); out << '\n';
+	out << GenerateProperty("LeftKey", actionKeys[0]);
+	out << GenerateProperty("RightKey", actionKeys[1]);
+	out << GenerateProperty("DownKey", actionKeys[2]);
+	out << GenerateProperty("UpKey", actionKeys[3]);
+	out << GenerateProperty("JumpKey", actionKeys[4]);
+	out << GenerateProperty("DashKey", actionKeys[5]); out << '\n';
 		
 	out.close();
 }
@@ -30,6 +36,13 @@ void PlayerData::Load()
 	mutedMaster =	GetProperty<bool>(stream, "MutedMaster");
 	mutedSFX =		GetProperty<bool>(stream, "MutedSFX");
 	mutedMusic =	GetProperty<bool>(stream, "MutedMusic");
+
+	actionKeys[0] =	GetProperty<u16>(stream, "LeftKey");
+	actionKeys[1] =	GetProperty<u16>(stream, "RightKey");
+	actionKeys[2] =	GetProperty<u16>(stream, "DownKey");
+	actionKeys[3] =	GetProperty<u16>(stream, "UpKey");
+	actionKeys[4] =	GetProperty<u16>(stream, "JumpKey");
+	actionKeys[5] =	GetProperty<u16>(stream, "DashKey");
 
 	in.close();
 }

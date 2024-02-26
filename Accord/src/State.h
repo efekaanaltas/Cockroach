@@ -23,7 +23,7 @@ namespace Entities
 	{
 	public:
 		float gravity = 400.0f, maxFallSpeed = 150.0f;
-		float maxWalkSpeed = 60.0f, acceleration = 400.0f, deceleration = 1000.0f, airDeceleration = 700.0f;
+	float maxWalkSpeed = 60.0f, acceleration = 1400.0f, deceleration = 1000.0f, airDeceleration = 700.0f;
 
 		virtual void Enter(Player* player) override;
 		virtual State<Player>* Update(Player* player) override;

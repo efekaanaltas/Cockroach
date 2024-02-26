@@ -12,12 +12,12 @@ class RollingState;
 
 struct BufferedInput
 {
-	BufferedInput(u16 keycode, int bufferFrames)
+	BufferedInput(InputAction keycode, int bufferFrames)
 		: keycode(keycode), bufferFramesTimer((float)bufferFrames, frames, false)
 	{
 	};
 
-	u16 keycode;
+	InputAction keycode;
 	Timer bufferFramesTimer;
 
 	void Update()
@@ -50,7 +50,7 @@ struct DashTrail
 
 enum DashType
 {
-	Dash, Drift, Propel, Virtual, Regen, Flashback
+	BasicDash, Drift, Propel, Virtual, Regen, Flashback
 };
 
 namespace Entities
@@ -74,7 +74,7 @@ namespace Entities
 		float2 velocity = ZERO;
 		float2 velocityLastFrame = ZERO;
 
-		DashType currentDashType = Dash;
+		DashType currentDashType = DashType::BasicDash;
 
 		State<Player>* currentState = nullptr;
 		WalkingState* walkingState = nullptr;
@@ -93,8 +93,8 @@ namespace Entities
 		Sheet idleSheet, walkingSheet, fallingSheet, jumpingSheet, clingingSheet, dashingSheet, rollingSheet;
 		Sheet currentSheet;
 
-		BufferedInput bufferedJumpInput = BufferedInput(CR_KEY_SPACE, 6);
-		BufferedInput bufferedDashInput = BufferedInput(CR_KEY_LEFT_SHIFT, 20);// 15);
+		BufferedInput bufferedJumpInput = BufferedInput(Jump, 6);
+		BufferedInput bufferedDashInput = BufferedInput(Dash, 20);// 15);
 
 		Timer coyoteTimer = Timer(10.0f, frames);
 		Timer flashTimer = Timer(5.0f, frames);
@@ -116,7 +116,7 @@ namespace Entities
 		void TrySwitchState(State<Player>* state);
 
 		void TryChangeRoom();
-		void RegainDash(DashType dashType = Dash);
+		void RegainDash(DashType dashType = DashType::BasicDash);
 		void Die();
 		void CreateDashTrail();
 	};

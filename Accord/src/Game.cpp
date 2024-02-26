@@ -49,6 +49,13 @@ Game::Game()
 	Audio::ToggleSoundSFX(data.mutedSFX);
 	Audio::ToggleSoundMusic(data.mutedMusic);
 
+	Input::actionMap[InputAction::Left]	 = data.actionKeys[0];
+	Input::actionMap[InputAction::Right] = data.actionKeys[1];
+	Input::actionMap[InputAction::Down]	 = data.actionKeys[2];
+	Input::actionMap[InputAction::Up]	 = data.actionKeys[3];
+	Input::actionMap[InputAction::Jump]  = data.actionKeys[4];
+	Input::actionMap[InputAction::Dash]  = data.actionKeys[5];
+
 	//for (int i = EntityType::Checkpoint; i < EntityType::END; i++)
 	//{
 	//	Entity* e = CreateEntity(EntityDefinition(i, false, ZEROi, ONEi));
@@ -108,15 +115,24 @@ void Game::Update()
 	}
 
 	if (Input::IsDown(CR_KEY_O))
+	{
 		timeScale += 1;
+	}
 	if (Input::IsDown(CR_KEY_P))
+	{
 		timeScale -= 1;
+	}
 	timeScale = max(0.0f, timeScale);
 	
 	Room::current->Update();
 	cameraController->Update();
 
 	EditorCursor::Update();
+
+	if (Input::IsDown(Dash))
+	{
+		CR_INFO("Dashed using a rebound key!");
+	}
 
 	if (Input::IsDown(CR_KEY_TAB))
 	{
@@ -139,6 +155,30 @@ void Game::Update()
 	if (Input::IsDown(CR_KEY_G)) renderGrid = !renderGrid;
 	if (Input::IsDown(CR_KEY_H)) renderHitboxes = !renderHitboxes;
 	if (Input::IsDown(CR_KEY_R)) renderAllRooms = !renderAllRooms;
+}
+
+global InputAction actionToRebind = InputAction::Left;
+void RebindKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (action != GLFW_PRESS)
+	{
+		return;
+	}
+
+	Input::actionMap[actionToRebind] = key;
+	Game::data.actionKeys[actionToRebind] = key;
+
+	Game::Get().GetWindow().ResetKeyCallback();
+	Game::data.Save();
+
+	timeScale = 1;
+}
+
+void Game::BeginKeyRebind(InputAction action)
+{
+	actionToRebind = action;
+	glfwSetKeyCallback(GetWindow().GLFWWindow, RebindKeyCallback);
+	timeScale = 0;
 }
 
 #pragma warning (disable: 4244) // No need for DrawQuad... warnings
@@ -301,6 +341,44 @@ void Game::ImGuiRender()
 	else modified = false;
 
 	if(modified) data.Save();
+
+	Text("Move Left currently binded to: %d", Input::actionMap[Left]);
+	Text("Move Right currently binded to: %d", Input::actionMap[Right]);
+	Text("Face Down currently binded to: %d", Input::actionMap[Down]);
+	Text("Face Up currently binded to: %d", Input::actionMap[Up]);
+	Text("Jump currently binded to: %d", Input::actionMap[Jump]);
+	Text("Dash currently binded to: %d", Input::actionMap[InputAction::Dash]);
+
+	if (Button("Rebind Move Left"))
+	{
+		ImGui::SetWindowFocus(nullptr);
+		BeginKeyRebind(InputAction::Left);
+	}
+	if (Button("Rebind Move Right"))
+	{
+		ImGui::SetWindowFocus(nullptr);
+		BeginKeyRebind(InputAction::Right);
+	}
+	if (Button("Rebind Face Down"))
+	{
+		ImGui::SetWindowFocus(nullptr);
+		BeginKeyRebind(InputAction::Down);
+	}
+	if (Button("Rebind Face Up"))
+	{
+		ImGui::SetWindowFocus(nullptr);
+		BeginKeyRebind(InputAction::Up);
+	}
+	if (Button("Rebind Jump"))
+	{
+		ImGui::SetWindowFocus(nullptr);
+		BeginKeyRebind(InputAction::Jump);
+	}
+	if (Button("Rebind Dash"))
+	{
+		ImGui::SetWindowFocus(nullptr);
+		BeginKeyRebind(InputAction::Dash);
+	}
 
 	End();
 

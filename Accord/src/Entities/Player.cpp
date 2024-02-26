@@ -197,8 +197,8 @@ namespace Entities
 	{
 		static int lastDir = 0;
 
-		bool left = Input::IsPressed(CR_KEY_A);
-		bool right = Input::IsPressed(CR_KEY_D);
+		bool left = Input::IsPressed(InputAction::Left);
+		bool right = Input::IsPressed(InputAction::Right);
 
 		if (left && right)
 			return -lastDir;
@@ -207,8 +207,8 @@ namespace Entities
 
 	i32 Player::InputDirY() const
 	{
-		bool down = Input::IsPressed(CR_KEY_S);
-		bool up = Input::IsPressed(CR_KEY_W);
+		bool down = Input::IsPressed(InputAction::Down);
+		bool up = Input::IsPressed(InputAction::Up);
 		return down ? -1 : (up ? 1 : 0);
 	}
 

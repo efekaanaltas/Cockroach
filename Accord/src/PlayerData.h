@@ -11,6 +11,8 @@ struct PlayerData
 	bool mutedSFX = false;
 	bool mutedMusic = false;
 
+	u16 actionKeys[6];
+
 	PlayerData()
 	{
 		Load();

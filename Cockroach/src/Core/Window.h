@@ -20,6 +20,8 @@ namespace Cockroach
 		GLFWwindow* GLFWWindow;
 		GLFWmonitor* GLFWMonitor;
 
+		void ResetKeyCallback();
+
 		std::string title;
 		int width, height;
 		int2 pos;

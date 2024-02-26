@@ -5,23 +5,39 @@
 
 namespace Cockroach
 {
+	enum InputAction
+	{
+		Left,
+		Right,
+		Up,
+		Down,
+		Jump,
+		Dash,
+	};
+
 	class Input
 	{
 	public:
-
 		struct InputState
 		{
 			bool pressed = false, pressedLastFrame = false;
 		};
 
+
 		static std::unordered_map<u16, InputState> stateMap; // Initialized in .cpp
 		static float scroll;
+		static u16 actionMap[];
 
 		static void Update();
 
 		static bool IsPressed(u16 code);
 		static bool IsDown(u16 code);
 		static bool IsUp(u16 code);
+	
+		static bool IsPressed(InputAction code);
+		static bool IsDown(InputAction code);
+		static bool IsUp(InputAction code);
+
 		static float2 MousePosition();
 	};
 

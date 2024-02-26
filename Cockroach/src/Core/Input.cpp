@@ -47,6 +47,16 @@ namespace Cockroach
 		{ CR_KEY_M,					{} },
 	};
 
+	u16 Input::actionMap[] = 
+	{
+		CR_KEY_A,
+		CR_KEY_D,
+		CR_KEY_W,
+		CR_KEY_S,
+		CR_KEY_SPACE,
+		CR_KEY_LEFT_SHIFT
+	};
+
 	float Input::scroll = 0.0f;
 
 	void Input::Update()
@@ -59,6 +69,10 @@ namespace Cockroach
 	bool Input::IsPressed(u16 code) { return stateMap[code].pressed; }
 	bool Input::IsDown(u16 code)	{ return stateMap[code].pressed && !stateMap[code].pressedLastFrame; }
 	bool Input::IsUp(u16 code)		{ return !stateMap[code].pressed && stateMap[code].pressedLastFrame; }
+
+	bool Input::IsPressed(InputAction action)	{ return IsPressed(actionMap[action]); }
+	bool Input::IsDown(InputAction action)		{ return IsDown(actionMap[action]); }
+	bool Input::IsUp(InputAction action)		{ return IsUp(actionMap[action]); }
 
 	float2 Input::MousePosition()
 	{
