@@ -19,7 +19,7 @@ namespace Cockroach
 		virtual void Update() = 0;
 		virtual void Render() = 0;
 
-		void OnQuit();
+		virtual void OnQuit();
 		void OnWindowResize(int width, int height);
 		void OnInputCallback(int code, bool down);
 

@@ -9,8 +9,8 @@ namespace Cockroach
 	{
 		Left,
 		Right,
-		Up,
 		Down,
+		Up,
 		Jump,
 		Dash,
 	};

@@ -28,7 +28,6 @@ namespace Cockroach
 
 	Application::~Application()
 	{
-
 	}
 
 	void Application::OnInputCallback(int code, bool down)
