@@ -44,11 +44,13 @@ namespace Cockroach
 
 	void Framebuffer::Bind()
 	{
+		CR_CORE_INFO("Bound framebuffer {0}", rendererID);
 		glBindFramebuffer(GL_FRAMEBUFFER, rendererID);
 	}
 
 	void Framebuffer::Unbind()
 	{
+		CR_CORE_INFO("Bound framebuffer 0");
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 }

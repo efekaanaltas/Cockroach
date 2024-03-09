@@ -185,15 +185,22 @@ void Game::BeginKeyRebind(InputAction action)
 
 void Game::Render()
 {
+	CR_INFO("Begin render");
+
+	Renderer::SetClearColor({ 0.1f, 0.0f, 0.0f, 1 });
+	Renderer::Clear();
+	glEnable(GL_DEPTH_TEST);
+
 	if (!editMode)
 	{
 		framebuffer->Bind();
 		glViewport(0, 0, 320, 180);
 	}
 
-	Renderer::SetClearColor({ 0.1f, 0.0f, 0.0f, 1 });
-	Renderer::Clear();
-	glEnable(GL_DEPTH_TEST);
+	Renderer::Clear(); // We are cleaning both the OpenGL default framebuffer and our actual render framebuffer. When we don't clear the default framebuffer,
+					   // some artifacts from the previous render frame are left outside of our current viewport. When we don't clear the render framebuffer,
+					   // random noise (I won't even guess what causes it) fills the render framebuffer. Maybe it's better to actually find the reason instead of
+					   // calling Clear twice, but this is ok for now.
 
 	Renderer::BeginScene(cameraController->camera);
 
@@ -261,12 +268,27 @@ void Game::Render()
 	Cockroach::Window& window = Application::Get().GetWindow();
 	Renderer::OnWindowResize(window.width, window.height);
 
+	const float targetAspect = 16.0f / 9.0f;
+	float currentAspect = (float)window.width / window.height;
+	float renderWidth = window.width;
+	float renderHeight = window.height;
+	if (currentAspect >= targetAspect)
+	{
+		renderWidth = renderHeight * targetAspect;
+	}
+	else
+	{
+		float renderHeight = renderWidth / targetAspect;
+	}
+
 	if (!editMode)
 	{
-		//framebuffer->Unbind();
-		static Ref<Framebuffer> h = CreateRef<Framebuffer>(window.width, window.height, false);
-		Renderer::Distortion(up3, distortionFramebuffer, h);
-		Renderer::BlitToScreen(h);
+		CR_INFO("Begin blit");
+		static Ref<Framebuffer> finalFramebuffer = CreateRef<Framebuffer>(renderWidth, renderHeight, false);
+		Renderer::Distortion(up3, distortionFramebuffer, finalFramebuffer);
+		Renderer::OnWindowResize(window.width, window.height);
+		Renderer::BlitToScreen(finalFramebuffer);
+		CR_INFO("End blit");
 
 		Application::ImGuiBegin();
 		ExampleGameUI();
@@ -276,6 +298,7 @@ void Game::Render()
 
 	if(editMode)
 		ImGuiRender();
+	CR_INFO("End render");
 }
 
 void Game::ExampleGameUI()
