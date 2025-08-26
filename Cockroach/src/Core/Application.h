@@ -38,6 +38,7 @@ namespace Cockroach
 		int frameCount_ = 0;
 
 		float timeScale_ = 1.0f;
+
 	private:
 		Window* window;
 		bool running = true;

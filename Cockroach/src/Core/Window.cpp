@@ -43,7 +43,7 @@ namespace Cockroach
 		glfwGetWindowPos(GLFWWindow, &pos.x, &pos.y);
 		fullscreen = glfwGetWindowMonitor(GLFWWindow) != nullptr;
 
-		glfwSwapInterval(1);
+		//glfwSwapInterval(1);
 
 		glfwSetWindowSizeCallback(GLFWWindow, [](GLFWwindow* window, int width, int height)
 		{ Application::Get().OnWindowResize(width, height); });

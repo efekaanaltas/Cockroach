@@ -36,8 +36,8 @@ struct DashTrail
 		: sprite()
 	{}
 
-	DashTrail(Sprite sprite, int2 position, bool flipX)
-		: sprite(sprite), strength(1.0f), position(position), flipX(flipX)
+	DashTrail(Sprite sprite, int2 position, bool flipX, float2 velocity)
+		: sprite(sprite), strength(1.0f), position(position), flipX(flipX), velocity(velocity)
 	{}
 	
 	static const int count = 20;
@@ -46,6 +46,7 @@ struct DashTrail
 	float strength = 1.0f;
 	int2 position = ZEROi;
 	bool flipX = false;
+	float2 velocity = ZERO;
 };
 
 enum DashType

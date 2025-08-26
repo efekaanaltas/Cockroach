@@ -300,6 +300,9 @@
     <ClInclude Include="vendor\glm\glm\ext.hpp">
       <Filter>vendor\glm\glm</Filter>
     </ClInclude>
+    <ClInclude Include="vendor\glm\glm\ext\_matrix_vectorize.hpp">
+      <Filter>vendor\glm\glm\ext</Filter>
+    </ClInclude>
     <ClInclude Include="vendor\glm\glm\ext\matrix_clip_space.hpp">
       <Filter>vendor\glm\glm\ext</Filter>
     </ClInclude>

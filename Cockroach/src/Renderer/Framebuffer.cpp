@@ -5,7 +5,7 @@
 
 namespace Cockroach
 {
-	Framebuffer::Framebuffer(int width, int height, bool bilinear)
+	Framebuffer::Framebuffer(int width, int height, bool bilinear, bool clamp)
 		: width(width), height(height)
 	{
 		glCreateFramebuffers(1, &rendererID);
@@ -23,6 +23,12 @@ namespace Cockroach
 		{
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		}
+
+		if (clamp) // Wrap mode is defaulted to GL_REPEAT so we don't need to handle that in an else statement.
+		{
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 		}
 
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorAttachment, 0);
@@ -44,13 +50,13 @@ namespace Cockroach
 
 	void Framebuffer::Bind()
 	{
-		CR_CORE_INFO("Bound framebuffer {0}", rendererID);
+		//CR_CORE_INFO("Bound framebuffer {0}", rendererID);
 		glBindFramebuffer(GL_FRAMEBUFFER, rendererID);
 	}
 
 	void Framebuffer::Unbind()
 	{
-		CR_CORE_INFO("Bound framebuffer 0");
+		//CR_CORE_INFO("Bound framebuffer 0");
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 }

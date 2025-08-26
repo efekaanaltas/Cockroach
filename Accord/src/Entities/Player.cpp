@@ -67,7 +67,7 @@ namespace Entities
 		{
 			Renderer::EndScene();
 			Renderer::BeginScene(Game::cameraController->camera);
-	;		Game::distortionFramebuffer->Bind();
+			Game::distortionFramebuffer->Bind();
 			Renderer::Clear();
 			for (int i = 0; i < DashTrail::count; i++)
 			{
@@ -131,7 +131,7 @@ namespace Entities
 
 		for (int i = 0; i < DashTrail::count; i++)
 		{
-			dashTrail[i].strength = max(dashTrail[i].strength - 1/20.0f, 0.0f);
+			dashTrail[i].strength = max(dashTrail[i].strength - 1/30.0f, 0.0f);
 		}
 	}
 
@@ -259,6 +259,6 @@ namespace Entities
 
 	void Player::CreateDashTrail()
 	{
-		dashTrail[(++lastDashTrailIndex%DashTrail::count)] = DashTrail(sprite, position, faceDir == -1);
+		dashTrail[(++lastDashTrailIndex%DashTrail::count)] = DashTrail(sprite, position, faceDir == -1, velocity);
 	}
 }

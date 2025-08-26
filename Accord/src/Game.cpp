@@ -37,7 +37,7 @@ Game::Game()
 	: Application()
 {
 	Game::framebuffer = CreateRef<Framebuffer>(320, 180);
-	Game::distortionFramebuffer = CreateRef<Framebuffer>(320, 180);
+	Game::distortionFramebuffer = CreateRef<Framebuffer>(320, 180, true, false);
 	Game::background = CreateRef<Texture2D>("assets/textures/BG_RED.png");
 	Game::baseSpriteSheet = CreateRef<Texture2D>("assets/textures/SpriteSheet.png");
 	Game::tilemapSheet = CreateRef<Texture2D>("assets/textures/Tilemaps.png");
@@ -185,8 +185,6 @@ void Game::BeginKeyRebind(InputAction action)
 
 void Game::Render()
 {
-	CR_INFO("Begin render");
-
 	Renderer::SetClearColor({ 0.1f, 0.0f, 0.0f, 1 });
 	Renderer::Clear();
 	glEnable(GL_DEPTH_TEST);
@@ -283,12 +281,14 @@ void Game::Render()
 
 	if (!editMode)
 	{
-		CR_INFO("Begin blit");
-		static Ref<Framebuffer> finalFramebuffer = CreateRef<Framebuffer>(renderWidth, renderHeight, false);
-		Renderer::Distortion(up3, distortionFramebuffer, finalFramebuffer);
+		static Ref<Framebuffer> finalFramebuffer = CreateRef<Framebuffer>(renderWidth, renderHeight, false, false);
+		//if (finalFramebuffer->width != renderWidth || finalFramebuffer->height != renderHeight)
+		//{
+		//	finalFramebuffer = CreateRef<Framebuffer>(renderWidth, renderHeight, false, false);
+		//}
+		//Renderer::Distortion(up3, distortionFramebuffer, finalFramebuffer);
 		Renderer::OnWindowResize(window.width, window.height);
-		Renderer::BlitToScreen(finalFramebuffer);
-		CR_INFO("End blit");
+		Renderer::BlitToScreen(up3);
 
 		Application::ImGuiBegin();
 		ExampleGameUI();
@@ -298,7 +298,6 @@ void Game::Render()
 
 	if(editMode)
 		ImGuiRender();
-	CR_INFO("End render");
 }
 
 void Game::ExampleGameUI()

@@ -77,6 +77,12 @@ namespace Cockroach
 		return v < 0.0f ? -v : v;
 	}
 
+	// Amazing accurate framerate-independent exponential easing function by Freya Holmér!
+	inline float ExpDecay(float a, float b, float decay, float dt)
+	{
+    	return b + (a-b)*exp(-decay*dt);
+	}
+
 	vector<string> Split(const string& string, char delim = ',');
 
 	template<typename T>
